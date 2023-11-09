@@ -2,7 +2,7 @@ from dotenv import load_dotenv
 from langchain.chat_models import ChatOpenAI
 from langchain.memory import ConversationBufferMemory
 from langchain.chains import ConversationalRetrievalChain
-from langchain.embeddings import HuggingFaceHubEmbeddings
+from langchain.embeddings import HuggingFaceHubEmbeddings,OpenAIEmbeddings
 from langchain.vectorstores.redis import Redis
 from langchain.document_loaders import DirectoryLoader
 from langchain.text_splitter import CharacterTextSplitter
@@ -28,7 +28,7 @@ def connect_redis_db():
     return vectorstore
 
 def connect_vectorstore_db():
-    embeddings = HuggingFaceHubEmbeddings()
+    embeddings = OpenAIEmbeddings()
     raw_documents = DirectoryLoader('./document', glob="**/*").load()
     text_splitter = CharacterTextSplitter(separator="\n",
                                         chunk_size=1000,
