@@ -4,6 +4,9 @@ from langchain.memory import ConversationBufferMemory
 from langchain.chains import ConversationalRetrievalChain
 from langchain.embeddings import HuggingFaceHubEmbeddings
 from langchain.vectorstores.redis import Redis
+from langchain.document_loaders import DirectoryLoader
+from langchain.text_splitter import CharacterTextSplitter
+from langchain.vectorstores import faiss
 
 load_dotenv('.env')
 
@@ -24,16 +27,24 @@ def connect_redis_db():
     )
     return vectorstore
 
-def get_conversation_chain(question):
+def connect_vectorstore_db():
+    embeddings = HuggingFaceHubEmbeddings()
+    raw_documents = DirectoryLoader('./document', glob="**/*").load()
+    text_splitter = CharacterTextSplitter(separator="\n",
+                                        chunk_size=1000,
+                                        chunk_overlap=200,
+                                        length_function=len)
+    documents = text_splitter.split_documents(raw_documents)
+    vectorstore = faiss.FAISS.from_documents(documents=documents, embedding=embeddings)
+    return vectorstore
+    
+    
+def get_conversation_chain():
+    vectorstore = connect_vectorstore_db()
     llm = ChatOpenAI(model="gpt-3.5-turbo-16k",temperature=0)
-    vectorstore = connect_redis_db()
-    memory = ConversationBufferMemory(
-    memory_key='chat_history', return_messages=True)
-
     conversation = ConversationalRetrievalChain.from_llm(
         llm=llm,
         retriever=vectorstore.as_retriever(),
-        memory=memory
     )
-    return conversation({'question': question})
+    return conversation
     
