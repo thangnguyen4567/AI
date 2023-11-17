@@ -1,35 +1,17 @@
 from dotenv import load_dotenv
 from langchain.chat_models import ChatOpenAI
-from langchain.memory import ConversationBufferMemory
 from langchain.chains import ConversationalRetrievalChain
-from langchain.embeddings import HuggingFaceHubEmbeddings,OpenAIEmbeddings
+from langchain.embeddings import OpenAIEmbeddings
 from langchain.vectorstores.redis import Redis
-from langchain.document_loaders import DirectoryLoader
-from langchain.text_splitter import CharacterTextSplitter
+from langchain.document_loaders import DirectoryLoader,PyPDFLoader
+from langchain.text_splitter import CharacterTextSplitter,TokenTextSplitter
 from langchain.vectorstores import faiss
 
 load_dotenv('.env')
 
-def connect_redis_db():
-    embedding = HuggingFaceHubEmbeddings()
-    redis_url = "redis://localhost:6379"
-    index_name = 'test'
-    index_schema = {
-        "tag": [{"name": "credit_score"}],
-        "text": [{"name": "user"}, {"name": "job"}],
-        "numeric": [{"name": "age"}],
-    }
-    vectorstore = Redis.from_existing_index(
-        embedding=embedding,
-        index_name=index_name,
-        redis_url=redis_url,
-        schema=index_schema
-    )
-    return vectorstore
-
 def connect_vectorstore_db():
-    embeddings = OpenAIEmbeddings()
-    raw_documents = DirectoryLoader('./document', glob="**/*").load()
+    embeddings = OpenAIEmbeddings(disallowed_special=())
+    raw_documents = DirectoryLoader('./document', glob="**/*.pdf").load()
     text_splitter = CharacterTextSplitter(separator="\n",
                                         chunk_size=1000,
                                         chunk_overlap=200,
@@ -41,7 +23,7 @@ def connect_vectorstore_db():
     
 def get_conversation_chain():
     vectorstore = connect_vectorstore_db()
-    llm = ChatOpenAI(model="gpt-3.5-turbo-16k",temperature=0)
+    llm = ChatOpenAI(model="gpt-3.5-turbo-16k",temperature=0,openai_api_key="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")
     conversation = ConversationalRetrievalChain.from_llm(
         llm=llm,
         retriever=vectorstore.as_retriever(),

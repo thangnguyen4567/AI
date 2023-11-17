@@ -1,10 +1,18 @@
-from flask import Flask, request, session
+from flask import Flask, request, session, jsonify
 from Controller.answerController import get_conversation_chain
-from flask_cors import CORS
+from Controller.answerQuerySQL import get_conversation_query_sql
+
+import pyttsx3
+from init import create_app
 
 app = Flask(__name__)
-cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
-app.secret_key = 'your_secret_key' 
+engine = pyttsx3.init()
+
+app = create_app()
+
+@app.route('/', methods=['GET'])
+def check_api():
+    return 'hello world'
 
 @app.route('/api/conversations', methods=['GET'])
 def create_item():
@@ -14,9 +22,30 @@ def create_item():
         result = conversation({'question': question,'chat_history': session.get('chat_history',None)})
     else:
         result = conversation({'question': question,'chat_history': []})
-
     session['chat_history'] = [(question, result["answer"])]
     return result
 
+@app.route('/api/text_to_speech', methods=['GET'])
+def text_to_speech():
+    text = "Hello world, convert text to speech"
+    engine = pyttsx3.init()
+    engine.say(text)
+    engine.runAndWait()
+    return text
+
+@app.route('/api/answer_query', methods=['POST'])
+def create_query_sql():
+    requestJson = request.get_json()
+    
+    question = requestJson["question"]
+    connect_sql = app.config_class
+    check_connect = app.config['CONNECT_DB']
+    answerQuery = get_conversation_query_sql(requestJson, connect_sql, check_connect)
+    answer = answerQuery.replace("\n", " ")
+    result = {'question': question, 'answer': answer}
+
+    return jsonify(result)
+
+
 if __name__ == '__main__':
-    app.run(host="localhost", port=8181, debug=True)
+    app.run(debug=True)
