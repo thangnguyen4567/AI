@@ -6,29 +6,35 @@ from langchain.chains import create_sql_query_chain
 
 load_dotenv('.env')
 
-def get_conversation_query_sql(requestJson, configDataBase, check_connect):
+def get_conversation_query_sql(app, request):
+
+    requestJson = request.get_json()
+
     connectString = requestJson["connectString"]
     configTableDB = requestJson["configTableDB"]
     userQuestion = requestJson["question"]
 
+    connect_sql = app.config_class
+    check_connect = app.config['CONNECT_DB']
+
     if check_connect == False :
-        configDataBase = config_sql_database(connectString, configTableDB, check_connect)
+        configDataBase = config_sql_database(connectString, configTableDB)
 
     answerQuery = query_sql_database(configDataBase, userQuestion)
 
-    return answerQuery
+    answer = answerQuery.replace("\n", " ")
+    result = {'question': userQuestion, 'answer': answer}
 
-def config_sql_database(connectString, config_TableDB, checkConnect):
+    return result
 
-    # connectString = "vnr:rUbTwiQ8Rb6OEL4@115.73.215.48,16968:1433/LMS_MISA_TEST"
+def config_sql_database(connectString, config_TableDB):
+
     conn_str = f"mssql+pyodbc://" + connectString + "?driver=ODBC+Driver+17+for+SQL+Server"
     conf_table = ["mdl_user","mdl_course","mdl_course_completions","mdl_course_modules",
                                             "mdl_course_modules_completion","mdl_modules","mdl_quiz","mdl_quiz_attempts"]
     configDataBase = SQLDatabase.from_uri(conn_str,
                             sample_rows_in_table_info=1,
                             include_tables=config_TableDB)
-                            #   include_tables=["mdl_user","mdl_course","mdl_course_completions","mdl_course_modules",
-                            #                   "mdl_course_modules_completion","mdl_modules","mdl_quiz","mdl_quiz_attempts"])
         
     return configDataBase
 

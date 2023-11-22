@@ -1,17 +1,15 @@
-from flask import Flask, request, session, jsonify
+from flask import Flask, request, session, jsonify, render_template, Response
 from Controller.answerController import get_conversation_chain
 from Controller.answerQuerySQL import get_conversation_query_sql
 
-import pyttsx3
-from init import create_app
-
-app = Flask(__name__)
-engine = pyttsx3.init()
+from init import create_app, connect_sqldb
+from Controller.toSpeechController import fn_create_speech
 
 app = create_app()
 
 @app.route('/', methods=['GET'])
 def check_api():
+    
     return 'hello world'
 
 @app.route('/api/conversations', methods=['GET'])
@@ -25,27 +23,33 @@ def create_item():
     session['chat_history'] = [(question, result["answer"])]
     return result
 
-@app.route('/api/text_to_speech', methods=['GET'])
-def text_to_speech():
-    text = "Hello world, convert text to speech"
-    engine = pyttsx3.init()
-    engine.say(text)
-    engine.runAndWait()
-    return text
-
 @app.route('/api/answer_query', methods=['POST'])
 def create_query_sql():
-    requestJson = request.get_json()
     
-    question = requestJson["question"]
-    connect_sql = app.config_class
-    check_connect = app.config['CONNECT_DB']
-    answerQuery = get_conversation_query_sql(requestJson, connect_sql, check_connect)
-    answer = answerQuery.replace("\n", " ")
-    result = {'question': question, 'answer': answer}
+    return jsonify(get_conversation_query_sql(app, request))
 
-    return jsonify(result)
+@app.route('/api/view_speech', methods=['POST', 'GET'])
+def speech_view():
+    if request.method == 'POST':
+        text = request.form['speech']
+        
+        strBase64 = fn_create_speech(text)      
+        
+        audio = request.form['audio']
+        audio.src = 'data:audio/mp3;base64,' + strBase64
+        audio.play()
+
+        return render_template('template/text_speech.html')
+    else:
+        return render_template('template/text_speech.html')
+
+@app.route('/api/create_speak', methods=['POST'])
+def api_create_speech():
+
+    text = request.data.decode('utf-8')
+    return jsonify({'mp3_file': fn_create_speech(text)})
+
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=8501, debug=True)

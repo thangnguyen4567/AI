@@ -6,18 +6,17 @@ from config import ConfigDB
 
 
 def create_app():
-    app = Flask(__name__)
+    app = Flask(__name__, template_folder="view")
     
     app.config['SECRET_KEY'] = 'secretkey'
     app.cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
-
     app.config.from_object(ConfigDB)
-
-    if app.config['CONNECT_DB'] == False:
+    config_database = app.config_class
+    connectDB = app.config['CONNECT_DB']
+    if connectDB == False:       
         connect_sqldb(app)
 
     return app 
-
 
 def connect_sqldb(app):
 
@@ -28,6 +27,7 @@ def connect_sqldb(app):
     config_database = SQLDatabase.from_uri(conn_str,
                               sample_rows_in_table_info=1,
                               include_tables=conf_table)
+
     app.config_class = config_database
     app.config['CONNECT_DB'] = True
     
