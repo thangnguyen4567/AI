@@ -4,8 +4,15 @@ from Controller.answerQuerySQL import get_conversation_query_sql
 
 from init import create_app, connect_sqldb
 from Controller.toSpeechController import fn_create_speech
+from config import ConfigDB
 
 app = create_app()
+
+with app.app_context():
+    app.config.from_object(ConfigDB)
+    connectDB = app.config['CONNECT_DB']
+    if connectDB == False:       
+        connect_sqldb(app)
 
 @app.route('/', methods=['GET'])
 def check_api():
@@ -52,4 +59,4 @@ def api_create_speech():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8501, debug=True)
+    app.run(host='0.0.0.0', port=8009, debug=True)

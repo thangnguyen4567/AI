@@ -1,8 +1,6 @@
 from flask import Flask
 from flask_cors import CORS
 from langchain.sql_database import SQLDatabase
-from config import ConfigDB
-
 
 
 def create_app():
@@ -10,11 +8,6 @@ def create_app():
     
     app.config['SECRET_KEY'] = 'secretkey'
     app.cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
-    app.config.from_object(ConfigDB)
-    config_database = app.config_class
-    connectDB = app.config['CONNECT_DB']
-    if connectDB == False:       
-        connect_sqldb(app)
 
     return app 
 

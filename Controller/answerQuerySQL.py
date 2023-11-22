@@ -14,11 +14,12 @@ def get_conversation_query_sql(app, request):
     configTableDB = requestJson["configTableDB"]
     userQuestion = requestJson["question"]
 
-    connect_sql = app.config_class
     check_connect = app.config['CONNECT_DB']
 
     if check_connect == False :
         configDataBase = config_sql_database(connectString, configTableDB)
+    else:
+        configDataBase = app.config_class
 
     answerQuery = query_sql_database(configDataBase, userQuestion)
 
@@ -44,5 +45,5 @@ def query_sql_database(configDataBase, userQuestion):
     
     chain = create_sql_query_chain(llm, configDataBase)
     query = chain.invoke({"question": userQuestion})
-    
+
     return query
