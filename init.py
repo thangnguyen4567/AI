@@ -1,27 +1,14 @@
-from flask import Flask
+from flask import Flask,current_app
 from flask_cors import CORS
 from langchain.sql_database import SQLDatabase
 
-
 def create_app():
+    SQLDATABASE_URI = 'mssql+pyodbc://ebm:4OcDQ4OLo5eGngU@103.127.207.180,3968/EBM_CRM_TEST_SE?driver=ODBC+Driver+17+for+SQL+Server'
+    SQLDATABASE_INCLUDE_TABLES = ["Division","Class","Student","StudentAbsent", "StudentDept", "StudentClass", "StudentClassFee", "TrackClass"]
     app = Flask(__name__, template_folder="view")
-    
-    app.config['SECRET_KEY'] = 'secretkey'
     app.cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
-
+    with app.app_context():
+        current_app.config_class = SQLDatabase.from_uri(SQLDATABASE_URI,
+                                                        sample_rows_in_table_info=1,
+                                                        include_tables=SQLDATABASE_INCLUDE_TABLES)
     return app 
-
-def connect_sqldb(app):
-
-    sqldatabase_uri = app.config['SQLDATABASE_URI']
-    sqldatabase_include_tables = app.config['SQLDATABASE_INCLUDE_TABLES']
-    conn_str = sqldatabase_uri
-    conf_table = sqldatabase_include_tables
-    config_database = SQLDatabase.from_uri(conn_str,
-                              sample_rows_in_table_info=1,
-                              include_tables=conf_table)
-
-    app.config_class = config_database
-    app.config['CONNECT_DB'] = True
-    
-    return config_database

@@ -1,7 +1,5 @@
 import pyttsx3, base64, os
 
-
-
 def fn_create_speech(text):
     # text = request.data.decode('utf-8')
     file_name = "file.mp3"
