@@ -4,7 +4,7 @@ from langchain.sql_database import SQLDatabase
 
 def create_app():
     SQLDATABASE_URI = 'mssql+pyodbc://ebm:4OcDQ4OLo5eGngU@103.127.207.180,3968/EBM_TEST_QC?driver=ODBC+Driver+17+for+SQL+Server'
-    SQLDATABASE_INCLUDE_TABLES = ["Division","Class","Student","StudentAbsent", "StudentDept", "StudentClass", "StudentClassFee", "TrackClass", "BillOfSale", "BillOfSaleDetail", "BillOfSalePayment", "BillOfSalePaymentDetail"]
+    SQLDATABASE_INCLUDE_TABLES = ["Division","Class","Student","StudentAbsent", "StudentDept", "StudentClass", "StudentClassFee", "TrackClass"]
     app = Flask(__name__, template_folder="view")
     app.cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
     with app.app_context():
