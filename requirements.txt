@@ -13,3 +13,4 @@ langchain_experimental==0.0.20
 fastapi==0.104.1
 flask==3.0.0
 flask_cors==4.0.0
+pyttsx3==2.90

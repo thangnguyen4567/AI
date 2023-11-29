@@ -1,4 +1,4 @@
-from flask import request, session,Blueprint,current_app
+from flask import request, session,Blueprint
 from Controller.answerController import get_conversation_chain
 
 chatbot = Blueprint('chatbot', __name__)
