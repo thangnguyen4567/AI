@@ -11,18 +11,20 @@ def reportControllerV2(request):
     with current_app.app_context():
         app = current_app
     questions = []
-    docs = app.vector_db.similarity_search(query=userQuestion)
+    docs = app.vector_db.similarity_search(query=userQuestion,k=3)
     for value in docs:
         question = {}
         question['question'] = value.page_content
         question['answer'] = value.metadata['query']
         questions.append(question)
+    print(docs)
     example_prompt = PromptTemplate(input_variables=["question", "answer"], 
                                     template=
                                     """
                                         When query compare name add N'' 
+                                        'Danh sách' and 'Báo cáo' and 'Thống kê' have the same meaning
                                         Some examples of SQL queries that correspond to questions are:
-                                        {question}\n{answer}
+                                        {question}\n answer:{answer}
                                     """
                                     )
     prompt = FewShotPromptTemplate(
