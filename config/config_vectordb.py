@@ -12,6 +12,5 @@ def config_vectordb():
         Document(page_content=question, metadata={"query": few_shots[question]})
         for question in few_shots.keys()
     ]
-    print(newDocs)
     vector_db = faiss.FAISS.from_documents(newDocs, embeddings)
     return vector_db
