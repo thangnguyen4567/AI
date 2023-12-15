@@ -1,4 +1,4 @@
-from Controller.toSpeechController import fn_create_speech
+from controller.toSpeechController import fn_create_speech
 from flask import Blueprint,jsonify, render_template,request
 speech = Blueprint('speech', __name__)
 
