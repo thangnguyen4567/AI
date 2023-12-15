@@ -4,7 +4,7 @@ from langchain.chains import create_sql_query_chain
 from flask import current_app
 from langchain.prompts.few_shot import FewShotPromptTemplate
 from langchain.prompts.prompt import PromptTemplate
-from config.config_vectordb import connect_vectordb
+from config.config_vectordb import VectorDB
 load_dotenv('.env')
 
 def reportController(request):
@@ -21,8 +21,8 @@ def reportController(request):
     return result
 
 def get_training_prompt(userQuestion):
-    vectordb = connect_vectordb()
-    docs = vectordb.similarity_search(query=userQuestion,k=3)
+    vector_db = VectorDB()
+    docs = vector_db.connect_vectordb().similarity_search(query=userQuestion,k=3)
     questions = []
     for value in docs:
         question = {}

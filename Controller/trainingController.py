@@ -1,7 +1,8 @@
 from langchain.schema import Document
 import pandas as pd
-from config.config_vectordb import add_vectordb
+from config.config_vectordb import VectorDB
 
+vector_db = VectorDB()
 def training_from_import(request):
     file = request.files['file']
     data = pd.read_excel(file)
@@ -12,6 +13,15 @@ def training_from_import(request):
         Document(page_content=question, metadata={"query": few_shots[question]})
         for question in few_shots.keys()
     ]
-    add_vectordb(documents)
+    vector_db.add_vectordb(documents)
     return 'Import dữ liệu thành công'
 
+def training_from_api(request):
+    requestJson = request.get_json()
+    question = requestJson['question']
+    query = requestJson['query']
+    documents = [
+        Document(page_content=question, metadata={"query": query})
+    ]
+    vector_db.add_vectordb(documents)
+    return 'Lưu dữ liệu thành công'
