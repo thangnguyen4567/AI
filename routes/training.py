@@ -26,7 +26,7 @@ def get_training_data():
         obj['id'] = value.metadata['id']
         obj['question'] = value.page_content
         obj['answer'] = value.metadata['query']
-        obj['action'] = '<a target="_blank" href="../api/delete/'+obj['id']+'" >Xóa</a>'
+        obj['action'] = '<a class="delete btn btn-danger" id="'+obj['id']+'">Xóa</a>'
         data.append(obj)
     return data
 

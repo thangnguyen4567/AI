@@ -1,24 +1,7 @@
 <div id="grid"></div>
 <script>
 $(document).ready(function () {
-    $("#grid").kendoGrid({
-        dataSource: {
-            type: "json",
-            transport: {
-                read: "../api/get_data"
-            },
-            pageSize: 20
-        },
-        height: 800,
-        sortable: true,
-        pageSize: 20,
-        pageable: {
-            refresh: true,
-            pageSizes: true,
-            buttonCount: 5,
-            pageSize:20
-        },
-        columns: [
+    var columns = [
             { 
                 field: "id", 
                 title: "ID" },
@@ -33,8 +16,41 @@ $(document).ready(function () {
                     return e.action
                 },
                 field: "action", 
-                title: "Chức năng" }
-        ]
+                title: "Chức năng" 
+            }
+    ]
+    $("#grid").kendoGrid({
+        dataSource: {
+            type: "json",
+            transport: {
+                read: "../api/get_data"
+            },
+            pageSize: 20
+        },
+        height: 800,
+        sortable: true,
+        toolbar: ['search'],
+        search: {
+            fields: ["question","answer"]
+        },
+        pageSize: 20,
+        pageable: {
+            refresh: true,
+            pageSizes: true,
+            buttonCount: 5,
+            pageSize:20
+        },
+        columns: columns
     });    
+    $(document).on('click','.delete',function() {
+        let id = $(this).attr('id')
+        $.ajax({
+            url: '../api/delete/'+id,
+            type: 'GET',
+        }).then(function(response) {
+            console.log(response)
+            $("#grid").data("kendoGrid").dataSource.read()
+        })
+    })
 })
 </script>
