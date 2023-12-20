@@ -1,0 +1,20 @@
+<div class="row justify-content-center">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <h1 class="card-title mb-4">Import Training Data</h1>
+                <a href="{{ url_for('static',filename='template/data.xlsx') }}">Template import Mẫu</a>
+                <form method="POST" action="/training/api/import" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="file">Select File</label>
+                        <br>
+                        <input type="file" class="form-control-file d-flex" name="file" id="file" accept=".xlsx" required>
+                        <br>
+                        <button type="submit" class="btn btn-primary">Upload</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</div>

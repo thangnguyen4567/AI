@@ -1,0 +1,40 @@
+<div id="grid"></div>
+<script>
+$(document).ready(function () {
+    $("#grid").kendoGrid({
+        dataSource: {
+            type: "json",
+            transport: {
+                read: "../api/get_data"
+            },
+            pageSize: 20
+        },
+        height: 800,
+        sortable: true,
+        pageSize: 20,
+        pageable: {
+            refresh: true,
+            pageSizes: true,
+            buttonCount: 5,
+            pageSize:20
+        },
+        columns: [
+            { 
+                field: "id", 
+                title: "ID" },
+            { 
+                field: "question", 
+                title: "Câu hỏi" },
+            { 
+                field: "answer", 
+                title: "Trả lời" },
+            { 
+                template: function(e) {
+                    return e.action
+                },
+                field: "action", 
+                title: "Chức năng" }
+        ]
+    });    
+})
+</script>

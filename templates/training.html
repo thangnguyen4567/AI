@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="{{ url_for('static',filename='js/jquery-3.4.1.min.js') }}"></script> 
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  <script src="{{ url_for('static',filename='js/kendo.all.min.js') }}"></script> 
+  <link href="{{ url_for('static',filename='css/bootstrap.min.css') }}" rel="stylesheet"}>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2020.3.915/styles/kendo.common.min.css">
+  <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2020.3.915/styles/kendo.rtl.min.css">
+  <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2020.3.915/styles/kendo.default.min.css">
+</head>
+<body>
+<div class="pl-5 pr-5 mt-5">
+  <ul class="nav nav-tabs">
+    <li class="active"><a data-toggle="tab" href="#home">Dữ liệu đã được training</a></li>
+    <li><a data-toggle="tab" href="#menu1">Import dữ liệu</a></li>
+  </ul>
+
+  <div class="tab-content">
+    <div id="home" class="tab-pane fade in active">
+      {% include 'table_training.html' %}
+    </div>
+    <div id="menu1" class="tab-pane fade">
+      {% include 'import_training.html' %}
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
