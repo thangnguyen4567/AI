@@ -1,6 +1,7 @@
-from flask import Blueprint,render_template,request
+from flask import Blueprint,render_template,request,jsonify
 from controller.trainingController import training_from_import,training_from_api
 from config.config_vectordb import VectorDB
+import redis
 
 training = Blueprint('training', __name__)
 
@@ -19,15 +20,18 @@ def view_training_data():
 @training.route('/api/get_data', methods=['GET'])
 def get_training_data():
     vector_db = VectorDB()
-    docs = vector_db.connect_vectordb().similarity_search(query='',k=1000)
+    r = vector_db.connect_client()
     data = []
-    for value in docs:
+    for key in r.scan_iter("doc:*"):
         obj = {}
-        obj['id'] = value.metadata['id']
-        obj['question'] = value.page_content
-        obj['answer'] = value.metadata['query']
-        obj['date_create'] = value.metadata['date_create']
+        content = r.hget(key,'content').decode()
+        query = r.hget(key,'query').decode()
+        timecreated = r.hget(key,'timecreated').decode()
+        obj['question'] = content
+        obj['answer'] = query
+        obj['id'] = key.decode()
         obj['action'] = '<a class="delete btn btn-danger" id="'+obj['id']+'">Xóa</a>'
+        obj['timecreated'] = timecreated
         data.append(obj)
     return data
 
