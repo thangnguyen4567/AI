@@ -19,13 +19,14 @@ def view_training_data():
 @training.route('/api/get_data', methods=['GET'])
 def get_training_data():
     vector_db = VectorDB()
-    docs = vector_db.connect_vectordb().similarity_search(query='',k=100)
+    docs = vector_db.connect_vectordb().similarity_search(query='',k=1000)
     data = []
     for value in docs:
         obj = {}
         obj['id'] = value.metadata['id']
         obj['question'] = value.page_content
         obj['answer'] = value.metadata['query']
+        obj['date_create'] = value.metadata['date_create']
         obj['action'] = '<a class="delete btn btn-danger" id="'+obj['id']+'">Xóa</a>'
         data.append(obj)
     return data
