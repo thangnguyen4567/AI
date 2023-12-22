@@ -23,7 +23,7 @@ def training_from_api(request):
     question = requestJson['question']
     query = requestJson['query']
     documents = [
-        Document(page_content=question, metadata={"query": query})
+        Document(page_content=question, metadata={"query": query,"timecreated": int(time.time())})
     ]
     vector_db.add_vectordb(documents)
     result = {'message': 'Import dữ liệu thành công'}

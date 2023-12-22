@@ -1,8 +1,7 @@
 from flask import Blueprint,render_template,request,jsonify
 from controller.trainingController import training_from_import,training_from_api
 from config.config_vectordb import VectorDB
-import redis
-
+import datetime
 training = Blueprint('training', __name__)
 
 @training.route('/api/training', methods=['POST'])
@@ -24,16 +23,17 @@ def get_training_data():
     data = []
     for key in r.scan_iter("doc:*"):
         obj = {}
-        content = r.hget(key,'content').decode()
-        query = r.hget(key,'query').decode()
-        timecreated = r.hget(key,'timecreated').decode()
-        obj['question'] = content
-        obj['answer'] = query
+        content = r.hget(key,'content')
+        query = r.hget(key,'query')
+        timecreated = r.hget(key,'timecreated')
         obj['id'] = key.decode()
+        obj['question'] = content.decode() if content else 'None'
+        obj['answer'] = query.decode() if query else 'None'
+        obj['timecreated'] = datetime.datetime.utcfromtimestamp(int(timecreated.decode())).strftime("%d/%m/%Y %H:%M") if timecreated else '20/12/2023 00:00'
         obj['action'] = '<a class="delete btn btn-danger" id="'+obj['id']+'">Xóa</a>'
-        obj['timecreated'] = timecreated
         data.append(obj)
-    return data
+    sorted_data = sorted(data, key=lambda x: x['timecreated'],reverse=True)
+    return sorted_data
 
 @training.route('/api/delete/<id>', methods=['GET'])
 def delete_data(id):
