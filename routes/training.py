@@ -1,5 +1,5 @@
 from flask import Blueprint,render_template,request,jsonify
-from controller.trainingController import training_from_import,training_from_api
+from controller.trainingController import training_from_import, training_from_api, training_from_query
 from config.config_vectordb import VectorDB
 import datetime
 training = Blueprint('training', __name__)
@@ -29,7 +29,7 @@ def get_training_data():
         obj['id'] = key.decode()
         obj['question'] = content.decode() if content else 'None'
         obj['answer'] = query.decode() if query else 'None'
-        obj['timecreated'] = datetime.datetime.utcfromtimestamp(int(timecreated.decode())).strftime("%d/%m/%Y %H:%M") if timecreated else '20/12/2023 00:00'
+        obj['timecreated'] = datetime.datetime.fromtimestamp(int(timecreated.decode())).strftime("%d/%m/%Y %H:%M:%S") if timecreated else '22/12/2023 00:00:00'
         obj['action'] = '<a class="delete btn btn-danger" id="'+obj['id']+'">Xóa</a>'
         data.append(obj)
     sorted_data = sorted(data, key=lambda x: x['timecreated'],reverse=True)
@@ -44,4 +44,8 @@ def delete_data(id):
 
 @training.route('/api/import', methods=['POST'])
 def handle_import():
-    return training_from_import(request)
+    return training_from_import(request.form)
+
+@training.route('/api/training_from', methods=['POST'])
+def training_from():
+    return training_from_query(request)

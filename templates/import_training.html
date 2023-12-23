@@ -2,6 +2,29 @@
     <div class="col-md-12">
         <div class="card">
             <div class="card-body">
+                <h1 class="card-title mb-4">Training Data Query</h1>
+                <form action="/training/api/training_from" enctype="multipart/form-data" method="POST">                 
+                    <div class="form-group">
+                        <div class="mb-3">
+                            <label for="lbl_question" class="form-label">Câu hỏi</label>
+                            <input type="text" class="form-control" name="question" placeholder="...">
+                        </div>
+                        <div class="mb-3">
+                            <label for="lbl_answer" class="form-label">Câu query truy vấn</label>
+                            <textarea type="text" class="form-control" name="answer" rows="3"></textarea>
+                        </div>
+                        <br>
+                        <button type="submit" class="btn btn-success">Training</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row justify-content-center">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
                 <h1 class="card-title mb-4">Import Training Data</h1>
                 <a href="{{ url_for('static',filename='template/data.xlsx') }}">Template import Mẫu</a>
                 <form method="POST" action="/training/api/import" enctype="multipart/form-data">
@@ -17,4 +40,4 @@
         </div>
     </div>
 </div>
-</div>
+
