@@ -7,9 +7,13 @@ import time
 vector_db = VectorDB()
 connect_rds = vector_db.connect_vectordb()
 def training_from_import(request):
+    result = {'message': 'Import dữ liệu thành công'}
+    if 'file' not in request.files:
+        return {'message': 'No file part'}
     file = request.files['file']
     data = pd.read_excel(file)
     few_shots = {}
+    documents = None
     for index, row in data.iterrows():
         few_shots[row[0]] = row[1]
         if check_dup_data_training(row.question, connect_rds) == False:
@@ -18,8 +22,10 @@ def training_from_import(request):
                 Document(page_content=question, metadata={"query": few_shots[question],"timecreated":  int(time.time()) })
                 for question in few_shots.keys()
             ]
-    vector_db.add_vectordb(documents)
-    result = {'message': 'Import dữ liệu thành công'}
+    if documents is not None:
+        vector_db.add_vectordb(documents)
+    else:
+        result = {'message': 'Import dữ liệu không thành công'}
     return result
 
 def training_from_api(request):

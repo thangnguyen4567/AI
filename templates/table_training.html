@@ -46,7 +46,19 @@ $(document).ready(function () {
             buttonCount: 5,
             pageSize:20
         },
-        columns: columns
+        columns: columns,
+        // editable: "popup",
+        // schema: {
+        //     model: {
+        //         id: "id",
+        //         fields: {
+        //             id: { editable: false, nullable: true },
+        //             question: { validation: { required: true } },
+        //             answer: { validation: { required: true } },
+        //             timecreated: { editable: false },
+        //         }
+        //     }
+        // }
     });    
     $(document).on('click','.delete',function() {
         let id = $(this).attr('id')

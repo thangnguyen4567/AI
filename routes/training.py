@@ -44,7 +44,7 @@ def delete_data(id):
 
 @training.route('/api/import', methods=['POST'])
 def handle_import():
-    return training_from_import(request.form)
+    return training_from_import(request)
 
 @training.route('/api/training_from', methods=['POST'])
 def training_from():
