@@ -9,11 +9,14 @@ def check_api():
 
 @chatbot.route('/api/conversations', methods=['GET'])
 def create_item():
-    question = request.args.get('question')
+    if(request.args.get('question')):
+        question = request.args.get('question')
+    else:
+        question = request.get_json()['question']
     conversation = get_conversation_chain()
     if(session.get('chat_history',None)):
         result = conversation({'question': question,'chat_history': session.get('chat_history',None)})
     else:
         result = conversation({'question': question,'chat_history': []})
-    session['chat_history'] = [(question, result["answer"])]
+    # session['chat_history'] = [(question, result["answer"])]
     return result

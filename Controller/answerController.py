@@ -6,7 +6,7 @@ from langchain.vectorstores.redis import Redis
 from langchain.document_loaders import DirectoryLoader,PyPDFLoader
 from langchain.text_splitter import CharacterTextSplitter,TokenTextSplitter
 from langchain.vectorstores import faiss
-
+from config.config_vectordb import VectorDB
 load_dotenv('.env')
 
 def connect_vectorstore_db():
@@ -22,11 +22,12 @@ def connect_vectorstore_db():
     
     
 def get_conversation_chain():
-    vectorstore = connect_vectorstore_db()
-    llm = ChatOpenAI(model="gpt-3.5-turbo-16k",temperature=0,openai_api_key="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")
+    vector_db = VectorDB()
+    vector_store = vector_db.connect_vectordb('training_ddl')
+    llm = ChatOpenAI(model="gpt-3.5-turbo-16k",temperature=0)
     conversation = ConversationalRetrievalChain.from_llm(
         llm=llm,
-        retriever=vectorstore.as_retriever(),
+        retriever=vector_store.as_retriever(),
     )
     return conversation
     
