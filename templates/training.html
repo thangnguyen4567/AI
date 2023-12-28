@@ -13,21 +13,38 @@
   <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2020.3.915/styles/kendo.default.min.css">
 </head>
 <body>
-
+<style type="text/css">
+    div.k-edit-form-container {
+      width: auto;
+      height: auto;
+      padding: 15px;
+    }
+    .k-edit-buttons.k-state-default {
+      background: white;
+      bottom: -8em;
+    }
+    .form-control {
+      width: -webkit-fill-available !important;
+    }
+</style>
 <div class="pl-5 pr-5 mt-5">
   <div>
     <h1 class="bd-title" id="content" style="text-align: center;">DS Dữ Liệu Training</h1>
   </div>
   <ul class="nav nav-tabs">
-    <li class="active"><a data-toggle="tab" href="#home">Dữ liệu đã được training</a></li>
-    <li><a data-toggle="tab" href="#menu1">Import dữ liệu</a></li>
+    <li class="active"><a data-toggle="tab" href="#sql">Câu truy vấn đã train</a></li>
+    <li><a data-toggle="tab" href="#ddl">Bảng dữ liệu đã train</a></li>
+    <li><a data-toggle="tab" href="#import">Import dữ liệu</a></li>
   </ul>
 
   <div class="tab-content">
-    <div id="home" class="tab-pane fade in active">
-      {% include 'table_training.html' %}
+    <div id="sql" class="tab-pane fade in active">
+      {% include 'table_training_sql.html' %}
     </div>
-    <div id="menu1" class="tab-pane fade">
+    <div id="ddl" class="tab-pane fade">
+      {% include 'table_training_ddl.html' %}
+    </div>
+    <div id="import" class="tab-pane fade">
       {% include 'import_training.html' %}
     </div>
   </div>

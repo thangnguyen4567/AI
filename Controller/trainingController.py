@@ -20,11 +20,6 @@ class TrainingController:
             self.save_training_data(content,few_shots[content],type)
         return {'message': 'Import dữ liệu thành công'}
 
-    def process_create(self,request):
-        requestJson = request.get_json()
-        self.save_training_data(requestJson['question'],requestJson['query'],'training_sql')
-        return {'message': 'Import dữ liệu thành công'}
-
     def save_training_data(self,content,answer,type):
         if self.check_training_duplication(content,type) == False:
             if(type == 'training_sql'):
@@ -38,25 +33,63 @@ class TrainingController:
                 ]
                 vector_db.add_vectordb(documents,type)
 
-    def get_training_data(self):
+    def get_training_sql(self):
         data = []
-        for key in self.redis_client.scan_iter("doc:*"):
+        for key in self.redis_client.scan_iter("doc:training_sql*"):
             obj = {}
             content = self.redis_client.hget(key,'content')
             query = self.redis_client.hget(key,'query')
             timecreated = self.redis_client.hget(key,'timecreated')
             obj['id'] = key.decode()
-            obj['question'] = content.decode() if content else 'None'
+            obj['content'] = content.decode() if content else 'None'
             obj['answer'] = query.decode() if query else 'None'
             obj['timecreated'] = datetime.datetime.utcfromtimestamp(int(timecreated.decode())).strftime("%d/%m/%Y %H:%M") if timecreated else '20/12/2023 00:00'
-            # obj['action'] = '<a class="delete btn btn-danger" id="'+obj['id']+'">Xóa</a>'
+            obj['type'] = 'training_sql'
             data.append(obj)
         sorted_data = sorted(data, key=lambda x: x['timecreated'],reverse=True)
         return sorted_data
     
-    def delete_training_data(self,id):
-        self.redis_client.delete(id)
+    def get_training_ddl(self):
+        data = []
+        for key in self.redis_client.scan_iter("doc:training_ddl*"):
+            obj = {}
+            content = self.redis_client.hget(key,'content')
+            table = self.redis_client.hget(key,'table')
+            timecreated = self.redis_client.hget(key,'timecreated')
+            obj['id'] = key.decode()
+            obj['content'] = content.decode() if content else 'None'
+            obj['answer'] = table.decode() if table else 'None'
+            obj['timecreated'] = datetime.datetime.utcfromtimestamp(int(timecreated.decode())).strftime("%d/%m/%Y %H:%M") if timecreated else '20/12/2023 00:00'
+            obj['type'] = 'training_ddl'
+            data.append(obj)
+        sorted_data = sorted(data, key=lambda x: x['timecreated'],reverse=True)
+        return sorted_data
+    
+    def delete_training_data(self,request):
+        key = request.form['id']
+        self.redis_client.delete(key)
         return {'message': 'Xóa thành công'}
+
+    def update_training_data(self,request):
+        key = request.form['id']
+        obj = {}
+        obj['content'] = request.form['content']
+        if(request.form['type'] == 'training_sql'):
+            obj['query'] = request.form['answer']
+        else:
+            obj['table'] = request.form['answer']
+        obj['timecreated'] = int(time.time())
+        self.redis_client.hmset(key,obj)
+        return {'message': 'Cập nhật thành công'}
+    
+    def create_training_data(self,request):
+        if(request.form):
+            data = request.form
+            self.save_training_data(data['content'],data['answer'],data['type'])
+        else:
+            data = request.get_json()
+            self.save_training_data(data['question'],data['query'],'training_sql')
+        return {'message': 'Import dữ liệu thành công'}
     
     def check_training_duplication(self,question,type):
         is_dup = False

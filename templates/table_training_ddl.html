@@ -1,0 +1,104 @@
+<div id="grid_ddl"></div>
+<script>
+$(document).ready(function () {
+    var dataSource = new kendo.data.DataSource({
+        transport: {
+            type: "json",
+            read: {
+                url:"../api/get_training_ddl",
+            },
+            create: {
+                url: "../api/training",
+                method: "POST",
+                data: {
+                    type: 'training_ddl',
+                }
+            },
+            update: {
+                url: "../api/update",
+                method: "POST",
+                data: {
+                    type: 'training_ddl',
+                }
+            },
+            destroy: {
+                url: "../api/delete",
+                method: "POST",
+            }
+        },
+        pageSize: 20,
+        batch: false,
+        schema: {
+            data: function(data) {
+                if(data.message) {
+                    $("#grid_ddl").data("kendoGrid").dataSource.read()
+                }
+                return data
+            },
+            model: {
+                id: "id",
+                fields: {
+                    id: { editable: false, nullable: true },
+                    content: { validation: { required: true } },
+                    answer: { validation: { required: true }  },
+                    timecreated: { editable: false, nullable: true,hidden:true},
+                }
+            }
+        }
+    });
+    var columns = [
+            { 
+                field: "content", 
+                title: "Nội dung"
+            },
+            { 
+                field: "answer", 
+                title: "Bảng" 
+            },
+            { 
+                field: "timecreated",  
+                title: "Ngày tạo" 
+            },
+            { 
+                command: ["edit", "destroy"], 
+                title: " " 
+            }
+    ]
+    $("#grid_ddl").kendoGrid({
+        dataSource: dataSource,
+        height: 800,
+        sortable: true,
+        toolbar: ["create","search"],
+        search: {
+            fields: ["content","answer"]
+        },
+        pageSize: 20,
+        pageable: {
+            refresh: true,
+            pageSizes: true,
+            buttonCount: 5,
+            pageSize:20
+        },
+        columns: columns,
+        editable: {
+            mode: "popup",
+            template: kendo.template($("#popup-editor-ddl").html()),
+            window: {
+                animation: false,
+                width: "900px",
+                height: "600px",
+            }
+        }
+    });    
+})
+</script>
+<script id="popup-editor-ddl" type="text/x-kendo-template">
+    <div class="form-group">
+        <label>Nội dung</label>
+        <textarea class="form-control" data-bind="value:content" rows="3"></textarea>
+    </div>
+    <div class="form-group">
+        <label>Bảng dữ liệu</label>
+        <textarea class="form-control" data-bind="value:answer" rows="9"></textarea>
+    </div>
+</script>
