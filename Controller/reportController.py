@@ -22,7 +22,7 @@ def reportController(request):
 
 def get_training_prompt(userQuestion):
     vector_db = VectorDB()
-    docs = vector_db.connect_vectordb().similarity_search(query=userQuestion,k=3)
+    docs = vector_db.connect_vectordb('training_sql').similarity_search(query=userQuestion,k=3)
     questions = []
     for value in docs:
         question = {}

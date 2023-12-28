@@ -3,7 +3,8 @@ from flask import jsonify
 import pandas as pd
 from config.config_vectordb import VectorDB
 import time
-import datetime
+from datetime import datetime
+import pytz
 vector_db = VectorDB()
 class TrainingController:
     def __init__(self):
@@ -43,7 +44,7 @@ class TrainingController:
             obj['id'] = key.decode()
             obj['content'] = content.decode() if content else 'None'
             obj['answer'] = query.decode() if query else 'None'
-            obj['timecreated'] = datetime.datetime.utcfromtimestamp(int(timecreated.decode())).strftime("%d/%m/%Y %H:%M") if timecreated else '20/12/2023 00:00'
+            obj['timecreated'] = self.convert_unixtime(timecreated) if timecreated else '20/12/2023 00:00'
             obj['type'] = 'training_sql'
             data.append(obj)
         sorted_data = sorted(data, key=lambda x: x['timecreated'],reverse=True)
@@ -59,7 +60,7 @@ class TrainingController:
             obj['id'] = key.decode()
             obj['content'] = content.decode() if content else 'None'
             obj['answer'] = table.decode() if table else 'None'
-            obj['timecreated'] = datetime.datetime.utcfromtimestamp(int(timecreated.decode())).strftime("%d/%m/%Y %H:%M") if timecreated else '20/12/2023 00:00'
+            obj['timecreated'] = self.convert_unixtime(timecreated) if timecreated else '20/12/2023 00:00'
             obj['type'] = 'training_ddl'
             data.append(obj)
         sorted_data = sorted(data, key=lambda x: x['timecreated'],reverse=True)
@@ -91,6 +92,14 @@ class TrainingController:
             self.save_training_data(data['question'],data['query'],'training_sql')
         return {'message': 'Import dữ liệu thành công'}
     
+    def convert_unixtime(self,unixtime):
+        unixtime = int(unixtime)
+        utc_datetime = datetime.utcfromtimestamp(unixtime)
+        utc_timezone = pytz.timezone('UTC')
+        utc_datetime = utc_timezone.localize(utc_datetime)
+        vn_timezone = pytz.timezone('Asia/Ho_Chi_Minh')
+        return utc_datetime.astimezone(vn_timezone).strftime("%d/%m/%Y %H:%M")
+
     def check_training_duplication(self,question,type):
         is_dup = False
         if(self.redis_client.exists(type)):
