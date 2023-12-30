@@ -34,3 +34,7 @@ def update_data():
 @training.route('/api/training', methods=['POST'])
 def create_data():
     return TrainingController().create_training_data(request)
+
+@training.route('/api/generate_table_ddl', methods=['POST'])
+def generate_table_ddl():
+    return TrainingController().generate_table_ddl(request)

@@ -1,10 +1,11 @@
 from langchain.schema import Document
 from flask import jsonify
-import pandas as pd
 from config.config_vectordb import VectorDB
+from tools.helper import convert_unixtime
+import pandas as pd
 import time
-from datetime import datetime
-import pytz
+import pyodbc
+import re
 vector_db = VectorDB()
 class TrainingController:
     def __init__(self):
@@ -44,7 +45,7 @@ class TrainingController:
             obj['id'] = key.decode()
             obj['content'] = content.decode() if content else 'None'
             obj['answer'] = query.decode() if query else 'None'
-            obj['timecreated'] = self.convert_unixtime(timecreated) if timecreated else '20/12/2023 00:00'
+            obj['timecreated'] = convert_unixtime(timecreated) if timecreated else '20/12/2023 00:00'
             obj['type'] = 'training_sql'
             data.append(obj)
         sorted_data = sorted(data, key=lambda x: x['timecreated'],reverse=True)
@@ -60,7 +61,7 @@ class TrainingController:
             obj['id'] = key.decode()
             obj['content'] = content.decode() if content else 'None'
             obj['answer'] = table.decode() if table else 'None'
-            obj['timecreated'] = self.convert_unixtime(timecreated) if timecreated else '20/12/2023 00:00'
+            obj['timecreated'] = convert_unixtime(timecreated) if timecreated else '20/12/2023 00:00'
             obj['type'] = 'training_ddl'
             data.append(obj)
         sorted_data = sorted(data, key=lambda x: x['timecreated'],reverse=True)
@@ -92,14 +93,6 @@ class TrainingController:
             self.save_training_data(data['question'],data['query'],'training_sql')
         return {'message': 'Import dữ liệu thành công'}
     
-    def convert_unixtime(self,unixtime):
-        unixtime = int(unixtime)
-        utc_datetime = datetime.utcfromtimestamp(unixtime)
-        utc_timezone = pytz.timezone('UTC')
-        utc_datetime = utc_timezone.localize(utc_datetime)
-        vn_timezone = pytz.timezone('Asia/Ho_Chi_Minh')
-        return utc_datetime.astimezone(vn_timezone).strftime("%d/%m/%Y %H:%M")
-
     def check_training_duplication(self,question,type):
         is_dup = False
         if(self.redis_client.exists(type)):
@@ -108,3 +101,23 @@ class TrainingController:
             if results != []:
                 is_dup = True
         return is_dup
+
+    def generate_table_ddl(self,request):
+        conn = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};Server=103.127.207.180,3968;Database=EBM_TEST_QC;UID=ebm;PWD=4OcDQ4OLo5eGngU', autocommit=True)
+        strings = request.get_json()['tables']
+        tables = re.split(',', strings)
+        cursor = conn.cursor()
+        for table in tables:
+            data = []
+            for row in cursor.columns(table=table):
+                data.extend([row])
+                sql_template = "CREATE TABLE {} (\n{})"
+
+                columns = []
+                for entry in data:
+                    column_definition = "{} {}({})".format(entry[3], entry[5], entry[7])
+                    columns.append(column_definition)
+
+                sql_columns = ",\n".join(columns)
+                sql_statement = sql_template.format(table, sql_columns)
+            self.save_training_data(table, sql_statement,'training_ddl')

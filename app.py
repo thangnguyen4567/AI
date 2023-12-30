@@ -10,6 +10,7 @@ import logging
 import os
 
 app = Flask(__name__, template_folder="templates")
+app.secret_key = 'secret_key'
 app.cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
 handler = RotatingFileHandler(os.path.join(app.root_path, 'logs', 'error_log.log'), maxBytes=102400, backupCount=10)
 logging_format = logging.Formatter(
