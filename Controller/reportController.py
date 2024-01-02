@@ -5,6 +5,7 @@ from flask import current_app
 from langchain.prompts.few_shot import FewShotPromptTemplate
 from langchain.prompts.prompt import PromptTemplate
 from config.config_vectordb import VectorDB
+import os
 load_dotenv('.env')
 
 class reportController:
@@ -16,11 +17,15 @@ class reportController:
             app = current_app
         requestJson = request.get_json()
         question = requestJson["question"]
-        prompt = self.get_training_sql_prompt(question)
-        tables = self.get_training_ddl_prompt(question)
         llm = ChatOpenAI(model="gpt-3.5-turbo-16k",temperature=0)
+        prompt = self.get_training_sql_prompt(question)
+        isDLL = os.getenv("SQLDB_USE_TRAINING_DLL")
+        if isDLL == True:
+            tables = self.get_training_ddl_prompt(question)
+            prompt = tables+prompt.format(input=question)
+        else: prompt = prompt.format(input=question)     
         chain = create_sql_query_chain(llm, app.sql_db)
-        query = chain.invoke({"question": tables+prompt.format(input=question)})
+        query = chain.invoke({"question": prompt})
         answer = query.replace("\n", " ")
         result = {'question': question, 'answer': answer}
         return result
