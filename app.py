@@ -2,9 +2,8 @@ from routes.chatbot import chatbot
 from routes.report import report
 from routes.speech import speech
 from routes.training import training
-from flask import Flask,current_app
+from flask import Flask
 from flask_cors import CORS
-from config.config_sqldb import SQLDB
 from logging.handlers import RotatingFileHandler
 import logging
 import os
@@ -18,9 +17,6 @@ logging_format = logging.Formatter(
 handler.setFormatter(logging_format)
 app.logger.addHandler(handler)
 
-with app.app_context():
-    sql_db = SQLDB()
-    current_app.sql_db = sql_db.config_sqldb()
 app.register_blueprint(chatbot, url_prefix='/chatbot')
 app.register_blueprint(report, url_prefix='/report')
 app.register_blueprint(speech, url_prefix='/speech')

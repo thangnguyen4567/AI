@@ -1,5 +1,6 @@
 from flask import Blueprint,render_template,request
 from controller.trainingController import TrainingController
+from config.config_sqldb import SQLDB
 training = Blueprint('training', __name__)
 training_controller = TrainingController
 
@@ -38,3 +39,13 @@ def create_data():
 @training.route('/api/generate_table_ddl', methods=['POST'])
 def generate_table_ddl():
     return TrainingController().generate_table_ddl(request)
+
+
+@training.route('/api/get_table', methods=['GET'])
+def get_table():
+    return SQLDB().get_table()
+
+@training.route('/api/get_table_ddl/<table>', methods=['GET'])
+def get_table_ddl(table):
+    sql_statement = SQLDB().autogenerate_ddl(table)
+    return str(sql_statement)

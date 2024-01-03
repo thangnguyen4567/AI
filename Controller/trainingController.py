@@ -1,15 +1,16 @@
 from langchain.schema import Document
 from flask import jsonify
 from config.config_vectordb import VectorDB
+from config.config_sqldb import SQLDB
 from tools.helper import convert_unixtime
 import pandas as pd
 import time
-import pyodbc
 import re
 vector_db = VectorDB()
 class TrainingController:
     def __init__(self):
         self.redis_client = vector_db.connect_client()
+        self.sql_db = SQLDB()
         
     def process_import(self,request):
         file = request.files['file']
@@ -103,21 +104,9 @@ class TrainingController:
         return is_dup
 
     def generate_table_ddl(self,request):
-        conn = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};Server=103.127.207.180,3968;Database=EBM_TEST_QC;UID=ebm;PWD=4OcDQ4OLo5eGngU', autocommit=True)
         strings = request.get_json()['tables']
         tables = re.split(',', strings)
-        cursor = conn.cursor()
         for table in tables:
-            data = []
-            for row in cursor.columns(table=table):
-                data.extend([row])
-                sql_template = "CREATE TABLE {} (\n{})"
-
-                columns = []
-                for entry in data:
-                    column_definition = "{} {}({})".format(entry[3], entry[5], entry[7])
-                    columns.append(column_definition)
-
-                sql_columns = ",\n".join(columns)
-                sql_statement = sql_template.format(table, sql_columns)
+            sql_statement = self.sql_db.autogenerate_ddl(table)
             self.save_training_data(table, sql_statement,'training_ddl')
+        return {'message': 'Import dữ liệu thành công'}
