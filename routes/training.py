@@ -20,6 +20,10 @@ def get_training_sql():
 def get_training_ddl():
     return TrainingController().get_training_ddl()
 
+@training.route('/api/get_training_doc', methods=['GET'])
+def get_training_doc():
+    return TrainingController().get_training_doc()
+
 @training.route('/api/delete', methods=['POST'])
 def delete_data():
     return TrainingController().delete_training_data(request)

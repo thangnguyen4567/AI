@@ -40,6 +40,7 @@
   <ul class="nav nav-tabs">
     <li class="active"><a data-toggle="tab" href="#sql">Câu truy vấn đã train</a></li>
     <li><a data-toggle="tab" href="#ddl">Bảng dữ liệu đã train</a></li>
+    <li><a data-toggle="tab" href="#doc">Tài liệu đã train</a></li>
     <li><a data-toggle="tab" href="#import">Import dữ liệu</a></li>
   </ul>
 
@@ -49,6 +50,9 @@
     </div>
     <div id="ddl" class="tab-pane fade">
       {% include 'table_training_ddl.html' %}
+    </div>
+    <div id="doc" class="tab-pane fade">
+      {% include 'table_training_doc.html' %}
     </div>
     <div id="import" class="tab-pane fade">
       {% include 'import_training.html' %}

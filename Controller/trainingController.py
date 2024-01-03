@@ -35,6 +35,11 @@ class TrainingController:
                     Document(page_content=content, metadata={"table": answer,"timecreated": int(time.time())})
                 ]
                 vector_db.add_vectordb(documents,type)
+            elif(type == 'training_doc'):
+                documents = [
+                    Document(page_content=content, metadata={"document": answer,"timecreated": int(time.time())})
+                ]
+                vector_db.add_vectordb(documents,type)
 
     def get_training_sql(self):
         data = []
@@ -68,6 +73,22 @@ class TrainingController:
         sorted_data = sorted(data, key=lambda x: x['timecreated'],reverse=True)
         return sorted_data
     
+    def get_training_doc(self):
+        data = []
+        for key in self.redis_client.scan_iter("doc:training_doc*"):
+            obj = {}
+            content = self.redis_client.hget(key,'content')
+            define = self.redis_client.hget(key,'document')
+            timecreated = self.redis_client.hget(key,'timecreated')
+            obj['id'] = key.decode()
+            obj['content'] = content.decode() if content else 'None'
+            obj['define'] = define.decode() if define else 'None'
+            obj['timecreated'] = convert_unixtime(timecreated) if timecreated else '20/12/2023 00:00'
+            obj['type'] = 'training_doc'
+            data.append(obj)
+        sorted_data = sorted(data, key=lambda x: x['timecreated'],reverse=True)
+        return sorted_data
+
     def delete_training_data(self,request):
         key = request.form['id']
         self.redis_client.delete(key)
@@ -75,12 +96,14 @@ class TrainingController:
 
     def update_training_data(self,request):
         key = request.form['id']
-        obj = {}
-        obj['content'] = request.form['content']
+        obj = {}  
         if(request.form['type'] == 'training_sql'):
             obj['query'] = request.form['answer']
-        else:
+        elif (request.form['type'] == 'training_table'):         
             obj['table'] = request.form['answer']
+        else: 
+            obj['document'] = request.form['define']
+        obj['content'] = request.form['content']
         obj['timecreated'] = int(time.time())
         self.redis_client.hmset(key,obj)
         return {'message': 'Cập nhật thành công'}
@@ -88,7 +111,13 @@ class TrainingController:
     def create_training_data(self,request):
         if(request.form):
             data = request.form
-            self.save_training_data(data['content'],data['answer'],data['type'])
+            req_type = data['type']
+            req_content = data['content']
+            if req_type == 'training_doc':
+                req_answer = data['define']
+            else:
+                req_answer = data['answer']
+            self.save_training_data(req_content,req_answer,req_type)
         else:
             data = request.get_json()
             self.save_training_data(data['question'],data['query'],'training_sql')
