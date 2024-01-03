@@ -1,0 +1,104 @@
+<div id="grid_doc"></div>
+<script>
+$(document).ready(function () {
+    var dataSource = new kendo.data.DataSource({
+        transport: {
+            type: "json",
+            read: {
+                url:"../api/get_training_doc",
+            },
+            create: {
+                url: "../api/training",
+                method: "POST",
+                data: {
+                    type: 'training_doc',
+                }
+            },
+            update: {
+                url: "../api/update",
+                method: "POST",
+                data: {
+                    type: 'training_doc',
+                }
+            },
+            destroy: {
+                url: "../api/delete",
+                method: "POST",
+            }
+        },
+        pageSize: 20,
+        batch: false,
+        schema: {
+            data: function(data) {
+                if(data.message) {
+                    $("#grid_doc").data("kendoGrid").dataSource.read()
+                }
+                return data
+            },
+            model: {
+                id: "id",
+                fields: {
+                    id: { editable: false, nullable: true },
+                    content: { validation: { required: true } },
+                    define: { validation: { required: true }  },
+                    timecreated: { editable: false, nullable: true,hidden:true},
+                }
+            }
+        }
+    });
+    var columns = [
+            { 
+                field: "content", 
+                title: "Tiêu đề" 
+            },
+            { 
+                field: "define", 
+                title: "Định nghĩa" 
+            },
+            { 
+                field: "timecreated",  
+                title: "Ngày tạo" 
+            },
+            { 
+                command: ["edit", "destroy"], 
+                title: " " 
+            }
+    ]
+    $("#grid_doc").kendoGrid({
+        dataSource: dataSource,
+        height: 800,
+        sortable: true,
+        toolbar: ["create","search"],
+        search: {
+            fields: ["content","define"]
+        },
+        pageSize: 20,
+        pageable: {
+            refresh: true,
+            pageSizes: true,
+            buttonCount: 5,
+            pageSize:20
+        },
+        columns: columns,
+        editable: {
+            mode: "popup",
+            template: kendo.template($("#popup-editor-doc").html()),
+            window: {
+                animation: false,
+                width: "900px",
+                height: "600px",
+            }
+        }
+    });    
+})
+</script>
+<script id="popup-editor-doc" type="text/x-kendo-template">
+    <div class="form-group">
+        <label>Tiêu đề</label>
+        <textarea class="form-control" data-bind="value:content" rows="4"></textarea>
+    </div>
+    <div class="form-group">
+        <label>Định nghĩa</label>
+        <textarea class="form-control" data-bind="value:define" rows="14"></textarea>
+    </div>
+</script>
