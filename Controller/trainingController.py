@@ -99,7 +99,7 @@ class TrainingController:
         obj = {}  
         if(request.form['type'] == 'training_sql'):
             obj['query'] = request.form['answer']
-        elif (request.form['type'] == 'training_table'):         
+        elif (request.form['type'] == 'training_ddl'):         
             obj['table'] = request.form['answer']
         else: 
             obj['document'] = request.form['define']
