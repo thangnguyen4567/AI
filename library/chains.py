@@ -1,11 +1,11 @@
 from typing import List, TypedDict, Union
-
+from tools.helper import logging_data
 from langchain.chains.sql_database.prompt import PROMPT, SQL_PROMPTS
 from langchain.schema.language_model import BaseLanguageModel
 from langchain.schema.output_parser import NoOpOutputParser
 from langchain.schema.runnable import Runnable, RunnableParallel
 from config.config_vectordb import VectorDB
-
+from googletrans import Translator
 def _strip(text: str) -> str:
     return text.strip()
 
@@ -24,11 +24,23 @@ class SQLInputWithTables(TypedDict):
 
 def get_table_info(question) -> str:
     tables = []
-    docs = VectorDB().connect_vectordb('training_ddl').similarity_search(query=question,k=10)
+    logdata = []
+    question = handle_question(question)
+    logdata.append(question)
+    docs = VectorDB().connect_vectordb('training_ddl').similarity_search(query=question,k=12)
     for value in docs:
+        logdata.append(value.page_content)
         tables.append(value.metadata['table']+'\n')
+    if(question) :
+        logging_data(logdata)
     final_str = "\n\n".join(tables)
     return final_str
+
+def handle_question(question):
+    translator = Translator()
+    translate_question = translator.translate(question)
+    final_question = translate_question.text.replace("branch", "division")
+    return final_question
 
 def create_sql_query_chain(
     llm: BaseLanguageModel,
