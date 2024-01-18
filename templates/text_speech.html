@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="{{ url_for('static',filename='js/jquery-3.4.1.min.js') }}"></script> 
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  <script src="{{ url_for('static',filename='js/kendo.all.min.js') }}"></script> 
+  <link href="{{ url_for('static',filename='css/bootstrap.min.css') }}" rel="stylesheet"}>
+</head>
+<body>
+<style type="text/css">
+   
+</style>
+<form method="POST" action="/speech/api/view_speech" enctype="multipart/form-data">
+  <div class="form-group">
+    <div class="container overflow-hidden">
+      <h1>Text To Speed</h1>
+      <div class="row gx-5">
+        <div class="col">
+          <div class="p-3 border bg-light">
+              <label for="exampleInput" class="form-label">Input text</label>
+              <textarea class="form-control" id="exampleInput" rows="3" name="input"></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary">Send</button>
+        </div>
+        <div class="col">
+          <div class="p-3 border bg-light">
+              <audio controls controlsList="nodownload" autoplay>
+                <source src="data:audio/wav;base64,{{url_base64}}">
+              </audio>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+
+</body>
+</html>
