@@ -6,12 +6,13 @@ speech = Blueprint('speech', __name__)
 
 @speech.route('/api/view_speech', methods=['GET','POST'])
 def speech_view():
+    strBase64 = ''
     if request.method == 'POST':
         text = request.form['input']
         strBase64 = fn_create_speech(text)
         return render_template("text_speech.html", url_base64 = strBase64)
     else:
-        return render_template("text_speech.html", url_base64 = '')
+        return render_template("text_speech.html", url_base64 = strBase64)
 
 
 @speech.route('/api/create_speak', methods=['POST'])
