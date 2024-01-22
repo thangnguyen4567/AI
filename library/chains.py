@@ -27,7 +27,7 @@ def get_table_info(question) -> str:
     logdata = []
     question = handle_question(question)
     logdata.append(question)
-    docs = VectorDB().connect_vectordb('training_ddl').similarity_search(query=question,k=12)
+    docs = VectorDB().connect_vectordb('training_ddl').similarity_search(query=question,k=10)
     for value in docs:
         logdata.append(value.page_content)
         tables.append(value.metadata['table']+'\n')
