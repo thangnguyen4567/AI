@@ -7,10 +7,9 @@ from flask_cors import CORS
 from logging.handlers import RotatingFileHandler
 import logging
 import os
-
 app = Flask(__name__, template_folder="templates")
 app.secret_key = 'secret_key'
-app.cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
+app.cors = CORS(app, resources={r"*": {"origins": "*"}},supports_credentials=True)
 handler = RotatingFileHandler(os.path.join(app.root_path, 'logs', 'error_log.log'), maxBytes=102400, backupCount=10)
 logging_format = logging.Formatter(
     '%(asctime)s - %(levelname)s - %(filename)s - %(funcName)s - %(lineno)s - %(message)s')

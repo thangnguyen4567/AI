@@ -5,7 +5,7 @@ from langchain.schema.language_model import BaseLanguageModel
 from langchain.schema.output_parser import NoOpOutputParser
 from langchain.schema.runnable import Runnable, RunnableParallel
 from config.config_vectordb import VectorDB
-from googletrans import Translator
+# from googletrans import Translator
 def _strip(text: str) -> str:
     return text.strip()
 
@@ -25,7 +25,7 @@ class SQLInputWithTables(TypedDict):
 def get_table_info(question) -> str:
     tables = []
     logdata = []
-    question = handle_question(question)
+    # question = handle_question(question)
     logdata.append(question)
     docs = VectorDB().connect_vectordb('training_ddl').similarity_search(query=question,k=10)
     for value in docs:
@@ -36,11 +36,11 @@ def get_table_info(question) -> str:
     final_str = "\n\n".join(tables)
     return final_str
 
-def handle_question(question):
-    translator = Translator()
-    translate_question = translator.translate(question)
-    final_question = translate_question.text.replace("branch", "division")
-    return final_question
+# def handle_question(question):
+#     translator = Translator()
+#     translate_question = translator.translate(question)
+#     final_question = translate_question.text.replace("branch", "division")
+#     return final_question
 
 def create_sql_query_chain(
     llm: BaseLanguageModel,

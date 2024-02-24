@@ -1,4 +1,4 @@
-from langchain.embeddings import HuggingFaceHubEmbeddings
+from langchain_community.embeddings import HuggingFaceHubEmbeddings
 from langchain.vectorstores.redis import Redis
 from dotenv import load_dotenv
 import os
@@ -11,8 +11,11 @@ class VectorDB:
         self.vector_host = os.getenv("VECTORDB_HOST")
         self.vector_port = os.getenv("VECTORDB_PORT")
         self.redis_url = self.vector_name + '://' + self.vector_host + ':' + self.vector_port
+        # self.index_schema = {
+        #     "text": [{"name": "query"},{"name": "table"}],
+        # }
         self.index_schema = {
-            "text": [{"name": "query"},{"name": "table"}],
+            "numeric": [{"name": "courseid"}],
         }
 
     def connect_vectordb(self, index_name):

@@ -1,10 +1,10 @@
-langchain==0.0.321
+langchain==0.1.8
 mypy-extensions==1.0.0
 numexpr==2.8.4
 python-environ==0.4.54
 qdrant_client==0.11.9
 pyodbc==4.0.39
-streamlit==1.27.0
+streamlit==1.31.1
 python-dotenv==1.0.0
 pymongo==4.5.0
 openai==0.27.6
@@ -19,3 +19,4 @@ redis==5.0.1
 googletrans==4.0.0rc1
 google-generativeai==0.3.2
 openpyxl==3.1.2
+langchain-google-genai==0.0.9
