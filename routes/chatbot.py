@@ -45,17 +45,16 @@ def get_converstation_chain(history,data):
         iscourseid = RedisNum("courseid") == int(data['courseid'])
         docs = VectorDB().connect_vectordb('chatbot').similarity_search(data['question'],k=10,filter=iscourseid)
         context = """
-            Bạn là AI trợ giảng Elearning Pro , hỗ trợ trả lời ,tóm tắt những thông tin trong khóa học:
-            - Chỉ trả lời nhưng thông tin có nội dung dưới đây những thông tin bên ngoài không trả lời
+            Bạn là AI trợ giảng Elearning Pro ( Được làm dựa hệ thống moodle ), hỗ trợ trả lời những thông tin trong khóa học:
             - Khóa học học có những nội dung như sau:
         """
+        for value in docs:
+            context += value.page_content
     else:
-        docs = VectorDB().connect_vectordb('chatbot').similarity_search(data['question'],k=10)
         context = """
-            Bạn là AI trợ giảng Elearning Pro , hỗ trợ trả lời ,tóm tắt những thông tin trên hệ thống:
+            - Bạn là trợ lý ảo Elearning Pro ( Được làm dựa hệ thống moodle , bạn có thể tham khảo tài liệu hướng dẫn sử dụng của moodle để trả lời ), hỗ trợ trả lời những thông tin trên hệ thống
+            - Khi trả lời câu hỏi bạn không nên đề cập đến chữ moodle
         """
-    for value in docs:
-        context += value.page_content
     memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
     llm = GoogleGenerativeAI(model="gemini-pro", google_api_key="AIzaSyCG-B02IPEKbwwzfSzP4gyNX6J46TVpZ0k")
     message = [SystemMessagePromptTemplate.from_template(context)]
