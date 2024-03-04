@@ -36,12 +36,23 @@ class SQLDB:
     
     def get_table(self):
         cursor = self.conn.cursor()
+
+        # Thực hiện truy vấn SQL để lấy danh sách các bảng
+        cursor.execute("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE'")
+
+        # Lấy danh sách các bảng
+        tables = cursor.fetchall()
         data = []
-        for row in cursor.tables():
+        # In ra danh sách các bảng
+        for table in tables:
             obj = {}
-            obj['value'] = row.table_name
-            obj['text'] = row.table_name
+            obj['value'] = table[0]
+            obj['text'] = table[0]
             data.append(obj)
+
+        # Đóng cursor và kết nối
+        cursor.close()
+        self.conn.close()
         return data
 
     def get_table_constraint(self,table_name):
