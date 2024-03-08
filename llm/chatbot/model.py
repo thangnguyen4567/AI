@@ -2,15 +2,18 @@ from langchain_google_genai import GoogleGenerativeAI
 from langchain.chains import LLMChain
 from langchain.memory import ConversationBufferMemory
 from langchain_core.messages import AIMessage, HumanMessage
+from langchain_openai import ChatOpenAI
 from langchain.prompts import (
     ChatPromptTemplate,
     SystemMessagePromptTemplate,
     HumanMessagePromptTemplate,
 )
-
+from dotenv import load_dotenv
+load_dotenv('.env')
 class ChatConverstation():
     def __init__(self) -> None:
         self.llm = GoogleGenerativeAI(model="gemini-pro", google_api_key="AIzaSyCG-B02IPEKbwwzfSzP4gyNX6J46TVpZ0k")
+        # self.llm = ChatOpenAI()
 
     def get_conversation_chain(self,message):
         memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
@@ -23,12 +26,12 @@ class ChatConverstation():
         )
         return conversation
     
-    def get_conversation_message(self,prompt:str,history: list):
+    def get_conversation_message(self,prompt:str):
         message = [SystemMessagePromptTemplate.from_template(prompt)]
-        for chat in history:
+        for chat in self.chat_history:
             if 'human' in chat:
                 message.append(HumanMessage(content=chat['human']))
-            if 'bot' in chat:
+            if 'bot' in chat and chat['bot'] != None:
                 message.append(AIMessage(content=chat['bot']))
         message.append(HumanMessagePromptTemplate.from_template("{question}"))
         return message

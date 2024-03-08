@@ -1,3 +1,4 @@
+from langchain_openai import OpenAIEmbeddings
 from langchain_community.embeddings import HuggingFaceHubEmbeddings
 from langchain.vectorstores.redis import Redis
 from dotenv import load_dotenv
@@ -6,7 +7,7 @@ import redis
 class VectorDB:
     def __init__(self):
         load_dotenv()
-        self.embeddings = HuggingFaceHubEmbeddings()
+        self.embeddings = OpenAIEmbeddings()
         self.vector_name = os.getenv("VECTORDB_NAME")
         self.vector_host = os.getenv("VECTORDB_HOST")
         self.vector_port = os.getenv("VECTORDB_PORT")
