@@ -16,6 +16,10 @@ class ChatConverstation():
         # self.llm = ChatOpenAI()
 
     def get_conversation_chain(self,message):
+        num_tokens = 0
+        for value in message:
+            num_tokens += (len(value.prompt.template) / 4)  # Use 4 as an approximation for the number of characters per token
+        print(f"Using {num_tokens} tokens (approx)")
         memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
         prompt = ChatPromptTemplate(messages=message)
         conversation = LLMChain(

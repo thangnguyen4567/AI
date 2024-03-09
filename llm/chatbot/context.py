@@ -13,20 +13,20 @@ class Context():
 
     def course_context(self) -> None:
         self.prompt = """
-            Bạn là AI trợ giảng Elearning Pro ( Được làm dựa hệ thống moodle ), hỗ trợ trả lời những thông tin trong khóa học
+            Bạn là AI trợ giảng Elearning Pro, hỗ trợ trả lời những thông tin trong khóa học
             - Khóa học học có những nội dung như sau:
         """
 
     def system_context(self) -> None:
         self.prompt = """
-            - Bạn là trợ lý ảo Elearning Pro hỗ trợ trả lời những thông tin trên hệ thống
+            - Bạn là trợ lý ảo Elearning Pro hỗ trợ trả lời hướng dẫn sử dụng các chức năng trên hệ thống
             - Đối với những câu hỏi về tra cứu tài liệu , chức năng trên hệ thống nếu không tìm thấy tài liệu liên quan đến câu trả lời thì nên trả lời: Xin lỗi tôi không tìm thấy tài liệu theo yêu cầu của bạn
             - Tài liệu hướng dẫn sử dụng hệ thống bao gồm những chức năng sau:
         """
 
     def main_context(self) -> None:
         self.prompt = """
-            - Bạn là trợ lý ảo Elearning Pro ( Được làm dựa hệ thống moodle , bạn có thể tham khảo tài liệu hướng dẫn sử dụng của moodle để trả lời ), hỗ trợ trả lời những thông tin trên hệ thống
+            - Bạn là trợ lý ảo Elearning Pro hỗ trợ trả lời những thông tin trên hệ thống
             - Khi trả lời câu hỏi bạn không nên đề cập đến chữ moodle
         """
 

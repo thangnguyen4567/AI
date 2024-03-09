@@ -23,3 +23,10 @@ def create_item():
     result = {'answer':answer['text'].replace("AI:",""),
               'metadata':chat.get_documents_metadata()}
     return result
+
+@chatbot.route('/api/get_metadata', methods=['POST'])
+def create_item():
+    data = request.get_json()
+    chat = ChatBot(data)
+    result = {'metadata':chat.get_documents_metadata()}
+    return result
