@@ -2,14 +2,9 @@ from config.config_vectordb import VectorDB
 from langchain_community.vectorstores.redis import RedisFilter
 class Context():
     def __init__(self):
-        self.course_index_schema = {
-            "text": [{"name": "courseid"}],
-        }
-        self.system_index_schema = {
-            "text": [{"name": "role"},{"name": "source"},{"name": "title"}],
-        }
         self.prompt = ''
         self.documents = []
+        self.index_schema = {"text": [{"name":"source"},{"name":"title"}]}
 
     def course_context(self) -> None:
         self.prompt = """
@@ -31,18 +26,14 @@ class Context():
         """
 
     def retriever_document(self) -> None:
-        prompt = ''
         filter = ''
-        method_name = self.context+'_index_schema'
-        if(hasattr(self,method_name)):
-            index_schema = getattr(self,method_name)
-            for value in self.contextdata:
-                filter = RedisFilter.text(value) == self.contextdata[value]
-            if filter != '':
-                self.documents = VectorDB().connect_vectordb(index_name=self.context,index_schema=index_schema).similarity_search(self.question,k=4,filter=filter)
-            if self.documents:
-                prompt += self.documents[0].page_content
-        return prompt
+        for value in self.contextdata:
+            filter = RedisFilter.text(value) == self.contextdata[value]
+            self.index_schema["text"].append({"name": value})
+        if filter != '':
+            self.documents = VectorDB().connect_vectordb(index_name=self.context,index_schema=self.index_schema).similarity_search(self.question,k=5,filter=filter)
+        if self.documents:
+            self.prompt += self.documents[0].page_content
         
     def get_context(self) -> str:
         method_name = self.context + "_context"

@@ -15,10 +15,10 @@ class ChatConverstation():
         self.llm = GoogleGenerativeAI(model="gemini-pro", google_api_key="AIzaSyCG-B02IPEKbwwzfSzP4gyNX6J46TVpZ0k")
         # self.llm = ChatOpenAI()
 
-    def get_conversation_chain(self,message):
+    def get_conversation_chain(self,message) -> list:
         num_tokens = 0
         for value in message:
-            num_tokens += (len(value.prompt.template) / 4)  # Use 4 as an approximation for the number of characters per token
+            num_tokens += (len(value.content)/4) if hasattr(value,'content') else (len(value.prompt.template) / 4)  # Use 4 as an approximation for the number of characters per token
         print(f"Using {num_tokens} tokens (approx)")
         memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
         prompt = ChatPromptTemplate(messages=message)
@@ -30,8 +30,8 @@ class ChatConverstation():
         )
         return conversation
     
-    def get_conversation_message(self,prompt:str):
-        message = [SystemMessagePromptTemplate.from_template(prompt)]
+    def get_conversation_message(self) -> list:
+        message = [SystemMessagePromptTemplate.from_template(self.prompt)]
         for chat in self.chat_history:
             if 'human' in chat:
                 message.append(HumanMessage(content=chat['human']))

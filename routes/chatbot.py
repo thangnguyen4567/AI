@@ -16,7 +16,7 @@ def start_chat():
     return 'Work'
 
 @chatbot.route('/api/conversations', methods=['POST'])
-def create_item():
+def get_conversations():
     data = request.get_json()
     chat = ChatBot(data)
     answer = chat.chat_reponse()
@@ -25,7 +25,7 @@ def create_item():
     return result
 
 @chatbot.route('/api/get_metadata', methods=['POST'])
-def create_item():
+def get_metadata():
     data = request.get_json()
     chat = ChatBot(data)
     result = {'metadata':chat.get_documents_metadata()}

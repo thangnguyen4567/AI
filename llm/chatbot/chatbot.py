@@ -18,11 +18,11 @@ class ChatBot(Context, ChatConverstation):
 
     def chat_reponse(self) -> list:
 
-        prompt = self.get_context()
+        self.get_context()
 
-        prompt += self.retriever_document()
+        self.retriever_document()
 
-        message = self.get_conversation_message(prompt)
+        message = self.get_conversation_message()
 
         chain = self.get_conversation_chain(message)
 
@@ -31,11 +31,11 @@ class ChatBot(Context, ChatConverstation):
         return reponse
 
     def get_documents_metadata(self) -> list:
-        metadatas = ['source','title']
+        self.retriever_document()
         sources = []
         for document in self.documents:
             dict = {}
-            for metadata in metadatas:
-                dict[metadata] = document.metadata[metadata]
+            for metadata in self.index_schema['text']:
+                dict[metadata['name']] = document.metadata[metadata['name']]
             sources.append(dict)
         return sources
