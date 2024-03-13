@@ -13,13 +13,12 @@ load_dotenv('.env')
 class ChatConverstation():
     def __init__(self) -> None:
         self.llm = GoogleGenerativeAI(model="gemini-pro", google_api_key="AIzaSyCG-B02IPEKbwwzfSzP4gyNX6J46TVpZ0k")
-        # self.llm = ChatOpenAI()
+        # self.llm = ChatOpenAI(model="gpt-3.5-turbo-0125")
 
     def get_conversation_chain(self,message) -> list:
         num_tokens = 0
         for value in message:
             num_tokens += (len(value.content)/4) if hasattr(value,'content') else (len(value.prompt.template) / 4)  # Use 4 as an approximation for the number of characters per token
-        print(f"Using {num_tokens} tokens (approx)")
         memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
         prompt = ChatPromptTemplate(messages=message)
         conversation = LLMChain(
@@ -28,6 +27,7 @@ class ChatConverstation():
             verbose=True,
             memory=memory,
         )
+        print(f"///////////////// Using {num_tokens} tokens (approx) //////////////////")
         return conversation
     
     def get_conversation_message(self) -> list:

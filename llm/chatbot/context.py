@@ -5,6 +5,7 @@ class Context():
         self.prompt = ''
         self.documents = []
         self.index_schema = {"text": [{"name":"source"},{"name":"title"}]}
+        self.k = {"system": 4, "course": 5}
 
     def course_context(self) -> None:
         self.prompt = """
@@ -31,9 +32,13 @@ class Context():
             filter = RedisFilter.text(value) == self.contextdata[value]
             self.index_schema["text"].append({"name": value})
         if filter != '':
-            self.documents = VectorDB().connect_vectordb(index_name=self.context,index_schema=self.index_schema).similarity_search(self.question,k=5,filter=filter)
+            self.documents = VectorDB().connect_vectordb(index_name=self.context,index_schema=self.index_schema).similarity_search(self.question,k=self.k[self.context],filter=filter)
         if self.documents:
-            self.prompt += self.documents[0].page_content
+            if self.context == 'course':
+                for doc in self.documents:
+                    self.prompt += doc.page_content
+            elif self.context == 'system':
+                self.prompt += self.documents[0].page_content
         
     def get_context(self) -> str:
         method_name = self.context + "_context"
