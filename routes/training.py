@@ -44,7 +44,6 @@ def create_data():
 def generate_table_ddl():
     return TrainingController().generate_table_ddl(request)
 
-
 @training.route('/api/get_table', methods=['GET'])
 def get_table():
     return SQLDB().get_table()

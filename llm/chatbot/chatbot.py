@@ -1,7 +1,6 @@
 from llm.chatbot.context import Context
 from llm.chatbot.model import ChatConverstation
 
-
 class ChatBot(Context, ChatConverstation):
 
     def __init__(self,config):

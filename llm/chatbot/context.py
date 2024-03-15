@@ -1,10 +1,14 @@
 from config.config_vectordb import VectorDB
 from langchain_community.vectorstores.redis import RedisFilter
+from langchain_community.vectorstores.redis import RedisText
 class Context():
     def __init__(self):
         self.prompt = ''
         self.documents = []
-        self.index_schema = {"text": [{"name":"source"},{"name":"title"}]}
+        self.index_schema = {
+                                "text": [{"name":"source"},{"name":"title"}],
+                                "numeric": []
+                            }
         self.k = {"system": 4, "course": 5}
 
     def course_context(self) -> None:
@@ -20,17 +24,25 @@ class Context():
             - Tài liệu hướng dẫn sử dụng hệ thống bao gồm những chức năng sau:
         """
 
-    def main_context(self) -> None:
-        self.prompt = """
-            - Bạn là trợ lý ảo Elearning Pro hỗ trợ trả lời những thông tin trên hệ thống
-            - Khi trả lời câu hỏi bạn không nên đề cập đến chữ moodle
-        """
-
     def retriever_document(self) -> None:
+        ## Xử lý filter dữ liệu theo metadata
+        filtertext = ''
+        filternumber = ''
         filter = ''
-        for value in self.contextdata:
-            filter = RedisFilter.text(value) == self.contextdata[value]
-            self.index_schema["text"].append({"name": value})
+        for key, value in self.contextdata.items():
+            if value.isnumeric():
+                filternumber = RedisFilter.num(key) == int(value)
+                self.index_schema["numeric"].append({"name": key})
+            else:
+                filtertext = RedisFilter.text(key) == value
+                self.index_schema["text"].append({"name": key})
+
+        if(filtertext and filternumber):
+            filter = filtertext & filternumber
+        elif(filtertext):
+            filter = filtertext
+        elif(filternumber):
+            filter = filternumber
         if filter != '':
             self.documents = VectorDB().connect_vectordb(index_name=self.context,index_schema=self.index_schema).similarity_search(self.question,k=self.k[self.context],filter=filter)
         if self.documents:
