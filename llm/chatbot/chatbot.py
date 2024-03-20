@@ -1,10 +1,9 @@
-from llm.chatbot.context import Context
 from llm.chatbot.model import ChatConverstation
+from llm.factory.context_factory import ContextFactory
 
-class ChatBot(Context, ChatConverstation):
+class ChatBot(ChatConverstation):
 
     def __init__(self,config):
-        Context.__init__(self)
         ChatConverstation.__init__(self)
         if "question" in config:
             self.question = config['question']
@@ -15,11 +14,10 @@ class ChatBot(Context, ChatConverstation):
         if "context" in config:
             self.context = config['context']
 
+        self.context = ContextFactory.create_context(self,self.context)
+        self.prompt = self.context.retriever_document(self.contextdata,self.question)
+
     def chat_reponse(self) -> list:
-
-        self.get_context()
-
-        self.retriever_document()
 
         message = self.get_conversation_message()
 
@@ -30,11 +28,11 @@ class ChatBot(Context, ChatConverstation):
         return reponse
 
     def get_documents_metadata(self) -> list:
-        self.retriever_document()
         sources = []
-        for document in self.documents:
+        for document in self.context.documents:
             dict = {}
-            for metadata in self.index_schema['text']:
-                dict[metadata['name']] = document.metadata[metadata['name']]
-            sources.append(dict)
+            for metadata in self.context.index_schema['text']:
+                if metadata['name'] in document.metadata:
+                    dict[metadata['name']] = document.metadata[metadata['name']]
+                    sources.append(dict)
         return sources

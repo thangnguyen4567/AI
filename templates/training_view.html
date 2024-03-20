@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="{{ url_for('static',filename='js/jquery-3.4.1.min.js') }}"></script> 
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  <script src="{{ url_for('static',filename='js/kendo.all.min.js') }}"></script> 
+  <link href="{{ url_for('static',filename='css/bootstrap.min.css') }}" rel="stylesheet"}>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2020.3.915/styles/kendo.common.min.css">
+  <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2020.3.915/styles/kendo.rtl.min.css">
+  <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2020.3.915/styles/kendo.default.min.css">
+</head>
+<body>
+<style type="text/css">
+    div.k-edit-form-container {
+      width: auto;
+      height: auto;
+      padding: 15px;
+    }
+    .k-edit-buttons.k-state-default {
+      background: white;
+      bottom: -3em;
+    }
+    .form-control {
+      width: -webkit-fill-available !important;
+    }
+    table tbody td {
+      width: max-content;
+      white-space: nowrap;
+      overflow: hidden !important;
+      text-overflow: ellipsis;
+    }
+</style>
+<div class="pl-5 pr-5 mt-5">
+    <div>
+    <h1 class="bd-title" id="content" style="text-align: center;">{{ data.type }}</h1>
+    </div>
+    <div id="grid"></div>
+</div>
+</div>
+
+</body>
+</html>
+<script>
+    $(document).ready(function () {
+        var dataSource = new kendo.data.DataSource({
+            transport: {
+                type: "json",
+                read: {
+                    url:"../api/read?type={{data.type}}",
+                },
+                destroy: {
+                    url: "../api/delete",
+                    method: "POST",
+                }
+            },
+            pageSize: 20,
+            batch: false,
+            schema: {
+                data: function(data) {
+                    if(data.message) {
+                        $("#grid").data("kendoGrid").dataSource.read()
+                    }
+                    return data
+                },
+                model: {
+                    id: "id",
+                    fields: {
+                        id: { editable: false, nullable: true },
+                    }
+                }
+            }
+        });
+        var columns = [
+            {% for item in data.columns %}
+            {
+                field:"{{ item }}",
+                title:"{{ item }}",
+            },
+            {% endfor %}
+        ];
+        columns.push({ 
+                command: ["edit", "destroy"], 
+                title: "Action" 
+            })
+        $("#grid").kendoGrid({
+            dataSource: dataSource,
+            height: 800,
+            sortable: true,
+            toolbar: ["create","search"],
+            search: {
+                fields: ["content"]
+            },
+            pageSize: 20,
+            pageable: {
+                refresh: true,
+                pageSizes: true,
+                buttonCount: 5,
+                pageSize:20
+            },
+            columns: columns,
+        });
+       
+    })
+</script>
