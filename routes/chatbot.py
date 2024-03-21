@@ -6,13 +6,6 @@ chatbot = Blueprint('chatbot', __name__)
 
 @chatbot.route('/', methods=['GET'])
 def check_api():
-    session['test'] = 'abcd'
-    return 'Work'
-
-@chatbot.route('/api/start', methods=['GET'])
-def start_chat():
-    if 'chat_history' in session:
-        session.pop('chat_history')
     return 'Work'
 
 @chatbot.route('/api/conversations', methods=['POST'])

@@ -34,5 +34,5 @@ class ChatBot(ChatConverstation):
             for metadata in self.context.index_schema['text']:
                 if metadata['name'] in document.metadata:
                     dict[metadata['name']] = document.metadata[metadata['name']]
-                    sources.append(dict)
+            sources.append(dict)
         return sources

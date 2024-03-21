@@ -1,19 +1,14 @@
 from config.config_vectordb import VectorDB
 from config.config_sqldb import SQLDB
 from abc import ABC, abstractmethod 
-vector_db = VectorDB()
 class Training(ABC):
     def __init__(self):
-        self.redis_client = vector_db.connect_client()
-        self.vector_db = vector_db
+        self.redis_client = VectorDB().connect_client()
+        self.vector_db = VectorDB()
         self.sql_db = SQLDB()
 
     @abstractmethod
     def save_training_data(self):
-        pass
-
-    @abstractmethod
-    def delete_training_data():
         pass
 
     @abstractmethod
@@ -35,6 +30,6 @@ class Training(ABC):
             data.append(obj)
         return data
     
-    def delete_training_data(self,key):
+    def delete_training_data(self,key) -> dict:
         self.redis_client.delete(key)
         return {'message': 'Xóa thành công'}

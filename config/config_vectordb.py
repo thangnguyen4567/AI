@@ -8,6 +8,7 @@ class VectorDB:
     def __init__(self):
         load_dotenv()
         self.embeddings = OpenAIEmbeddings()
+        # self.embeddings = HuggingFaceHubEmbeddings()
         self.vector_name = os.getenv("VECTORDB_NAME")
         self.vector_host = os.getenv("VECTORDB_HOST")
         self.vector_port = os.getenv("VECTORDB_PORT")

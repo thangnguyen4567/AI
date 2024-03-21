@@ -1,7 +1,9 @@
 from config.config_vectordb import VectorDB
 from langchain_community.vectorstores.redis import RedisFilter
-class ContextCourse():
+from llm.factory.context.context import Context
+class ContextCourse(Context):
     def __init__(self):
+        super().__init__()
         self.prompt = """
             - Bạn là AI trợ giảng Elearning Pro, hỗ trợ trả lời những thông tin trong khóa học
             - Khóa học học có những nội dung như sau:
@@ -26,7 +28,7 @@ class ContextCourse():
             filtertitle = RedisFilter.text('title') == contextdata['title'] 
             filtercourseid = RedisFilter.num('courseid') == int(contextdata['courseid'])
             filter = filtertitle & filtercourseid
-            self.documents = VectorDB().connect_vectordb(index_name=self.context,index_schema=self.index_schema).similarity_search(question,k=self.docsretriever,filter=filter)
+            self.documents = VectorDB().connect_vectordb(index_name=self.context+'_'+contextdata['collection'],index_schema=self.index_schema).similarity_search(question,k=self.docsretriever,filter=filter)
             if self.documents:
                 for doc in self.documents:
                     self.prompt += doc.page_content
