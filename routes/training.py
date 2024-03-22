@@ -15,7 +15,7 @@ def get_training_data():
     training = training_factory.create_training(data['type'])
     return training.get_training_data()
 
-@training.route('/api/create', methods=['POST'])
+@training.route('/api/training', methods=['POST'])
 def save_training_data():
     data = request.get_json() 
     training = training_factory.create_training(data['type'])

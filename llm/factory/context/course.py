@@ -15,19 +15,17 @@ class ContextCourse(Context):
                                     {"name":"source"},
                                     {"name":"title"},
                                     {"name":"content"},
-                                    {"name":"role"},
                                 ],
                                 "numeric": [
-                                    {"name":"courseid"}
+                                    {"name":"courseid"},
+                                    {"name":"coursemoduleid"},
                                 ]
                             }
-        self.docsretriever = 5
+        self.docsretriever = 4
 
     def retriever_document(self,contextdata,question) -> str:
         if 'courseid' in contextdata and 'title' in contextdata:
-            filtertitle = RedisFilter.text('title') == contextdata['title'] 
-            filtercourseid = RedisFilter.num('courseid') == int(contextdata['courseid'])
-            filter = filtertitle & filtercourseid
+            filter = RedisFilter.num('coursemoduleid') == int(contextdata['coursemoduleid'])
             self.documents = VectorDB().connect_vectordb(index_name=self.context+'_'+contextdata['collection'],index_schema=self.index_schema).similarity_search(question,k=self.docsretriever,filter=filter)
             if self.documents:
                 for doc in self.documents:

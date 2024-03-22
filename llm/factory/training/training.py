@@ -6,6 +6,10 @@ class Training(ABC):
         self.redis_client = VectorDB().connect_client()
         self.vector_db = VectorDB()
         self.sql_db = SQLDB()
+        self.reponse = {
+            'error': False,
+            'message': ''
+        }
 
     @abstractmethod
     def save_training_data(self):
@@ -20,7 +24,9 @@ class Training(ABC):
         pass
     
     def get_training_data(self) -> list:
+        
         data = []
+
         for key in self.redis_client.scan_iter("doc:"+self.context+"*"):
             obj = {}
             obj['id'] = key.decode()
@@ -28,8 +34,13 @@ class Training(ABC):
                 content = self.redis_client.hget(key,column)
                 obj[column] = content.decode() if content else 'None'
             data.append(obj)
+
         return data
     
     def delete_training_data(self,key) -> dict:
+
         self.redis_client.delete(key)
-        return {'message': 'Xóa thành công'}
+
+        self.reponse['message'] = 'Xóa thành công'
+
+        return self.reponse

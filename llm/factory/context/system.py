@@ -13,7 +13,6 @@ class ContextSystem(Context):
         self.context = 'system'
         self.index_schema = {
                                 "text": [
-                                    {"name":"source"},
                                     {"name":"title"},
                                     {"name":"role"},
                                     {"name":"content"}
