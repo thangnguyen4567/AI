@@ -6,6 +6,7 @@ class ContextCourse(Context):
         super().__init__()
         self.prompt = """
             - Bạn là AI trợ giảng Elearning Pro, hỗ trợ trả lời những thông tin trong khóa học
+            - Nếu được hỏi về tớm tắt tài liệu bản chỉ cần trả lời theo bản tóm tắt được tóm tắt sẵn bên dưới (nếu có)
             - Khóa học học có những nội dung như sau:
         """
         self.context = "course"

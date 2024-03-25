@@ -16,18 +16,31 @@ class Training(ABC):
         pass
 
     @abstractmethod
-    def update_training_data(self):
-        pass
-
-    @abstractmethod
     def check_training_duplication(self):
         pass
     
-    def get_training_data(self) -> list:
+    def update_training_data(self,data) -> dict:
+
+        try:
+            obj = {}  
+
+            for value in data:
+                obj[value] = data[value]
+            
+            self.redis_client.hmset(data['id'],obj)
+
+            self.reponse['message'] = 'Sửa thành công'
+
+        except:
+            self.reponse['message'] = 'Sửa thất bại'
+
+        return self.reponse
+        
+    def get_training_data(self,index) -> list:
         
         data = []
 
-        for key in self.redis_client.scan_iter("doc:"+self.context+"*"):
+        for key in self.redis_client.scan_iter("doc:"+index+"*"):
             obj = {}
             obj['id'] = key.decode()
             for column in self.columns:
@@ -39,8 +52,12 @@ class Training(ABC):
     
     def delete_training_data(self,key) -> dict:
 
-        self.redis_client.delete(key)
+        try:
+            self.redis_client.delete(key)
 
-        self.reponse['message'] = 'Xóa thành công'
+            self.reponse['message'] = 'Xóa thành công'
+
+        except:
+            self.reponse['message'] = 'Xóa thất bại'
 
         return self.reponse

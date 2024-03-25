@@ -28,7 +28,6 @@ class TrainingCourse(Training):
 
             all_splits = self.text_splitter.split_documents(docs.load())
 
-
             metadata = {}
 
             for key,value in data.items():
@@ -38,11 +37,11 @@ class TrainingCourse(Training):
                 finaldocx.append(Document(page_content=doc.page_content,metadata=metadata))
             
             ## Xử lý lưu docs tóm tắt tài liệu
-            # summary = 'Bản tóm tắt tài liệu '+data['title']+':' + self.summary_traning_data(all_splits)
+            summary = 'Bản tóm tắt tài liệu '+data['title']+':' + self.summary_traning_data(all_splits)
 
-            # finaldocx.append(Document(page_content=summary,metadata=metadata))
+            finaldocx.append(Document(page_content=summary,metadata=metadata))
 
-            # self.vector_db.add_vectordb(finaldocx,self.context+'_'+data['collection'])
+            self.vector_db.add_vectordb(finaldocx,self.context+'_'+data['collection'])
 
             self.reponse['message'] = 'Training thành công'
 
@@ -54,10 +53,6 @@ class TrainingCourse(Training):
             self.reponse['message'] = 'Training thất bại'
 
             return self.reponse
-
-
-    def update_training_data(self):
-        pass
 
     def check_training_duplication(self):
         pass

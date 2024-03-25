@@ -34,9 +34,7 @@
     }
 </style>
 <div class="pl-5 pr-5 mt-5">
-    <div>
-    <h1 class="bd-title" id="content" style="text-align: center;">{{ data.type }}</h1>
-    </div>
+    <input id="dropdown_index" class="mb-3" style="width: 250px;">
     <div id="grid"></div>
 </div>
 </div>
@@ -45,62 +43,111 @@
 </html>
 <script>
     $(document).ready(function () {
-        var dataSource = new kendo.data.DataSource({
-            transport: {
-                type: "json",
-                read: {
-                    url:"../api/read?type={{data.type}}",
-                },
-                destroy: {
-                    url: "../api/delete",
-                    method: "POST",
-                }
+        // Xử lý kendo dropdown index
+        $("#dropdown_index").kendoDropDownList({
+			filter: "contains",
+			optionLabel: 'Chọn DB theo dự án',
+			dataTextField: "text",
+			dataValueField: "value",
+            change: function(e) {
+                kendoGrid(this.value())
             },
-            pageSize: 20,
-            batch: false,
-            schema: {
-                data: function(data) {
-                    if(data.message) {
-                        $("#grid").data("kendoGrid").dataSource.read()
-                    }
-                    return data
-                },
-                model: {
-                    id: "id",
-                    fields: {
-                        id: { editable: false, nullable: true },
-                    }
+			dataSource: new kendo.data.DataSource({
+                transport: {
+                    type: "json",
+                    read: {
+                        url:"../api/read_index"
+                    },
                 }
-            }
-        });
-        var columns = [
-            {% for item in data.columns %}
-            {
-                field:"{{ item }}",
-                title:"{{ item }}",
-            },
-            {% endfor %}
-        ];
-        columns.push({ 
-                command: ["edit", "destroy"], 
-                title: "Action" 
             })
-        $("#grid").kendoGrid({
-            dataSource: dataSource,
-            height: 800,
-            sortable: true,
-            toolbar: ["create","search"],
-            search: {
-                fields: ["content","title"]
-            },
-            pageSize: 20,
-            pageable: {
-                refresh: true,
-                pageSizes: true,
-                buttonCount: 5,
-                pageSize:20
-            },
-            columns: columns,
         });
+        // Xử lý kendo grid
+        function kendoGrid(index) {
+            var dataSource = new kendo.data.DataSource({
+                transport: {
+                    type: "json",
+                    read: {
+                        url:"../api/read?type={{data.type}}&index="+index,
+                    },
+                    destroy: {
+                        url: "../api/delete?type={{data.type}}",
+                        method: "POST",
+                    },
+                    update: {
+                        url: "../api/update?type={{data.type}}",
+                        method: "POST",
+                    },
+                },
+                pageSize: 20,
+                batch: false,
+                schema: {
+                    data: function(data) {
+                        if(data.message) {
+                            $("#grid").data("kendoGrid").dataSource.read()
+                        }
+                        return data
+                    },
+                    model: {
+                        id: "id",
+                        fields: {
+                            id: { editable: false, nullable: true },
+                        }
+                    }
+                }
+            });
+            var columns = [
+                {% for item in data.columns %}
+                {
+                    field:"{{ item }}",
+                    title:"{{ item }}",
+                },
+                {% endfor %}
+            ];
+            columns.push({ 
+                    command: ["edit", "destroy"], 
+                    title: "Action" 
+                })
+            if($('#grid').data('kendoGrid')) {
+                $('#grid').kendoGrid('destroy').empty();
+            }
+            $("#grid").kendoGrid({
+                dataSource: dataSource,
+                height: 800,
+                sortable: true,
+                toolbar: ["create","search"],
+                search: {
+                    fields: ["content","title"]
+                },
+                pageSize: 20,
+                pageable: {
+                    refresh: true,
+                    pageSizes: true,
+                    buttonCount: 5,
+                    pageSize:20
+                },
+                editable: {
+                    mode: "popup",
+                    template: kendo.template($("#popup-editor").html()),
+                    window: {
+                        animation: false,
+                        width: "900px",
+                        height: "600px",
+                    }
+                },
+                columns: columns,
+            });
+        }
     })
+</script>
+<script id="popup-editor" type="text/x-kendo-template">
+    {% for item in data.columns %}
+        <div class="form-group">
+        <label>{{ item }}</label>
+        {% if item == "content" %}
+            <textarea class="form-control" data-bind="value:{{ item }}" rows="12"></textarea>
+        {% else %}
+            <textarea class="form-control" data-bind="value:{{ item }}" rows="4"></textarea>
+        {% endif %}
+        </div>
+    {% endfor %}
 </script>

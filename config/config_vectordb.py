@@ -36,3 +36,10 @@ class VectorDB:
             port=self.vector_port,
         )
         return redis_client
+    
+    def get_list_index(self):
+        index_list = self.connect_client().execute_command('FT._LIST')
+        data = []
+        for index in index_list:
+            data.append(index.decode())
+        return data

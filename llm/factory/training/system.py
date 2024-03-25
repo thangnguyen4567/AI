@@ -21,8 +21,5 @@ class TrainingSystem(Training):
             finaldocx.append(Document(page_content=doc.page_content,metadata=metadata))
         self.vector_db.add_vectordb(finaldocx,self.context )
 
-    def update_training_data(self):
-        pass
-
     def check_training_duplication(self):
         pass
