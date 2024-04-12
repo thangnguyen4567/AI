@@ -9,10 +9,15 @@ from langchain.prompts import (
     HumanMessagePromptTemplate,
 )
 from dotenv import load_dotenv
+import os
 load_dotenv('.env')
 class ChatConverstation():
     def __init__(self) -> None:
-        self.llm = GoogleGenerativeAI(model="gemini-pro", google_api_key="AIzaSyCG-B02IPEKbwwzfSzP4gyNX6J46TVpZ0k")
+
+        google_api_key = os.getenv("GOOGLE_API_KEY_"+self.project.upper())
+
+        self.llm = GoogleGenerativeAI(model="gemini-pro", google_api_key=google_api_key)
+
         # self.llm = ChatOpenAI(model="gpt-3.5-turbo-0125")
 
     def get_conversation_chain(self,message) -> list:

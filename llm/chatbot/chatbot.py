@@ -4,7 +4,6 @@ from llm.factory.context_factory import ContextFactory
 class ChatBot(ChatConverstation):
 
     def __init__(self,config):
-        ChatConverstation.__init__(self)
         if "question" in config:
             self.question = config['question']
         if "chat_history" in config:
@@ -13,7 +12,10 @@ class ChatBot(ChatConverstation):
             self.contextdata = config['contextdata']
         if "context" in config:
             self.context = config['context']
+        if "project" in config:
+            self.project = config['project']
 
+        ChatConverstation.__init__(self)
         self.context = ContextFactory.create_context(self,self.context)
         self.prompt = self.context.retriever_document(self.contextdata,self.question)
 
