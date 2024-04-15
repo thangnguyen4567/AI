@@ -61,10 +61,18 @@ class TrainingCourse(Training):
         pass
     
     def summary_traning_data(self,docs):
+        
         summary = 'Bản tóm tắt tài liệu và các ý chính:'
         content = ''
+        num_tokens = 0
+
         for doc in docs:
-            content += doc.page_content
+            num_tokens += len(doc.page_content)/4
+            if(num_tokens < 25000):
+                content += doc.page_content
+            else:
+                break
+
         summary += self.llm.invoke(input="""Bạn hãy tóm tắt tài liệu sau đây giúp tôi nhé, tài liệu:
             {content}
         """.format(content=content))
