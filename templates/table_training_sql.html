@@ -5,7 +5,7 @@ $(document).ready(function () {
         transport: {
             type: "json",
             read: {
-                url:"../api/get_training_sql",
+                url:"../api/read?type=training_sql&index=training_sql",
             },
             create: {
                 url: "../api/training",
@@ -22,7 +22,7 @@ $(document).ready(function () {
                 }
             },
             destroy: {
-                url: "../api/delete",
+                url: "../api/delete?type=training_sql",
                 method: "POST",
             }
         },
@@ -52,7 +52,7 @@ $(document).ready(function () {
                 title: "Câu hỏi" 
             },
             { 
-                field: "answer", 
+                field: "query", 
                 title: "Trả lời" 
             },
             { 
@@ -99,6 +99,6 @@ $(document).ready(function () {
     </div>
     <div class="form-group">
         <label>Câu trả lời</label>
-        <textarea class="form-control" data-bind="value:answer" rows="14"></textarea>
+        <textarea class="form-control" data-bind="value:query" rows="14"></textarea>
     </div>
 </script>

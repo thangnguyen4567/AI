@@ -8,5 +8,7 @@ report = Blueprint('report', __name__)
 def create_query_sql_custom():
     requestJson = request.get_json()
     question = requestJson["question"]
-    result = llm.generate_sql(question)
+    query = llm.generate_sql(question)
+    answer = query.replace("\n", " ")
+    result = {'question': question, 'answer': answer}
     return result

@@ -112,21 +112,6 @@ class OpenAI_Chat(LLMBase):
         response = self.client.chat.completions.create(
             model=model, messages=prompt, max_tokens=500, stop=None, temperature=0.7
         )
-        # Set up the model
-        generation_config = {
-            "temperature": 0.9,
-            "top_p": 1,
-            "top_k": 1,
-            "max_output_tokens": 16000,
-        }
-        model = genai.GenerativeModel(model_name="gemini-pro",generation_config=generation_config)
-
-        convo = model.start_chat(history=[])
-
-
-        response = convo.send_message(prompt)
-
-
 
         for (
             choice

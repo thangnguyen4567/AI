@@ -19,32 +19,32 @@ class VectorStore(LLMBase):
         self.vector_port = os.getenv("VECTORDB_PORT")
         self.redis_url = self.vector_name + '://' + self.vector_host + ':' + self.vector_port
         self.ddl_schema = {
-            "text": [{"name": "table"}],
+            "text": [{"name": "query"}],
         }
         self.sql_schema = {
             "text": [{"name": "query"}],
         }
 
-        # self.documentation_collection = Redis.from_existing_index(
-        #     self.embeddings,
-        #     index_name='training_ddl',
-        #     redis_url=self.redis_url,
-        #     schema=self.ddl_schema
-        # )
+        self.documentation_collection = Redis.from_existing_index(
+            self.embeddings,
+            index_name='training_ddl',
+            redis_url=self.redis_url,
+            schema=self.ddl_schema
+        )
 
-        # self.ddl_collection = Redis.from_existing_index(
-        #     self.embeddings,
-        #     index_name='training_ddl',
-        #     redis_url=self.redis_url,
-        #     schema=self.ddl_schema
-        # )
+        self.ddl_collection = Redis.from_existing_index(
+            self.embeddings,
+            index_name='training_ddl',
+            redis_url=self.redis_url,
+            schema=self.ddl_schema
+        )
 
-        # self.sql_collection = Redis.from_existing_index(
-        #     self.embeddings,
-        #     index_name='training_sql',
-        #     redis_url=self.redis_url,
-        #     schema=self.sql_schema
-        # )
+        self.sql_collection = Redis.from_existing_index(
+            self.embeddings,
+            index_name='training_sql',
+            redis_url=self.redis_url,
+            schema=self.sql_schema
+        )
 
         self.client = redis.Redis(
             host=self.vector_host,

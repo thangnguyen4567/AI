@@ -5,7 +5,7 @@ $(document).ready(function () {
         transport: {
             type: "json",
             read: {
-                url:"../api/get_training_ddl",
+                url:"../api/read?type=training_ddl&index=training_ddl",
             },
             create: {
                 url: "../api/training",
@@ -22,7 +22,7 @@ $(document).ready(function () {
                 }
             },
             destroy: {
-                url: "../api/delete",
+                url: "../api/delete?type=training_ddl",
                 method: "POST",
             }
         },
@@ -52,7 +52,7 @@ $(document).ready(function () {
                 title: "Nội dung"
             },
             { 
-                field: "answer", 
+                field: "query", 
                 title: "Bảng" 
             },
             { 
@@ -112,7 +112,7 @@ $(document).ready(function () {
                             url: "../api/get_table_ddl/"+this.value(),
                             type: 'GET',
                         }).done(function(res) {
-                            kendo.editable.options.model.set('answer',res);
+                            kendo.editable.options.model.set('query',res);
                         });
                     }
                 });
@@ -129,10 +129,10 @@ $(document).ready(function () {
     </div>
     <div class="form-group">
         <label>Nội dung</label>
-        <textarea id="ddl_content" class="form-control" data-bind="value:content" rows="4"></textarea>
+        <textarea class="form-control" data-bind="value:content" rows="4"></textarea>
     </div>
     <div class="form-group">
         <label>Bảng dữ liệu</label>
-        <textarea id="ddl_answer" class="form-control" data-bind="value:answer" rows="14"></textarea>
+        <textarea class="form-control" data-bind="value:query" rows="14"></textarea>
     </div>
 </script>

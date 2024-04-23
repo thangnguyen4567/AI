@@ -22,11 +22,14 @@ def get_training_data():
     training = training_factory.create_training(request.args['type'])
     return training.get_training_data(data['index'])
 
-# @training.route('/api/training', methods=['POST'])
-# def save_training_data():
-#     data = request.get_json() 
-#     training = training_factory.create_training(data['type'])
-#     return training.save_training_data(data)
+@training.route('/api/training', methods=['POST'])
+def save_training_data():
+    if(request.form):
+        data = request.form
+    else:
+        data = request.get_json() 
+    training = training_factory.create_training(data['type'])
+    return training.save_training_data(data)
     
 @training.route('/api/delete', methods=['POST'])
 def delete_training_data():
@@ -48,12 +51,12 @@ def get_index():
 @training.route('/api/update', methods=['POST'])
 def update_data():
     data = request.form
-    training = training_factory.create_training(request.args['type'])
+    training = training_factory.create_training(data['type'])
     return training.update_training_data(data)
 
-@training.route('/api/generate_table_ddl', methods=['POST'])
-def generate_table_ddl():
-    return TrainingController().generate_table_ddl(request)
+# @training.route('/api/generate_table_ddl', methods=['POST'])
+# def generate_table_ddl():
+#     return TrainingController().generate_table_ddl(request)
 
 @training.route('/api/get_table', methods=['GET'])
 def get_table():
@@ -63,15 +66,3 @@ def get_table():
 def get_table_ddl(table):
     sql_statement = SQLDB().autogenerate_ddl(table)
     return str(sql_statement)
-
-@training.route('/api/get_training_sql', methods=['GET'])
-def get_training_sql():
-    return TrainingController().get_training_sql()
-
-@training.route('/api/get_training_ddl', methods=['GET'])
-def get_training_ddl():
-    return TrainingController().get_training_ddl()
-
-@training.route('/api/training', methods=['POST'])
-def create_data():
-    return TrainingController().create_training_data(request)
