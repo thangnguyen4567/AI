@@ -1,6 +1,5 @@
 from llm.factory.training.training import Training
 from langchain_community.document_loaders import Docx2txtLoader
-from langchain_community.document_loaders import PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.schema import Document
 class TrainingSystem(Training):
