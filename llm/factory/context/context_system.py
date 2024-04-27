@@ -21,7 +21,7 @@ class ContextSystem(Context):
                             }
         self.docsretriever = 5
     
-    def retriever_document(self,contextdata,question) -> str:
+    def retriever_document(self,contextdata: dict,question: str) -> str:
         if 'role' in contextdata:
             filter = RedisFilter.text('role') == contextdata['role']
             self.documents = VectorDB().connect_vectordb(index_name=self.context,index_schema=self.index_schema).similarity_search(question,k=self.docsretriever,filter=filter)

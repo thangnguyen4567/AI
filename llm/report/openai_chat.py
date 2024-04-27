@@ -84,31 +84,15 @@ class OpenAI_Chat(LLMBase):
                 if example is not None and "question" in example and "sql" in example:
                     message_log.append(OpenAI_Chat.user_message(example["question"]))
                     message_log.append(OpenAI_Chat.assistant_message(example["sql"]))
-
+    
         message_log.append({"role": "user", "content": question})
 
         return message_log
 
     def submit_prompt(self, prompt, **kwargs) -> str:
-        if prompt is None:
-            raise Exception("Prompt is None")
 
-        if len(prompt) == 0:
-            raise Exception("Prompt is empty")
+        
 
-        # Count the number of tokens in the message log
-        num_tokens = 0
-        for message in prompt:
-            num_tokens += (
-                len(message["content"]) / 4
-            )  # Use 4 as an approximation for the number of characters per token
-
-        if num_tokens > 3500:
-            model = "gpt-3.5-turbo-16k"
-        else:
-            model = "gpt-3.5-turbo"
-
-        print(f"Using model {model} for {num_tokens} tokens (approx)")
         response = self.client.chat.completions.create(
             model=model, messages=prompt, max_tokens=500, stop=None, temperature=0.7
         )

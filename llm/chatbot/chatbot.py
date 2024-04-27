@@ -1,29 +1,42 @@
-from llm.chatbot.model import ChatConverstation
 from llm.factory.context_factory import ContextFactory
-
-class ChatBot(ChatConverstation):
+from llm.factory.model_factory import ModelFactory
+class ChatBot():
 
     def __init__(self,config):
+
         if "question" in config:
             self.question = config['question']
+            
         if "chat_history" in config:
             self.chat_history = config['chat_history']
+
         if "contextdata" in config:
             self.contextdata = config['contextdata']
+
         if "context" in config:
             self.context = config['context']
+
         if "project" in config:
             self.project = config['project']
+        else:
+            self.project = None
 
-        ChatConverstation.__init__(self)
+        if "model" in config:
+            self.model = config['model']
+        else:
+            self.model = 'groq'
+
+        self.model = ModelFactory.create_model(self,self.model)
         self.context = ContextFactory.create_context(self,self.context)
         self.prompt = self.context.retriever_document(self.contextdata,self.question)
 
     def chat_reponse(self) -> list:
+        
+        self.model.generate_model(self.project)
 
-        message = self.get_conversation_message()
+        message = self.model.get_conversation_message(self.prompt,self.context.chat_history)
 
-        chain = self.get_conversation_chain(message)
+        chain = self.model.get_conversation_chain(message)
 
         reponse = chain({"question": self.question}) 
 

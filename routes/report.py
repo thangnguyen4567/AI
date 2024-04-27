@@ -1,14 +1,18 @@
 from flask import request,Blueprint
-from llm.init import PowerAI
+from llm.chatbot.chatbot import ChatBot
 
-llm = PowerAI()
 report = Blueprint('report', __name__)
 
 @report.route('/api/answer_query_v2', methods=['POST'])
 def create_query_sql_custom():
-    requestJson = request.get_json()
-    question = requestJson["question"]
-    query = llm.generate_sql(question)
-    answer = query.replace("\n", " ")
+    question = request.get_json()["question"]
+    data = {
+        'context':'report',
+        'question': question,
+        'contextdata': [],
+    }
+    chat = ChatBot(data)
+    query = chat.chat_reponse()
+    answer = query['text'].replace("\n", " ")
     result = {'question': question, 'answer': answer}
     return result

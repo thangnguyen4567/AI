@@ -24,7 +24,7 @@ class ContextCourse(Context):
                             }
         self.docsretriever = 4
 
-    def retriever_document(self,contextdata,question) -> str:
+    def retriever_document(self,contextdata: dict,question: str) -> str:
         if 'courseid' in contextdata and 'title' in contextdata:
             filter = RedisFilter.num('coursemoduleid') == int(contextdata['coursemoduleid'])
             self.documents = VectorDB().connect_vectordb(index_name=self.context+'_'+contextdata['collection'],index_schema=self.index_schema).similarity_search(question,k=self.docsretriever,filter=filter)

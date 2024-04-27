@@ -5,5 +5,5 @@ class Context(ABC):
 
     ##Lấy danh sách document theo context
     @abstractmethod
-    def retriever_document(self,contextdata,question) -> str:
+    def retriever_document(self,contextdata: dict,question: str) -> str:
         pass
