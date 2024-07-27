@@ -2,7 +2,6 @@ from config.config_vectordb import VectorDB
 from llm.factory.context.context import Context
 class ContextReport(Context):
     def __init__(self):
-        super().__init__()
         self.prompt = "The user provides a question and you provide SQL. You will only respond with SQL code and not with any explanations.\n\nRespond with only SQL code. Do not answer with any explanations -- just the code.\n"
         self.schema_sql = {
             "text": [{"name": "query"}],

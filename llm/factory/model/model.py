@@ -13,7 +13,7 @@ class Model(ABC):
         self.llm = ''
     
     @abstractmethod
-    def generate_model(self, project: str, **kwargs) -> None:
+    def generate_model(self, apikey: str, **kwargs) -> None:
         pass
 
     def get_conversation_chain(self,message) -> list:

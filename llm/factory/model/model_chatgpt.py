@@ -6,11 +6,9 @@ class ModelChatGPT(Model):
     def __init__(self):
         Model.__init__(self)
 
-    def generate_model(self,project: str):
+    def generate_model(self,apikey: str):
 
-        if project is not None:
-            api_key = os.getenv("OPENAI_API_KEY_"+project.upper())
-        else:
-            api_key = os.getenv("OPENAI_API_KEY")
+        if apikey is None:
+            apikey = os.getenv("OPENAI_API_KEY")
             
-        self.llm = ChatOpenAI(model="gpt-3.5-turbo-0125",api_key=api_key)
+        self.llm = ChatOpenAI(model="gpt-3.5-turbo-0125",api_key=apikey)

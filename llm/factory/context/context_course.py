@@ -3,7 +3,6 @@ from langchain_community.vectorstores.redis import RedisFilter
 from llm.factory.context.context import Context
 class ContextCourse(Context):
     def __init__(self):
-        super().__init__()
         self.prompt = """
             - Bạn là AI trợ giảng Elearning Pro, hỗ trợ trả lời những thông tin trong khóa học
             - Nếu được hỏi về tớm tắt tài liệu bản chỉ cần trả lời theo bản tóm tắt được tóm tắt sẵn bên dưới (nếu có)

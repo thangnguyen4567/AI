@@ -1,7 +1,9 @@
 from flask import Blueprint,request,session
 from dotenv import load_dotenv
 from llm.chatbot.chatbot import ChatBot
+
 load_dotenv('.env')
+
 chatbot = Blueprint('chatbot', __name__)
 
 @chatbot.route('/', methods=['GET'])
@@ -23,3 +25,12 @@ def get_metadata():
     chat = ChatBot(data)
     result = {'metadata':chat.get_documents_metadata()}
     return result
+
+@chatbot.route('/api/check_model', methods=['POST'])
+def check_model():
+    data = request.get_json()
+    try:
+        ChatBot(data)
+        return {'error':False}
+    except:
+        return {'error':True}

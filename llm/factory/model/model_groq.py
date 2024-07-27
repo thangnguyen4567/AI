@@ -7,11 +7,9 @@ class ModelGroq(Model):
     def __init__(self):
         Model.__init__(self)
 
-    def generate_model(self,project: str):
+    def generate_model(self,apikey: str):
 
-        if project is not None:
-            api_key = os.getenv("GROQ_API_KEY_"+project.upper())
-        else:
-            api_key = os.getenv("GROQ_API_KEY")
+        if apikey is None:
+            apikey = os.getenv("GROQ_API_KEY")
             
-        self.llm = ChatGroq(temperature=0, model_name="llama3-70b-8192", api_key=api_key)
+        self.llm = ChatGroq(temperature=0, model_name="llama3-70b-8192", api_key=apikey)
