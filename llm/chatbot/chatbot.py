@@ -5,7 +5,7 @@ class ChatBot():
 
     def __init__(self,config):
 
-        self.question = config.get('question')
+        self.question = config.get('question','test')
         self.chat_history = config.get('chat_history')
         self.contextdata = config.get('contextdata')
         self.context = config.get('context')
@@ -16,6 +16,12 @@ class ChatBot():
         if self.context is not None:
             self.context = ContextFactory.create_context(self,self.context)
             self.prompt = self.context.retriever_document(self.contextdata,self.question)
+
+    def check_chatbot(self):
+        
+        self.model.generate_model(self.apikey)
+        chain = self.model.get_conversation_chain([])
+        chain({"question": self.question}) 
 
     def chat_reponse(self) -> list:
         

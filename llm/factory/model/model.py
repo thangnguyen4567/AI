@@ -16,7 +16,10 @@ class Model(ABC):
     def generate_model(self, apikey: str, **kwargs) -> None:
         pass
 
-    def get_conversation_chain(self,message) -> list:
+    def get_conversation_chain(self, message: list) -> list:
+
+        if message == []:
+            message = [SystemMessagePromptTemplate.from_template('')]
 
         memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
         prompt = ChatPromptTemplate(messages=message)
@@ -28,7 +31,7 @@ class Model(ABC):
         )
         return conversation
     
-    def get_conversation_message(self,context,chat_history) -> list:
+    def get_conversation_message(self,context: str,chat_history: list) -> list:
         message = [SystemMessagePromptTemplate.from_template(context)]
         for chat in chat_history:
             if 'human' in chat:

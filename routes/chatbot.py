@@ -30,7 +30,8 @@ def get_metadata():
 def check_model():
     data = request.get_json()
     try:
-        ChatBot(data)
+        chat = ChatBot(data)
+        chat.check_chatbot()
         return {'error':False}
     except:
         return {'error':True}
