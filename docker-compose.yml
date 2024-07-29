@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis/redis-stack
+    container_name: redis
+    ports:
+      - "6381:6379"
+      - "8001:8001"
+    volumes:
+      - redisdata:/data
+      - ./dump.rdb:/data/dump.rdb
+    restart: always
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      FLASK_APP: app.py
+      FLASK_RUN_HOST: 0.0.0.0
+      FLASK_ENV: development
+    volumes:
+      - .:/app
+    depends_on:
+      - redis
+    restart: always
+    command: flask run
+
+volumes:
+  redisdata:
