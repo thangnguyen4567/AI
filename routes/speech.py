@@ -1,5 +1,6 @@
 from flask import Blueprint,send_file,request
 import pyttsx3
+from gtts import gTTS
 
 speech = Blueprint('speech', __name__)
 
@@ -7,9 +8,10 @@ speech = Blueprint('speech', __name__)
 def api_create_speech():
     if 'text' in request.get_json() :
         text = request.get_json()['text']
-        engine = pyttsx3.init()
-        voices = engine.getProperty("voices")
-        engine.setProperty("voice", voices[1].id)
-        engine.save_to_file(text, 'speech.mp3')
-        engine.runAndWait()
+        tts = gTTS(text=text, lang='vi')
+        tts.save("speech.mp3")
     return send_file('speech.mp3', mimetype='audio/mpeg')
+
+
+
+
