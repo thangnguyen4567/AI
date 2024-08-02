@@ -56,7 +56,7 @@
                 transport: {
                     type: "json",
                     read: {
-                        url:"../api/read_index"
+                        url:"../training/read_index"
                     },
                 }
             })
@@ -67,14 +67,14 @@
                 transport: {
                     type: "json",
                     read: {
-                        url:"../api/read?type={{data.type}}&index="+index,
+                        url:"../training/read?type={{data.type}}&index="+index,
                     },
                     destroy: {
-                        url: "../api/delete?type={{data.type}}",
+                        url: "../training/delete?type={{data.type}}",
                         method: "POST",
                     },
                     update: {
-                        url: "../api/update?type={{data.type}}",
+                        url: "../training/update?type={{data.type}}",
                         method: "POST",
                     },
                 },

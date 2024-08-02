@@ -4,7 +4,7 @@ from gtts import gTTS
 
 speech = Blueprint('speech', __name__)
 
-@speech.route('/api/voice', methods=['POST'])
+@speech.route('/voice', methods=['POST'])
 def api_create_speech():
     if 'text' in request.get_json() :
         text = request.get_json()['text']

@@ -1,5 +1,5 @@
 from flask import request,Blueprint
-from llm.chatbot.chatbot import ChatBot
+from llm.services.chatbot import ChatBot
 
 report = Blueprint('report', __name__)
 
@@ -12,7 +12,7 @@ def create_query_sql_custom():
         'contextdata': [],
     }
     chat = ChatBot(data)
-    query = chat.chat_reponse()
+    query = chat.chat_response()
     answer = query['text'].replace("\n", " ")
     result = {'question': question, 'answer': answer}
     return result

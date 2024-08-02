@@ -20,10 +20,10 @@ class ChatBot():
     def check_chatbot(self):
         
         self.model.generate_model(self.apikey)
-        chain = self.model.get_conversation_chain([])
+        chain = self.model.get_conversation_chain()
         chain({"question": self.question}) 
 
-    def chat_reponse(self) -> list:
+    def chat_response(self) -> list:
         
         self.model.generate_model(self.apikey)
         message = self.model.get_conversation_message(self.prompt,self.chat_history)

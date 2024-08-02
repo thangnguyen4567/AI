@@ -11,4 +11,4 @@ class ModelChatGPT(Model):
         if apikey is None:
             apikey = os.getenv("OPENAI_API_KEY")
             
-        self.llm = ChatOpenAI(model="gpt-3.5-turbo-0125",api_key=apikey)
+        self.llm = ChatOpenAI(model="gpt-4o-mini",api_key=apikey)

@@ -23,12 +23,12 @@ services:
       FLASK_APP: app.py
       FLASK_RUN_HOST: 0.0.0.0
       FLASK_ENV: development
+      FLASK_RUN_PORT: 5000
     volumes:
       - .:/app
     depends_on:
       - redis
     restart: always
-    command: flask run
 
 volumes:
   redisdata:

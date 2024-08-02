@@ -5,24 +5,24 @@ $(document).ready(function () {
         transport: {
             type: "json",
             read: {
-                url:"../api/read?type=training_ddl&index=training_ddl",
+                url:"../training/read?type=training_ddl&index=training_ddl",
             },
             create: {
-                url: "../api/training",
+                url: "../training/training",
                 method: "POST",
                 data: {
                     type: 'training_ddl',
                 }
             },
             update: {
-                url: "../api/update",
+                url: "../training/update",
                 method: "POST",
                 data: {
                     type: 'training_ddl',
                 }
             },
             destroy: {
-                url: "../api/delete?type=training_ddl",
+                url: "../training/delete?type=training_ddl",
                 method: "POST",
             }
         },
@@ -95,7 +95,7 @@ $(document).ready(function () {
                     transport: {
                         type: "json",
                         read: {
-                            url:"../api/get_table",
+                            url:"../training/get_table",
                         },
                     }
                 });
@@ -109,7 +109,7 @@ $(document).ready(function () {
                         let kendo = $('#grid_ddl').data('kendoGrid')
                         kendo.editable.options.model.set('content',this.value());
                         $.ajax({
-                            url: "../api/get_table_ddl/"+this.value(),
+                            url: "../training/get_table_ddl/"+this.value(),
                             type: 'GET',
                         }).done(function(res) {
                             kendo.editable.options.model.set('query',res);

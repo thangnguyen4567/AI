@@ -16,9 +16,9 @@ class Model(ABC):
     def generate_model(self, apikey: str, **kwargs) -> None:
         pass
 
-    def get_conversation_chain(self, message: list) -> list:
+    def get_conversation_chain(self, message: list = None) -> list:
 
-        if message == []:
+        if message is None:
             message = [SystemMessagePromptTemplate.from_template('')]
 
         memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
@@ -31,12 +31,16 @@ class Model(ABC):
         )
         return conversation
     
-    def get_conversation_message(self,context: str,chat_history: list) -> list:
+    def get_conversation_message(self,context: str,chat_history: list = None) -> list:
+
         message = [SystemMessagePromptTemplate.from_template(context)]
-        for chat in chat_history:
-            if 'human' in chat:
-                message.append(HumanMessage(content=chat['human']))
-            if 'bot' in chat and chat['bot'] != None:
-                message.append(AIMessage(content=chat['bot']))
-        message.append(HumanMessagePromptTemplate.from_template("{question}"))
+
+        if chat_history is not None:
+            for chat in chat_history:
+                if 'human' in chat:
+                    message.append(HumanMessage(content=chat['human']))
+                if 'bot' in chat and chat['bot'] != None:
+                    message.append(AIMessage(content=chat['bot']))
+            message.append(HumanMessagePromptTemplate.from_template("{question}"))
+
         return message

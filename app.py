@@ -2,6 +2,7 @@ from routes.chatbot import chatbot
 from routes.report import report
 from routes.speech import speech
 from routes.training import training
+from routes.editor import editor
 from flask import Flask
 from flask_cors import CORS
 from logging.handlers import RotatingFileHandler
@@ -25,6 +26,7 @@ app.register_blueprint(chatbot, url_prefix='/chatbot')
 app.register_blueprint(report, url_prefix='/report')
 app.register_blueprint(speech, url_prefix='/speech')
 app.register_blueprint(training, url_prefix='/training')
+app.register_blueprint(editor, url_prefix='/editor')
 
 if __name__ == '__main__':
-    app.run(debug=True,host='0.0.0.0', port=8009,use_reloader=True)
+    app.run(host='0.0.0.0', port=5000,use_reloader=True)

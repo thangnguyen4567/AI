@@ -25,3 +25,5 @@ langchain-google-genai==0.0.9
 langchain-groq
 gtts
 ptvsd
+pytz
+pandas

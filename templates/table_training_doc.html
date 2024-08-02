@@ -5,24 +5,24 @@ $(document).ready(function () {
         transport: {
             type: "json",
             read: {
-                url:"../api/get_training_doc",
+                url:"../training/get_training_doc",
             },
             create: {
-                url: "../api/training",
+                url: "../training/training",
                 method: "POST",
                 data: {
                     type: 'training_doc',
                 }
             },
             update: {
-                url: "../api/update",
+                url: "../training/update",
                 method: "POST",
                 data: {
                     type: 'training_doc',
                 }
             },
             destroy: {
-                url: "../api/delete",
+                url: "../training/delete",
                 method: "POST",
             }
         },

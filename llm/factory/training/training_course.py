@@ -40,9 +40,9 @@ class TrainingCourse(Training):
                 finaldocx.append(Document(page_content=doc.page_content,metadata=metadata))
             
             ## Xử lý lưu docs tóm tắt tài liệu
-            summary = 'Bản tóm tắt tài liệu '+data['title']+':' + self.summary_traning_data(all_splits)
+            # summary = 'Bản tóm tắt tài liệu '+data['title']+':' + self.summary_traning_data(all_splits)
 
-            finaldocx.append(Document(page_content=summary,metadata=metadata))
+            # finaldocx.append(Document(page_content=summary,metadata=metadata))
 
             self.vector_db.add_vectordb(finaldocx,self.context+'_'+data['collection'])
 
