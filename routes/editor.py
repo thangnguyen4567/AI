@@ -11,5 +11,8 @@ def get_conversations():
     data = request.get_json()
     editor = Editor(data)
     answer = editor.response()
-    result = {'answer':answer['text']}
+    if hasattr(answer, 'content'):
+        result = {'answer':answer.content}
+    else:
+        result = {'answer':answer}
     return result

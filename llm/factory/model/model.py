@@ -1,6 +1,6 @@
 from langchain.chains import LLMChain
 from langchain.memory import ConversationBufferMemory
-from langchain_core.messages import AIMessage, HumanMessage
+from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from langchain.prompts import (
     ChatPromptTemplate,
     SystemMessagePromptTemplate,
@@ -43,4 +43,15 @@ class Model(ABC):
                     message.append(AIMessage(content=chat['bot']))
             message.append(HumanMessagePromptTemplate.from_template("{question}"))
 
+        return message 
+
+    def get_editor_message(self,systems: list,context: str,query: str) -> list:
+
+        message = []
+        for system in systems:
+            message.append(SystemMessage(content=system))
+
+        message.append(SystemMessage(content='Cotext:'+context))
+        message.append(HumanMessage(content=query))
+        
         return message
