@@ -5,7 +5,7 @@ class Training(ABC):
     def __init__(self):
         self.redis_client = VectorDB().connect_client()
         self.vector_db = VectorDB()
-        self.sql_db = SQLDB()
+        # self.sql_db = SQLDB()
         self.reponse = {
             'error': False,
             'message': ''

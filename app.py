@@ -12,7 +12,7 @@ import ptvsd
 
 app = Flask(__name__, template_folder="templates")
 
-ptvsd.enable_attach(address=('0.0.0.0', 5678), redirect_output=True)
+# ptvsd.enable_attach(address=('0.0.0.0', 5678), redirect_output=True)
 
 app.secret_key = 'secret_key'
 app.cors = CORS(app, resources={r"*": {"origins": "*"}},supports_credentials=True)

@@ -11,7 +11,7 @@ class ChatBot():
         self.context = config.get('context')
         self.project = config.get('project')
         self.apikey = config.get('apikey')
-        self.model = ModelFactory.create_model(self,config.get('model','groq'))
+        self.model = ModelFactory.create_model(self,config.get('model','chatgpt'))
 
         if self.context is not None:
             self.context = ContextFactory.create_context(self,self.context)

@@ -11,7 +11,7 @@ class Editor():
         self.context = config.get('context')
         self.apikey = config.get('apikey')
         self.prompt = config.get('prompt')
-        self.model = ModelFactory.create_model(self,config.get('model','gemini'))
+        self.model = ModelFactory.create_model(self,config.get('model','chatgpt'))
 
     def response(self) -> list:
         
