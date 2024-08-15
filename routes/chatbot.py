@@ -1,4 +1,4 @@
-from flask import Blueprint,request,session
+from flask import Blueprint,request,render_template
 from dotenv import load_dotenv
 from llm.services.chatbot import ChatBot
 
@@ -9,7 +9,7 @@ chatbot = Blueprint('chatbot', __name__)
 @chatbot.route('/', methods=['GET'])
 def check_api():
     return 'Work'
-
+    
 @chatbot.route('/conversations', methods=['POST'])
 def get_conversations():
     data = request.get_json()
@@ -35,3 +35,7 @@ def check_model():
         return {'error':False}
     except:
         return {'error':True}
+
+@chatbot.route('/demo', methods=['GET'])
+def chatbottemplate():
+    return render_template('chatbot.html')

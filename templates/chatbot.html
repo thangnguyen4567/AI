@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Chatbot</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+    <link rel="stylesheet" href="../static/css/styles.css">
+  </head>
+  <body>
+    <div class="form_format">
+      <div class="container">
+        <h2>Trung Nguyên chatbot</h2>
+        <div class="chat_container"></div>
+        <div class="question_line">
+          <button id="microphone" class="button">
+            <i class="fas fa-microphone"></i>
+          </button>
+          <input type="text" id="questioninput" placeholder="Type or ask me something" />
+          <!-- <input id="onClickAddChat" type="submit" value=">" onclick="submit_data()" /> -->
+          <button id="onClickAddChat" class="buttonSubmit" onclick="submit_data()">
+            <!-- paper airplane share button -->
+            <i class="fas fa-paper-plane"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdn.rawgit.com/mattdiamond/Recorderjs/08e7abd9/dist/recorder.js"></script>
+  </body>
+</html>
