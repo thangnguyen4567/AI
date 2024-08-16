@@ -28,6 +28,9 @@ async function submit_data() {
       human: question,
       bot: data.answer 
     }
+    if(chat_history.length > 5) {
+      chat_history.shift()
+    } 
     chat_history.push(history)
   }
   
@@ -44,9 +47,8 @@ async function submit_data() {
   function onAppendBotChat(content) {
     $('.loading-spinner').remove()
     var chat_container = document.querySelector(".chat_container");
-  
     var lastChatResponse = chat_container.querySelector(".chat-response:last-child");
-  
+
     if (lastChatResponse) {
       lastChatResponse.querySelector("span").innerText += content;
     } else {
@@ -58,6 +60,10 @@ async function submit_data() {
       chatResponse.appendChild(chatResponse_text);
       chat_container.appendChild(chatResponse);
     }
+    let chatreponse = document.querySelectorAll(".chat-response:last-child")[0].innerHTML
+    let newhtml = convertLinksToImages(chatreponse);
+    console.log(newhtml)
+    document.querySelectorAll(".chat-response:last-child")[0].innerHTML = newhtml
   }
   
   function addSpeakerButton(answer) {
@@ -197,4 +203,15 @@ function pageRotate(){
   // Continuously update the background angle
   setInterval(updateAngle, updateInterval);
 
+}
+
+function convertLinksToImages(htmlString) {
+    // Biểu thức chính quy để tìm các liên kết hình ảnh trong chuỗi
+    const imageRegex = /\[.*?\]\((https?:\/\/[^\s]+)\)/g;
+
+    // Thay thế các liên kết hình ảnh bằng thẻ <img>
+    return htmlString.replace(imageRegex, (match, url) => {
+        console.log(`Found image URL: ${url}`); // Ghi lại URL hình ảnh
+        return `<img src="${url}" alt="">`;
+    });
 }

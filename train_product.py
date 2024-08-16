@@ -20,7 +20,7 @@ def get_routes_with_specific_path(base_url, path_contains, page):
         except requests.exceptions.RequestException as e:
             print(f"Lỗi khi truy cập {route}: {e}")
             return None
-        
+    
         soup = BeautifulSoup(response.text, 'html.parser')
 
         for link in soup.find_all('a'):
@@ -35,17 +35,29 @@ def get_routes_with_specific_path(base_url, path_contains, page):
 
     return specific_routes
 
-def fetch_data_from_class(route, class_names):
+def fetch_data_from_class(route, class_names, title):
     try:
         response = requests.get(route,verify=False)
         response.raise_for_status()
         soup = BeautifulSoup(response.text, 'html.parser')
         combined_text = ''
+
+
+        for img in soup.find_all('img'):
+            img=(img.get('src'))
+            if img is not None:
+                if '/product/' in img:
+                    finalimg = img
+
         for class_name in class_names:
             elements = soup.find_all(class_=class_name)
             if elements and elements[0]:
                 combined_text = combined_text + [element.get_text() for element in elements][0]
-        return combined_text
+
+        if combined_text != '':
+            combined_text = combined_text + 'link hình ảnh sản phẩm:' + finalimg
+            finaldocx.append(Document(page_content=combined_text, metadata={"url": route, "type": title, "image": finalimg}))
+
     except requests.exceptions.RequestException as e:
         print(f"Lỗi khi truy cập {route}: {e}")
         return None
@@ -64,10 +76,9 @@ class_names = ['product-info-main','description']
 
 
 filtered_routes = get_routes_with_specific_path(base_url, path_contains, page)
+filtered_routes = list(set(filtered_routes))
 
 for route in filtered_routes:
-    page_content = fetch_data_from_class(route, class_names)
-    if page_content != '':
-        finaldocx.append(Document(page_content=page_content, metadata={"url": route, "type": title}))
+    fetch_data_from_class(route, class_names, title)
 
 vector_db.add_vectordb(finaldocx,'webcafe')
