@@ -13,7 +13,7 @@ class ContextWebCafe(Context):
             2. Cung cấp thông tin về sản phẩm và dịch vụ:
             AI cần nắm rõ thông tin về tất cả các sản phẩm của Trung Nguyên Legend, bao gồm các loại cà phê, đặc điểm của từng loại, và các dịch vụ hiện có như giao hàng, chương trình khuyến mãi, và thẻ thành viên.
             Bổ sung giá tiền kèm theo ở mỗi sản phẩm khi AI tư vấn
-            Nếu trong sản phẩm có link hình ảnh sản phẩm thì đưa lên cho người dùng xem, Những sản phẩm có giá 0đ sẽ là công thức pha chế hướng dẫn khách hàng
+            Nếu trong sản phẩm có link hình ảnh hoặc link sản phẩm thì đưa lên cho người dùng xem, Những sản phẩm có giá 0đ sẽ là công thức pha chế hướng dẫn khách hàng
             Ví dụ: "Trung Nguyên Legend có các loại cà phê đặc biệt như cà phê sáng tạo, cà phê hòa tan G7, và cà phê Legend. Bạn có quan tâm đến loại nào không?"
             3. Xử lý khiếu nại và phản hồi:
             AI cần có khả năng lắng nghe và giải quyết khiếu nại của khách hàng một cách hiệu quả, đồng thời ghi nhận phản hồi để cải thiện dịch vụ.
@@ -37,7 +37,8 @@ class ContextWebCafe(Context):
         self.index_schema = {
                                 "text": [
                                     {"name":"content"},
-                                    {"name":"url"}
+                                    {"name":"url"},
+                                    {"name":"image"}
                                 ],
                             }
         self.docsretriever = 10
@@ -47,5 +48,8 @@ class ContextWebCafe(Context):
         self.documents = VectorDB().connect_vectordb(index_name=self.context,index_schema=self.index_schema).similarity_search(question,k=self.docsretriever)
         if self.documents:
             for doc in self.documents:
-                self.prompt += doc.page_content 
+                if doc.metadata['image'] is not None:
+                    self.prompt += doc.page_content + ' link sản phẩm:' + doc.metadata['url']
+                else:
+                    self.prompt += doc.page_content 
         return self.prompt

@@ -211,7 +211,10 @@ function convertLinksToImages(htmlString) {
 
     // Thay thế các liên kết hình ảnh bằng thẻ <img>
     return htmlString.replace(imageRegex, (match, url) => {
-        console.log(`Found image URL: ${url}`); // Ghi lại URL hình ảnh
-        return `<img src="${url}" alt="">`;
+        if (url.endsWith('.html')) {
+          return `<a target="_blank" href="${url}">Link sản phẩm</a>`
+        } else {
+          return `<img src="${url}" alt="">`;
+        }
     });
 }
