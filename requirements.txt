@@ -26,4 +26,5 @@ langchain-groq
 gtts
 ptvsd
 pytz
+pydub
 pandas

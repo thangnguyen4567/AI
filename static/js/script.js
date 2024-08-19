@@ -56,13 +56,13 @@ async function submit_data() {
       chatResponse.classList.add("chat-response");
   
       var chatResponse_text = document.createElement("span");
-      chatResponse_text.innerText = content || "";
+      chatResponse_text.innerHTML = content || "";
       chatResponse.appendChild(chatResponse_text);
       chat_container.appendChild(chatResponse);
     }
     let chatreponse = document.querySelectorAll(".chat-response:last-child")[0].innerHTML
     let newhtml = convertLinksToImages(chatreponse);
-    console.log(newhtml)
+    // console.log(newhtml)
     document.querySelectorAll(".chat-response:last-child")[0].innerHTML = newhtml
   }
   
