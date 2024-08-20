@@ -1,6 +1,7 @@
 from langchain.chains import LLMChain
 from langchain.memory import ConversationBufferMemory
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
+from langchain_core.output_parsers import StrOutputParser
 from langchain.prompts import (
     ChatPromptTemplate,
     SystemMessagePromptTemplate,
@@ -31,6 +32,17 @@ class Model(ABC):
         )
         return conversation
     
+    def get_conversation_chain_stream(self, message: list = None) -> list:
+
+        if message is None:
+            message = [SystemMessagePromptTemplate.from_template('')]
+
+        parser = StrOutputParser()
+        prompt = ChatPromptTemplate(messages=message)
+        chain = prompt | self.llm | parser
+
+        return chain
+
     def get_conversation_message(self,context: str,chat_history: list = None) -> list:
 
         message = [SystemMessagePromptTemplate.from_template(context)]
