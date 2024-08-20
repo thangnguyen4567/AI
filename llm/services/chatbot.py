@@ -34,6 +34,15 @@ class ChatBot():
 
         return reponse
 
+    async def chat_response_stream(self):
+
+        self.model.generate_model(self.apikey)
+        message = self.model.get_conversation_message(self.prompt,self.chat_history)
+        chain = self.model.get_conversation_chain_stream(message)
+
+        async for chunk in chain.astream({"question": self.question}):
+            yield chunk
+
     def get_documents_metadata(self) -> list:
         sources = []
         for document in self.context.documents:
