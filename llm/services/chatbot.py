@@ -6,6 +6,7 @@ class ChatBot():
     def __init__(self,config):
 
         self.question = config.get('question','test')
+        print(self.question)
         self.chat_history = config.get('chat_history')
         self.contextdata = config.get('contextdata')
         self.context = config.get('context')

@@ -1,0 +1,445 @@
+/* Importing Inter Font from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Inter", sans-serif;
+}
+body {
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  justify-content: center;
+  min-height: 100vh;
+  background: linear-gradient(120deg, rgb(96, 227, 97) 0%, rgb(0, 125, 44) 150%);
+}
+
+.back-button { /* Example button color */
+  color: grey;
+  border: none;
+  cursor: pointer;
+  font-size: 50px;
+  margin: 20px;
+}
+
+.back-button:hover {
+  color: white; /* Example hover color */
+}
+
+.file-uploader {
+  width: 500px;
+  height: 200px;
+  background: #fff;
+  border-radius: 5px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+.file-uploader .uploader-header {
+  display: flex;
+  padding: 20px;
+  background: #EEF1FB;
+  align-items: center;
+  border-radius: 5px 5px 0 0;
+  justify-content: space-between;
+}
+.uploader-header .uploader-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.uploader-header .file-completed-status {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #333;
+}
+.file-uploader .file-list {
+  list-style: none;
+  width: 100%;
+  padding-bottom: 10px;
+  max-height: 400px;
+  overflow-y: auto;
+  scrollbar-color: #999 transparent;
+  scrollbar-width: thin;
+}
+.file-uploader .file-list:has(li) {
+  padding: 20px;
+}
+.stacker {
+  margin: 20px;
+}
+.file-list-container {
+  width: 400px;
+  height: 500px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  margin-left: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.file-list-container .list-header {
+  display: flex;
+  padding: 20px;
+  background: #EEF1FB;
+  align-items: center;
+  border-radius: 10px 10px 0 0;
+  justify-content: space-between;
+}
+.file-list-container .list-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.file-list-container .file-list {
+  padding: 20px; /* Ensure padding inside the file-list-container */
+  max-height: 450px; /* Adjust the height based on header or other elements */
+  align-self: center;
+}
+
+.file-list {
+  list-style: none;
+  padding: 0;
+  border-radius: 15px ;
+  max-height: 400px; /* Set maximum height */
+  max-width: 400px;
+  overflow-y: auto; /* Enable vertical scrolling */
+  flex-grow: 1;
+}
+.file-list .file-item {
+  display: flex;
+  gap: 14px;
+  margin-bottom: 22px;
+  background-color: #e7e7e7; /* Add your desired background color */
+  padding: 15px; /* Adjust padding as needed */
+  border-radius: 8px; /* Add border radius for rounded corners */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional: Add box-shadow for depth */
+}
+.file-list .file-item:last-child {
+  margin-bottom: 0px;
+}
+.file-list .file-item .file-extension {
+  height: 50px;
+  width: 50px;
+  color: #fff;
+  display: flex;
+  text-transform: uppercase;
+  align-items: center;
+  justify-content: center;
+  border-radius: 15px;
+  background: #04aa6d;
+}
+.file-list .file-item .file-content-wrapper {
+  flex: 1;
+}
+.file-list .file-item .file-content {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+}
+.file-list .file-item .file-name {
+  font-size: 1rem;
+  font-weight: 600;
+}
+.file-list .file-item .file-info {
+  display: flex;
+  gap: 5px;
+}
+.file-list .file-item .file-info small {
+  color: #5c5c5c;
+  margin-top: 5px;
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+.file-list .file-item .file-info .file-status {
+  color: #04aa6d;
+}
+.file-list .file-item .cancel-button {
+  align-self: center;
+  border: none;
+  outline: none;
+  background: none;
+  cursor: pointer;
+  font-size: 1.4rem;
+}
+.file-list .file-item .cancel-button:hover {
+  color: #E3413F;
+}
+.file-list .file-item .file-progress-bar {
+  width: 100%;
+  height: 3px;
+  margin-top: 10px;
+  border-radius: 30px;
+  background: #d9d9d9;
+}
+.file-list .file-item .file-progress-bar .file-progress {
+  width: 0%;
+  height: inherit;
+  border-radius: inherit;
+  background: #04aa6d;
+}
+
+.file-item.uploading .file-status {
+  color: #FF9900; /* Color for uploading status */
+}
+
+.file-item.completed .file-status {
+  color: #00B125; /* Color for completed status */
+}
+
+.file-progress-bar {
+  display: none;
+}
+
+.file-item.uploading .file-progress-bar {
+  display: block;
+}
+
+.file-uploader .file-upload-box {
+  margin: 10px 20px 20px;
+  border-radius: 5px;
+  min-height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed #B1ADD4;
+  transition: all 0.2s ease;
+}
+.file-uploader .file-upload-box.active {
+  border: 2px solid #04aa6d;
+  background: #F3F6FF;
+}
+.file-uploader .file-upload-box .box-title {
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: #626161;
+}
+.file-uploader .file-upload-box.active .box-title {
+  pointer-events: none;
+}
+.file-upload-box .box-title .file-browse-button {
+  color: #3366CC;
+  cursor: pointer;
+}
+.file-upload-box .box-title .file-browse-button:hover {
+ text-decoration: underline;
+}
+
+.upload-button {
+    background-color: #007BFF; /* Example button color */
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.upload-button:hover {
+    background-color: #0056b3; /* Example hover color */
+}
+
+.download-button {
+  background-color: #777777; /* Example button color */
+  color: white;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.download-button:hover {
+  background-color: #565656; /* Example hover color */
+}
+
+.reset-button {
+  background-color: #ff0000; /* Example button color */
+  color: white;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.reset-button:hover {
+  background-color: #b30000; /* Example hover color */
+}
+
+.test-button {
+  background-color: #ff0000; /* Example button color */
+  color: white;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+  font-size: 5px;
+}
+
+.test-button:hover {
+  background-color: #b30000; /* Example hover color */
+}
+
+.BG-button {
+  display: inline;
+  background-color: #dddddd; /* Example button color */
+  color: white;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.BGtext{
+  display: inline-flex;
+  font-size: 16px;
+  transition: transform 0.5s;
+}
+
+.BG-button:hover .BGtext {
+  animation: spin 2s;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 20px;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* The slider */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 0;
+  bottom: 0;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #2196F3;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(20px);
+  -ms-transform: translateX(20px);
+  transform: translateX(20px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+
+.button-with-spinner {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.spinner {
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top: 4px solid #fff;
+  width: 16px;
+  height: 16px;
+  animation: spin 2s infinite ease-in-out;
+  position: absolute;
+  right: 10px; /* Adjust to position the spinner within the button */
+  display: none; /* Initially hide the spinner */
+}
+
+.loading .spinner {
+  display: block; /* Display the spinner when .loading class is applied */
+}
+
+.loading {
+  padding-right: 30px; /* Adjust padding when loading to accommodate the spinner */
+}
+
+
+.cancel-button {
+  background: transparent;
+  border: none;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.cancel-button:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.cancel-button:active {
+  background-color: rgba(0, 0, 0, 0.2);
+}
+.popup-message {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #7e7e7e;
+  color: white;
+  padding: 15px;
+  border-radius: 5px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  font-size: 16px;
+}
+
+/* fade in and fade out for pop-up message */
+.fade-in {
+  animation: fadeIn 0.5s;
+}
+.fade-out {
+  animation: fadeOut 0.5s;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

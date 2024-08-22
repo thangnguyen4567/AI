@@ -92,7 +92,7 @@ class OpenAI_Chat(LLMBase):
     def submit_prompt(self, prompt, **kwargs) -> str:
 
         response = self.client.chat.completions.create(
-            model='gpt-4o-mini', messages=prompt, max_tokens=500, stop=None, temperature=0.7
+            model='gpt-4o', messages=prompt, max_tokens=500, stop=None, temperature=0.7
         )
 
         for (
