@@ -18,7 +18,10 @@ async function submit_data() {
         { 
           question: question,
           context: 'webcafe',
-          chat_history: chat_history
+          chat_history: chat_history,
+          contextdata: {
+            type: 'order'
+          }
         }
       ),
     });
