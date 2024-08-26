@@ -28,3 +28,4 @@ ptvsd
 pytz
 pydub
 pandas
+langchain_text_splitters

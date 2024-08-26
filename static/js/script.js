@@ -20,7 +20,8 @@ async function submit_data() {
           context: 'webcafe',
           chat_history: chat_history,
           contextdata: {
-            type: 'order'
+            // type: ['order','info','coffee']
+            type: ['order','coffee']
           }
         }
       ),

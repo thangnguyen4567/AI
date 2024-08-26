@@ -3,6 +3,10 @@ from llm.factory.training_factory import TrainingFactory
 from controller.trainingController import TrainingController
 from config.config_vectordb import VectorDB
 from config.config_sqldb import SQLDB
+from langchain.schema import Document
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+import pandas as pd
+
 training = Blueprint('training', __name__)
 training_factory = TrainingFactory()
 
@@ -66,3 +70,37 @@ def get_table():
 def get_table_ddl(table):
     sql_statement = SQLDB().autogenerate_ddl(table)
     return str(sql_statement)
+
+@training.route('/import', methods=['GET','POST'])
+def import_data():
+    if 'file' in request.files:
+        file = request.files['file']
+        all_sheets = pd.read_excel(file, sheet_name=None)
+        finaldocx = []
+        text_splitter = RecursiveCharacterTextSplitter(
+            chunk_size=1400,
+            chunk_overlap=100,
+            length_function=len,
+        )
+        try:
+            for sheet_name, df in all_sheets.items():
+                for index, row in df.iterrows():
+                    metadata = {}
+                    content = row.content
+                    texts = text_splitter.split_text(content)
+                    for text in texts:
+                        for column in df.columns:
+                            if column != 'content':
+                                metadata[column] = row[column]
+
+                        finaldocx.append(Document(
+                            page_content=text, 
+                            metadata=metadata
+                        ))
+                vector_db = VectorDB()
+                vector_db.add_vectordb(finaldocx,'webcafe')
+            return 'Import thành công'
+        except:
+            return 'Import thất bại'
+
+    return render_template('import_training.html')

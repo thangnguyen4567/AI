@@ -39,18 +39,40 @@ class ContextWebCafe(Context):
                                 "text": [
                                     {"name":"content"},
                                     {"name":"url"},
-                                    {"name":"image"}
+                                    {"name":"image"},
+                                    {"name":"type"}
                                 ],
                             }
-        self.docsretriever = 10
+        self.docsretriever = 8
         
     def retriever_document(self,contextdata: dict,question: str) -> str:
 
-        self.documents = VectorDB().connect_vectordb(index_name=self.context,index_schema=self.index_schema).similarity_search(question,k=self.docsretriever)
+        filter_order = None
+        filter_coffee = None
+        filter_info = None
+
+        if 'order' in contextdata['type']:
+            filter_order = RedisFilter.text('type') == 'order'
+        if 'coffee' in contextdata['type']:
+            filter_coffee = RedisFilter.text('type') == 'coffee'
+        if 'info' in contextdata['type']:
+            filter_info = RedisFilter.text('type') == 'info'
+        
+        filters = [f for f in [filter_order, filter_coffee, filter_info] if f is not None]
+
+        if filters:
+            combined_filter = filters[0]
+            for f in filters[1:]:
+                combined_filter |= f
+
+            self.documents = VectorDB().connect_vectordb(index_name=self.context,index_schema=self.index_schema).similarity_search(question,k=self.docsretriever,filter=combined_filter)
+        else:
+            self.documents = VectorDB().connect_vectordb(index_name=self.context,index_schema=self.index_schema).similarity_search(question,k=self.docsretriever)
+
         if self.documents:
             for doc in self.documents:
                 if doc.metadata['image'] is not None:
-                    self.prompt += doc.page_content + ' link sản phẩm:' + doc.metadata['url']
+                    self.prompt += doc.page_content + ' .Link hình ảnh:' + doc.metadata['image'] + ' .Link sản phẩm:' + doc.metadata['url']
                 else:
                     self.prompt += doc.page_content 
         return self.prompt
