@@ -89,16 +89,17 @@ def import_data():
                     content = row.content
                     texts = text_splitter.split_text(content)
                     for text in texts:
+                        metatext = ''
                         for column in df.columns:
-                            if column != 'content':
+                            if column != 'content' and isinstance(row[column], str) and row[column] != '':
                                 metadata[column] = row[column]
-
+                                metatext += column+':'+row[column]+','
                         finaldocx.append(Document(
-                            page_content=text, 
+                            page_content=metatext+text, 
                             metadata=metadata
                         ))
                 vector_db = VectorDB()
-                vector_db.add_vectordb(finaldocx,'webcafe')
+                vector_db.add_vectordb(finaldocx,'highlands')
             return 'Import thành công'
         except:
             return 'Import thất bại'

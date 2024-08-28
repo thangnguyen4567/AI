@@ -4,6 +4,7 @@ from llm.services.chatbot import ChatBot
 from queue import Queue
 from threading import Thread
 import asyncio
+import markdown
 
 load_dotenv('.env')
 
@@ -52,7 +53,7 @@ def get_conversations():
     data = request.get_json()
     chat = ChatBot(data)
     answer = chat.chat_response()
-    result = {'answer':answer['text'].replace("AI:",""),
+    result = {'answer': markdown.markdown(answer['text']).replace("AI:",""),
               'metadata':chat.get_documents_metadata()}
     return result
 
@@ -64,10 +65,12 @@ def get_conversations_stream():
     
     @async_to_sync
     async def generator():
+        fullmessage = ''
         async for chunk in chat.chat_response_stream():
+            # fullmessage += chunk
+            # yield markdown.markdown(fullmessage)
             yield chunk
 
-    # return Response(stream_with_context(chat.chat_response_stream()))
     return Response(generator(), mimetype='text/event-stream', content_type='text/event-stream')
 
 @chatbot.route('/get_metadata', methods=['POST'])

@@ -10,10 +10,16 @@ class ContextWebCafe(Context):
             AI sẽ chào khách hàng một cách thân thiện và chuyên nghiệp, sử dụng các câu chào phù hợp với văn hóa Trung Nguyên Legend.
             Ví dụ: "Chào bạn, cảm ơn bạn đã liên hệ với Trung Nguyên Legend. Mình có thể giúp gì cho bạn hôm nay?"
             2. Cung cấp thông tin về sản phẩm và dịch vụ:
-            AI cần nắm rõ thông tin về tất cả các sản phẩm của Trung Nguyên Legend, bao gồm các loại cà phê, đặc điểm của từng loại, và các dịch vụ hiện có như giao hàng, chương trình khuyến mãi
-            Bổ sung giá tiền kèm theo ở mỗi sản phẩm khi AI tư vấn, nên format sản phẩm ra sao cho dễ nhìn nhất
+            AI cần nắm rõ thông tin về tất cả các sản phẩm của Trung Nguyên Legend, bao gồm các loại cà phê, đặc điểm của từng loại, và các dịch vụ hiện có như giao hàng, chương trình khuyến mãi\
+            Khi gợi ý sản phẩm AI chỉ gợi ý những sản phẩm của Trung Nguyên ở bên dưới, không gợi ý sản phẩm bên ngoài
+            Vị dụ: "Khách hàng: Tôi uống cafe cold brew thì nên ăn kèm cái gì" => AI: Gợi ý các sản phẩm có ở bên dưới để gợi ý
+            Ví dụ: "Trung Nguyên Legend có các loại cà phê đặc biệt như cà phê sáng tạo, cà phê hòa tan G7, và cà phê Legend. Bạn có quan tâm đến loại nào không?"
+            AI nên phân biệt được thức ăn và đồ uống là khác nhau. khi được hỏi về đồ uống thì nên tập trung trả lời những thức uống được bán tại quầy
+            AI nên ưu tiên gợi ý các món nước uống tại quầy
+            AI nên phân biệt được cà phê đóng gói và cà phê pha sẵn hay nước uống tại quầy, khi khách hàng muốn uống nước hay cà phê thì nên gợi ý những món nước uống tại quầy
+            Bổ sung giá tiền kèm theo ở mỗi sản phẩm khi AI tư vấn
             Nếu trong sản phẩm có link hình ảnh hoặc link sản phẩm thì đưa lên cho người dùng xem, Những sản phẩm có giá 0đ sẽ là công thức pha chế hướng dẫn khách hàng
-            Nếu AI phải liệt kê nhiều sản phẩm thì hiện thị dữ liệu dưới dạng table html cho đẹp, nếu là thẻ a thì nên thêm thuộc tính target="_blank",Nếu có hình ảnh thì nên để vào thẻ img
+            Nếu AI phải liệt kê nhiều sản phẩm thì hiện thị dữ liệu dưới dạng table, nếu là thẻ a thì nên thêm thuộc tính target="_blank",Nếu có hình ảnh thì nên để vào thẻ img
             Ví dụ: "Trung Nguyên Legend có các loại cà phê đặc biệt như cà phê sáng tạo, cà phê hòa tan G7, và cà phê Legend. Bạn có quan tâm đến loại nào không?"
             3. Xử lý khiếu nại và phản hồi:
             AI cần có khả năng lắng nghe và giải quyết khiếu nại của khách hàng một cách hiệu quả, đồng thời ghi nhận phản hồi để cải thiện dịch vụ.
@@ -40,34 +46,34 @@ class ContextWebCafe(Context):
                                     {"name":"content"},
                                     {"name":"url"},
                                     {"name":"image"},
-                                    {"name":"type"}
+                                    {"name":"Loại sản phẩm"}
                                 ],
                             }
-        self.docsretriever = 8
+        self.docsretriever = 12
         
     def retriever_document(self,contextdata: dict,question: str) -> str:
 
-        filter_order = None
-        filter_coffee = None
-        filter_info = None
+        # filter_order = None
+        # filter_coffee = None
+        # filter_info = None
 
-        if 'order' in contextdata['type']:
-            filter_order = RedisFilter.text('type') == 'order'
-        if 'coffee' in contextdata['type']:
-            filter_coffee = RedisFilter.text('type') == 'coffee'
-        if 'info' in contextdata['type']:
-            filter_info = RedisFilter.text('type') == 'info'
+        # if 'order' in contextdata['type']:
+        #     filter_order = RedisFilter.text('type') == 'order'
+        # if 'coffee' in contextdata['type']:
+        #     filter_coffee = RedisFilter.text('type') == 'coffee'
+        # if 'info' in contextdata['type']:
+        #     filter_info = RedisFilter.text('type') == 'info'
         
-        filters = [f for f in [filter_order, filter_coffee, filter_info] if f is not None]
+        # filters = [f for f in [filter_order, filter_coffee, filter_info] if f is not None]
 
-        if filters:
-            combined_filter = filters[0]
-            for f in filters[1:]:
-                combined_filter |= f
+        # if filters:
+        #     combined_filter = filters[0]
+        #     for f in filters[1:]:
+        #         combined_filter |= f
 
-            self.documents = VectorDB().connect_vectordb(index_name=self.context,index_schema=self.index_schema).similarity_search(question,k=self.docsretriever,filter=combined_filter)
-        else:
-            self.documents = VectorDB().connect_vectordb(index_name=self.context,index_schema=self.index_schema).similarity_search(question,k=self.docsretriever)
+        #     self.documents = VectorDB().connect_vectordb(index_name=self.context,index_schema=self.index_schema).similarity_search(question,k=self.docsretriever,filter=combined_filter)
+        # else:
+        self.documents = VectorDB().connect_vectordb(index_name=self.context,index_schema=self.index_schema).similarity_search(question,k=self.docsretriever)
 
         if self.documents:
             for doc in self.documents:

@@ -2,6 +2,7 @@ from llm.factory.context.context_course import ContextCourse
 from llm.factory.context.context_system import ContextSystem
 from llm.factory.context.context_report import ContextReport
 from llm.factory.context.context_webcafe import ContextWebCafe
+from llm.factory.context.context_highlands import ContextHighlands
 
 class ContextFactory:
     def create_context(self,context_type):
@@ -13,3 +14,5 @@ class ContextFactory:
             return ContextReport()
         elif context_type == 'webcafe':
             return ContextWebCafe()
+        elif context_type == 'highlands':
+            return ContextHighlands()
