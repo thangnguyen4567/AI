@@ -16,7 +16,8 @@ class ChatBot():
 
         if self.context is not None:
             self.context = ContextFactory.create_context(self,self.context)
-            self.prompt = self.context.retriever_document(self.contextdata,self.question)
+            aggregation_question = self.context.aggregation_question_context(self.chat_history,self.question)
+            self.prompt = self.context.retriever_document(self.contextdata,aggregation_question)
 
     def check_chatbot(self):
         

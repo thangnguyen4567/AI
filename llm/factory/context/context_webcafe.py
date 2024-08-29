@@ -46,7 +46,7 @@ class ContextWebCafe(Context):
                                     {"name":"content"},
                                     {"name":"url"},
                                     {"name":"image"},
-                                    {"name":"Loại sản phẩm"}
+                                    {"name":"type"}
                                 ],
                             }
         self.docsretriever = 12
