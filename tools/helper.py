@@ -19,3 +19,12 @@ def logging_data(info):
         string_log +=value + '\n'
     logging.info(string_log)
         
+def remove_stopwords(text):
+    file_path = './static/vietnamese-stopwords.txt'
+    with open(file_path, 'r', encoding='utf-8') as file:
+        stopwords = set(line.strip().lower() for line in file)
+
+    words = text.split()  # Tách từ trong văn bản
+    filtered_words = [word for word in words if word.lower() not in stopwords]
+    filtered_text = ' '.join(filtered_words)  # Ghép lại các từ đã lọc
+    return filtered_text

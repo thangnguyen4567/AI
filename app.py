@@ -9,8 +9,10 @@ from logging.handlers import RotatingFileHandler
 import logging
 import os
 import ptvsd
+from flasgger import Swagger
 
 app = Flask(__name__, template_folder="templates")
+swagger = Swagger(app)
 
 # ptvsd.enable_attach(address=('0.0.0.0', 5678), redirect_output=True)
 
@@ -27,6 +29,10 @@ app.register_blueprint(report, url_prefix='/report')
 app.register_blueprint(speech, url_prefix='/speech')
 app.register_blueprint(training, url_prefix='/training')
 app.register_blueprint(editor, url_prefix='/editor')
+
+@app.route('/')
+def home():
+    return {'text':'Welcome to API'}
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000,use_reloader=True)

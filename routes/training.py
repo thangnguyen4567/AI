@@ -5,6 +5,7 @@ from config.config_vectordb import VectorDB
 from config.config_sqldb import SQLDB
 from langchain.schema import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
+from tools.helper import remove_stopwords
 import pandas as pd
 
 training = Blueprint('training', __name__)
@@ -87,7 +88,7 @@ def import_data():
                 for index, row in df.iterrows():
                     metadata = {}
                     content = row.content
-                    texts = text_splitter.split_text(content)
+                    texts = remove_stopwords(text_splitter.split_text(content))
                     for text in texts:
                         metatext = ''
                         for column in df.columns:

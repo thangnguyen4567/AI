@@ -71,8 +71,5 @@ class ContextHighlands(Context):
 
         if self.documents:
             for doc in self.documents:
-                if doc.metadata['image'] is not None:
-                    self.prompt += doc.page_content + ' .Link hình ảnh:' + doc.metadata['image'] + ' .Link sản phẩm:' + doc.metadata['url']
-                else:
-                    self.prompt += doc.page_content 
+                self.prompt += doc.page_content
         return self.prompt
