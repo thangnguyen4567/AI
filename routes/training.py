@@ -87,8 +87,8 @@ def import_data():
             for sheet_name, df in all_sheets.items():
                 for index, row in df.iterrows():
                     metadata = {}
-                    content = row.content
-                    texts = remove_stopwords(text_splitter.split_text(content))
+                    content = remove_stopwords(row.content)
+                    texts = text_splitter.split_text(content)
                     for text in texts:
                         metatext = ''
                         for column in df.columns:
@@ -96,11 +96,12 @@ def import_data():
                                 metadata[column] = row[column]
                                 metatext += column+':'+row[column]+','
                         finaldocx.append(Document(
-                            page_content=metatext+text, 
+                            page_content=text+metatext, 
                             metadata=metadata
                         ))
                 vector_db = VectorDB()
                 vector_db.add_vectordb(finaldocx,'highlands')
+                # vector_db.add_vectordb(finaldocx,'webcafe')
             return 'Import thành công'
         except:
             return 'Import thất bại'

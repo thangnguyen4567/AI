@@ -1,5 +1,8 @@
 from abc import ABC, abstractmethod 
 from tools.helper import remove_stopwords
+from langchain.prompts import PromptTemplate
+from langchain_openai import ChatOpenAI
+import os
 
 class Context(ABC):
     def __init__(self):
@@ -10,6 +13,7 @@ class Context(ABC):
     def retriever_document(self,contextdata: dict,question: str) -> str:
         pass
 
+    ##Tổng hợp lại câu hỏi > để ko bị miss context cũ đối với những câu hỏi follow-up
     def aggregation_question_context(self,chat_history: list,question) -> str:
         
         aggregation = ''
@@ -22,3 +26,34 @@ class Context(ABC):
         aggregation += ' '+question
 
         return remove_stopwords(aggregation)
+
+    ##Phân loại câu hỏi theo chủ đề
+    def classify_topic(self,question,topics) -> str:
+        
+        apikey = os.getenv("OPENAI_API_KEY")
+        topic = ''
+        for item in topícs:
+            topic += item['title']+':'+item['description']+'\n'
+
+        template = """
+            Bạn là một AI phân loại câu hỏi của người dùng thành các chủ đề cụ thể. Dựa trên nội dung câu hỏi, xác định các chủ đề sau:
+            {topic}
+            Phân tích câu hỏi của người dùng và chỉ trả về **tên chủ đề chính xác** từ danh sách trên mà không kèm thêm bất kỳ từ nào khác.
+            Câu hỏi của người dùng: "{question}"
+            Định dạng đầu ra: Tên Chủ đề
+        """
+
+        prompt = PromptTemplate(
+            input_variables=["topic","question"],
+            template=template
+        )
+
+        llm = ChatOpenAI(model="gpt-4o-mini",api_key=apikey,temperature=0)
+
+        chain = prompt | llm
+
+        response = chain.invoke({
+            "topic": topic,
+            "question": question
+        })
+        return response.content

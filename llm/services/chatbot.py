@@ -6,7 +6,6 @@ class ChatBot():
     def __init__(self,config):
 
         self.question = config.get('question','test')
-        print(self.question)
         self.chat_history = config.get('chat_history')
         self.contextdata = config.get('contextdata')
         self.context = config.get('context')
@@ -31,9 +30,9 @@ class ChatBot():
         message = self.model.get_conversation_message(self.prompt,self.chat_history)
         chain = self.model.get_conversation_chain(message)
 
-        reponse = chain({"question": self.question}) 
+        response = chain({"question": self.question}) 
 
-        return reponse
+        return response
 
     async def chat_response_stream(self):
 
