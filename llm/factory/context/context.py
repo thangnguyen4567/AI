@@ -25,22 +25,22 @@ class Context(ABC):
 
         aggregation += ' '+question
 
-        return remove_stopwords(aggregation)
+        return aggregation
 
     ##Phân loại câu hỏi theo chủ đề
-    def classify_topic(self,question,topics) -> str:
+    def classify_topic(self,question,topics) -> list:
         
         apikey = os.getenv("OPENAI_API_KEY")
         topic = ''
-        for item in topícs:
+        for item in topics:
             topic += item['title']+':'+item['description']+'\n'
 
         template = """
-            Bạn là một AI phân loại câu hỏi của người dùng thành các chủ đề cụ thể. Dựa trên nội dung câu hỏi, xác định các chủ đề sau:
+            Bạn là một AI phân loại câu hỏi của người dùng vào các chủ đề cụ thể. Dựa trên nội dung câu hỏi, xác định tất cả các chủ đề phù hợp nhất từ danh sách sau:
             {topic}
-            Phân tích câu hỏi của người dùng và chỉ trả về **tên chủ đề chính xác** từ danh sách trên mà không kèm thêm bất kỳ từ nào khác.
+            Phân tích câu hỏi của người dùng và trả về **danh sách tên các chủ đề** phù hợp nhất từ danh sách trên mà không kèm thêm bất kỳ từ nào khác. Nếu câu hỏi liên quan đến nhiều chủ đề, hãy trả về tất cả các chủ đề đó.
             Câu hỏi của người dùng: "{question}"
-            Định dạng đầu ra: Tên Chủ đề
+            Định dạng đầu ra: Tên Chủ đề 1, Tên Chủ đề 2,...
         """
 
         prompt = PromptTemplate(
@@ -56,4 +56,5 @@ class Context(ABC):
             "topic": topic,
             "question": question
         })
-        return response.content
+        listtopic = response.content.split(',')
+        return listtopic

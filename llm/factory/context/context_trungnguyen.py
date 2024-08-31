@@ -2,7 +2,7 @@ from config.config_vectordb import VectorDB
 from langchain_community.vectorstores.redis import RedisFilter
 from llm.factory.context.context import Context
 
-class ContextWebCafe(Context):
+class ContextTrungNguyen(Context):
     def __init__(self):
         self.prompt = """
             Bạn là AI được huấn luyện để trở thành một trợ lý chăm sóc khách hàng cho chuỗi cà phê Trung Nguyên Legend, cung cấp thông tin, giải quyết vấn đề, và nâng cao trải nghiệm khách hàng.
@@ -14,13 +14,9 @@ class ContextWebCafe(Context):
             Khi gợi ý sản phẩm AI chỉ gợi ý những sản phẩm của Trung Nguyên ở bên dưới, không gợi ý sản phẩm bên ngoài
             Vị dụ: "Khách hàng: Tôi uống cafe cold brew thì nên ăn kèm cái gì" => AI: Gợi ý các sản phẩm có ở bên dưới để gợi ý
             Ví dụ: "Trung Nguyên Legend có các loại cà phê đặc biệt như cà phê sáng tạo, cà phê hòa tan G7, và cà phê Legend. Bạn có quan tâm đến loại nào không?"
-            AI nên phân biệt được thức ăn và đồ uống là khác nhau. khi được hỏi về đồ uống thì nên tập trung trả lời những thức uống được bán tại quầy
-            AI nên ưu tiên gợi ý các món nước uống tại quầy
-            AI nên phân biệt được cà phê đóng gói và cà phê pha sẵn hay nước uống tại quầy, khi khách hàng muốn uống nước hay cà phê thì nên gợi ý những món nước uống tại quầy
             Bổ sung giá tiền kèm theo ở mỗi sản phẩm khi AI tư vấn
-            Nếu trong sản phẩm có link hình ảnh hoặc link sản phẩm thì đưa lên cho người dùng xem, Những sản phẩm có giá 0đ sẽ là công thức pha chế hướng dẫn khách hàng
+            Nếu trong sản phẩm có link hình ảnh hoặc link sản phẩm thì đưa lên cho người dùng xem
             Nếu AI phải liệt kê nhiều sản phẩm thì hiện thị dữ liệu dưới dạng table, nếu là thẻ a thì nên thêm thuộc tính target="_blank",Nếu có hình ảnh thì nên để vào thẻ img
-            Ví dụ: "Trung Nguyên Legend có các loại cà phê đặc biệt như cà phê sáng tạo, cà phê hòa tan G7, và cà phê Legend. Bạn có quan tâm đến loại nào không?"
             3. Xử lý khiếu nại và phản hồi:
             AI cần có khả năng lắng nghe và giải quyết khiếu nại của khách hàng một cách hiệu quả, đồng thời ghi nhận phản hồi để cải thiện dịch vụ.
             Ví dụ: "Chúng tôi rất tiếc vì sự cố đã xảy ra. Trung Nguyên Legend luôn lắng nghe và trân trọng phản hồi của bạn để ngày càng hoàn thiện hơn."
@@ -49,36 +45,43 @@ class ContextWebCafe(Context):
                                     {"name":"type"}
                                 ],
                             }
-        self.docsretriever = 12
+        self.topics = [
+                {
+                    'title': 'Cà phê đóng gói',
+                    'description': 'Câu hỏi về cà phê bịch, cà phê đóng gói, cà phê mua mang về, g7 ( chưa được pha chế )',
+                },
+                {
+                    'title': 'Đồ uống,Thức uống',
+                    'description': 'Câu hỏi liên quan đến đặt nước hay order nước,đồ uống mua tại quầy, order ( bao gồm các món nước, cà phê) đã được pha chế sẵn',
+                },
+                {
+                    'title': 'Món ăn kèm đồ uống',
+                    'description': 'Câu hỏi về các món ăn, món ăn kèm đồ uống',
+                },
+                {
+                    'title': 'Phụ kiện',
+                    'description': 'Câu hỏi về các phụ kiện,sản phẩm mua về làm quà tặng',
+                },
+                {
+                    'title': 'Thông tin',
+                    'description': 'Câu hỏi liên quan đến thông tin Trung Nguyên, lịch sử, hình thành, phát triển, tầm nhìn, sứ mệnh, liên hệ, cửa hàng',
+                }
+            ]
+        self.docsretriever = 10
         
     def retriever_document(self,contextdata: dict,question: str) -> str:
 
-        # filter_order = None
-        # filter_coffee = None
-        # filter_info = None
+        topics = self.classify_topic(question,self.topics)
 
-        # if 'order' in contextdata['type']:
-        #     filter_order = RedisFilter.text('type') == 'order'
-        # if 'coffee' in contextdata['type']:
-        #     filter_coffee = RedisFilter.text('type') == 'coffee'
-        # if 'info' in contextdata['type']:
-        #     filter_info = RedisFilter.text('type') == 'info'
+        combined_filter = RedisFilter.text("type") == topics[0].strip()
         
-        # filters = [f for f in [filter_order, filter_coffee, filter_info] if f is not None]
+        for item in topics[1:]:
+            combined_filter |= RedisFilter.text("type") == item.strip()
 
-        # if filters:
-        #     combined_filter = filters[0]
-        #     for f in filters[1:]:
-        #         combined_filter |= f
-
-        #     self.documents = VectorDB().connect_vectordb(index_name=self.context,index_schema=self.index_schema).similarity_search(question,k=self.docsretriever,filter=combined_filter)
-        # else:
-        self.documents = VectorDB().connect_vectordb(index_name=self.context,index_schema=self.index_schema).similarity_search(question,k=self.docsretriever)
+        self.documents = VectorDB().connect_vectordb(index_name=self.context,index_schema=self.index_schema).similarity_search(question,k=self.docsretriever,filter=combined_filter)
 
         if self.documents:
             for doc in self.documents:
-                if doc.metadata['image'] is not None:
-                    self.prompt += doc.page_content + ' .Link hình ảnh:' + doc.metadata['image'] + ' .Link sản phẩm:' + doc.metadata['url']
-                else:
-                    self.prompt += doc.page_content 
+                self.prompt += doc.page_content 
+                
         return self.prompt

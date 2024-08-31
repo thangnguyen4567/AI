@@ -69,15 +69,17 @@ class ContextHighlands(Context):
         
     def retriever_document(self,contextdata: dict,question: str) -> str:
 
-        topic = self.classify_topic(question,self.topics)
+        topics = self.classify_topic(question,self.topics)
 
-        filter = RedisFilter.text('category') == topic
+        combined_filter = RedisFilter.text("category") == topics[0].strip()
+        
+        for item in topics[1:]:
+            combined_filter |= RedisFilter.text("category") == item.strip()
 
-        self.documents = VectorDB().connect_vectordb(index_name=self.context,index_schema=self.index_schema).similarity_search(question,k=self.docsretriever,filter=filter)
-
-        # self.documents = VectorDB().connect_vectordb(index_name=self.context,index_schema=self.index_schema).similarity_search(question,k=self.docsretriever)
+        self.documents = VectorDB().connect_vectordb(index_name=self.context,index_schema=self.index_schema).similarity_search(question,k=self.docsretriever,filter=combined_filter)
 
         if self.documents:
             for doc in self.documents:
                 self.prompt += doc.page_content
+
         return self.prompt
