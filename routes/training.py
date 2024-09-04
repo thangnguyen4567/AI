@@ -43,20 +43,27 @@ def delete_training_data():
 
 @training.route('/read_index', methods=['GET'])
 def get_index():
-    data = request.args
-    list_index = VectorDB().get_list_index()
-    data = []
-    for index in list_index:
-        obj = {}
-        obj['text'] = index
-        obj['value'] = index
-        data.append(obj)
+    datatype = request.args['type']
+    if datatype == 'chatbot':
+        data = [
+            {'text':'highlands'},
+            {'text':'webcafe'},
+        ]
+    elif datatype == 'training_course':
+        list_index = VectorDB().get_list_index()
+        data = []
+        for index in list_index:
+            obj = {}
+            obj['text'] = index
+            obj['value'] = index
+            data.append(obj)
     return data
 
-@training.route('/update', methods=['POST'])
+@training.route('/update', methods=['POST','GET'])
 def update_data():
+    datatype = request.args['type']
     data = request.form
-    training = training_factory.create_training(data['type'])
+    training = training_factory.create_training(datatype)
     return training.update_training_data(data)
 
 # @training.route('/generate_table_ddl', methods=['POST'])
@@ -75,6 +82,7 @@ def get_table_ddl(table):
 @training.route('/import', methods=['GET','POST'])
 def import_data():
     if 'file' in request.files:
+        db = request.args['db']
         file = request.files['file']
         all_sheets = pd.read_excel(file, sheet_name=None)
         finaldocx = []
@@ -100,10 +108,8 @@ def import_data():
                             metadata=metadata
                         ))
                 vector_db = VectorDB()
-                vector_db.add_vectordb(finaldocx,'highlands')
-                # vector_db.add_vectordb(finaldocx,'webcafe')
+                vector_db.add_vectordb(finaldocx,db)
             return 'Import thành công'
         except:
             return 'Import thất bại'
-
-    return render_template('import_training.html')
+    return 'Import thất bại'

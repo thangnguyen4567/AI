@@ -1,62 +1,123 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script src="{{ url_for('static',filename='js/jquery-3.4.1.min.js') }}"></script> 
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-  <script src="{{ url_for('static',filename='js/kendo.all.min.js') }}"></script> 
-  <link href="{{ url_for('static',filename='css/bootstrap.min.css') }}" rel="stylesheet"}>
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-  <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2020.3.915/styles/kendo.common.min.css">
-  <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2020.3.915/styles/kendo.rtl.min.css">
-  <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2020.3.915/styles/kendo.default.min.css">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="{{ url_for('static',filename='js/jquery-3.4.1.min.js') }}"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script src="{{ url_for('static',filename='js/kendo.all.min.js') }}"></script>
+    <link href="{{ url_for('static',filename='css/bootstrap.min.css') }}" rel="stylesheet" }>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2020.3.915/styles/kendo.common.min.css">
+    <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2020.3.915/styles/kendo.rtl.min.css">
+    <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2020.3.915/styles/kendo.default.min.css">
 </head>
+
 <body>
-<style type="text/css">
-    div.k-edit-form-container {
-      width: auto;
-      height: auto;
-      padding: 15px;
-    }
-    .k-edit-buttons.k-state-default {
-      background: white;
-      bottom: -3em;
-    }
-    .form-control {
-      width: -webkit-fill-available !important;
-    }
-    table tbody td {
-      width: max-content;
-      white-space: nowrap;
-      overflow: hidden !important;
-      text-overflow: ellipsis;
-    }
-</style>
-<div class="pl-5 pr-5 mt-5">
-    <input id="dropdown_index" class="mb-3" style="width: 250px;">
-    <div id="grid"></div>
-</div>
-</div>
+    <style type="text/css">
+        div.k-edit-form-container {
+            width: auto;
+            height: auto;
+            padding: 15px;
+        }
+
+        .k-edit-buttons.k-state-default {
+            background: white;
+            bottom: -3em;
+        }
+
+        .form-control {
+            width: -webkit-fill-available !important;
+        }
+
+        table tbody td {
+            width: max-content;
+            white-space: nowrap;
+            overflow: hidden !important;
+            text-overflow: ellipsis;
+        }
+    </style>
+    <div class="container-fluid mt-5">
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="dropdown_index" class="form-label fw-bold">Select Database:</label>
+                    <input id="dropdown_index" class="form-control">
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="form-label">&nbsp;</label>
+                    <button id="importBtn" class="btn btn-primary btn w-100">
+                        <i class="fas fa-file-import me-2"></i>Import Training Data
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="importForm" class="row justify-content-center mb-4" style="display: none;">
+            <div class="col-md-12">
+                <div class="card shadow">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <a href="{{ url_for('static',filename='template/trungnguyen_dataset.xlsx') }}"
+                                class="btn btn-outline-secondary">
+                                <i class="fas fa-download me-2"></i>Download Template
+                            </a>
+                        </div>
+                        <form id="form_importdata" method="POST" action="" enctype="multipart/form-data">
+                            <div class="form-group mb-3">
+                                <label for="file" class="form-label">Select Excel File</label>
+                                <div class="input-group mb-2">
+                                    <input type="file" class="form-control" name="file" id="file" accept=".xlsx" hidden>
+                                    <label for="file" class="input-group-text btn btn-primary me-2">
+                                        <i class="fas fa-file-excel me-2"></i> Choose File
+                                    </label>
+                                    <input type="text" class="form-control me-2 mt-3" id="file-name" placeholder="No file chosen" readonly>
+                                    <button type="submit" class="ml-2 btn btn-success">
+                                        <i class="fas fa-upload me-2"></i> Upload
+                                    </button>
+                                </div>
+                                <small class="form-text text-muted mt-2">Only .xlsx files are accepted</small>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-12">
+                <div id="grid" class="card shadow">
+                    <div class="card-body">
+                        <!-- Grid will be rendered here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
 </body>
+
 </html>
 <script>
     $(document).ready(function () {
         // Xử lý kendo dropdown index
         $("#dropdown_index").kendoDropDownList({
-			filter: "contains",
-			optionLabel: 'Chọn DB theo dự án',
-			dataTextField: "text",
-			dataValueField: "value",
-            change: function(e) {
+            filter: "contains",
+            optionLabel: 'Chọn DB',
+            dataTextField: "text",
+            dataValueField: "value",
+            change: function (e) {
                 kendoGrid(this.value())
+                document.getElementById('form_importdata').setAttribute('action', '/training/import?db=' + this.value())
             },
-			dataSource: new kendo.data.DataSource({
+            dataSource: new kendo.data.DataSource({
                 transport: {
                     type: "json",
                     read: {
-                        url:"../training/read_index"
+                        url: "../training/read_index?type={{data.type}}"
                     },
                 }
             })
@@ -67,7 +128,7 @@
                 transport: {
                     type: "json",
                     read: {
-                        url:"../training/read?type={{data.type}}&index="+index,
+                        url: "../training/read?type={{data.type}}&index=" + index,
                     },
                     destroy: {
                         url: "../training/delete?type={{data.type}}",
@@ -81,8 +142,8 @@
                 pageSize: 20,
                 batch: false,
                 schema: {
-                    data: function(data) {
-                        if(data.message) {
+                    data: function (data) {
+                        if (data.message) {
                             $("#grid").data("kendoGrid").dataSource.read()
                         }
                         return data
@@ -97,47 +158,78 @@
             });
             var columns = [
                 {% for item in data.columns %}
-                {
-                    field:"{{ item }}",
-                    title:"{{ item }}",
+        {
+            field: "{{ item }}",
+                title: "{{ item }}",
                 },
-                {% endfor %}
+        {% endfor %}
             ];
-            columns.push({ 
-                    command: ["edit", "destroy"], 
-                    title: "Action" 
-                })
-            if($('#grid').data('kendoGrid')) {
-                $('#grid').kendoGrid('destroy').empty();
-            }
-            $("#grid").kendoGrid({
-                dataSource: dataSource,
-                height: 800,
-                sortable: true,
-                toolbar: ["create","search"],
-                search: {
-                    fields: ["content","title","coursemoduleid","courseid"]
-                },
-                pageSize: 20,
-                pageable: {
-                    refresh: true,
-                    pageSizes: true,
-                    buttonCount: 5,
-                    pageSize:20
-                },
-                editable: {
-                    mode: "popup",
-                    template: kendo.template($("#popup-editor").html()),
-                    window: {
-                        animation: false,
-                        width: "900px",
-                        height: "600px",
-                    }
-                },
-                columns: columns,
-            });
+        columns.push({
+            command: ["edit", "destroy"],
+            title: "Action"
+        })
+        if ($('#grid').data('kendoGrid')) {
+            $('#grid').kendoGrid('destroy').empty();
         }
+        $("#grid").kendoGrid({
+            dataSource: dataSource,
+            height: 800,
+            sortable: true,
+            toolbar: ["create", "search"],
+            search: {
+                fields: ["content", "title", "coursemoduleid", "courseid"]
+            },
+            pageSize: 20,
+            pageable: {
+                refresh: true,
+                pageSizes: true,
+                buttonCount: 5,
+                pageSize: 20
+            },
+            editable: {
+                mode: "popup",
+                template: kendo.template($("#popup-editor").html()),
+                window: {
+                    animation: false,
+                    width: "900px",
+                    height: "600px",
+                }
+            },
+            columns: columns,
+        });
+    }
     })
+    document.getElementById('importBtn').addEventListener('click', function () {
+        var importForm = document.getElementById('importForm');
+        if (importForm.style.display === 'none') {
+            importForm.style.display = 'block';
+            importForm.style.opacity = 0;
+            let opacity = 0;
+            let fadeIn = setInterval(function () {
+                if (opacity < 1) {
+                    opacity += 0.1;
+                    importForm.style.opacity = opacity;
+                } else {
+                    clearInterval(fadeIn);
+                }
+            }, 50);
+        } else {
+            let opacity = 1;
+            let fadeOut = setInterval(function () {
+                if (opacity > 0) {
+                    opacity -= 0.1;
+                    importForm.style.opacity = opacity;
+                } else {
+                    clearInterval(fadeOut);
+                    importForm.style.display = 'none';
+                }
+            }, 50);
+        }
+    });
+    document.getElementById('file').addEventListener('change', function() {
+        var fileName = this.files[0].name;
+        document.getElementById('file-name').value = fileName;
+    });
 </script>
 <script id="popup-editor" type="text/x-kendo-template">
     {% for item in data.columns %}

@@ -65,6 +65,10 @@ class ContextTrungNguyen(Context):
                 {
                     'title': 'Thông tin',
                     'description': 'Câu hỏi liên quan đến thông tin Trung Nguyên, lịch sử, hình thành, phát triển, tầm nhìn, sứ mệnh, liên hệ, cửa hàng',
+                },
+                {
+                    'title': 'external',
+                    'description': 'Câu hỏi không liên quan đến bất cứ chủ đề nào',
                 }
             ]
         self.docsretriever = 10
@@ -73,15 +77,17 @@ class ContextTrungNguyen(Context):
 
         topics = self.classify_topic(question,self.topics)
 
-        combined_filter = RedisFilter.text("type") == topics[0].strip()
-        
-        for item in topics[1:]:
-            combined_filter |= RedisFilter.text("type") == item.strip()
+        if topics[0].strip() != 'external':
+            
+            combined_filter = RedisFilter.text("type") == topics[0].strip()
+            
+            for item in topics[1:]:
+                combined_filter |= RedisFilter.text("type") == item.strip()
 
-        self.documents = VectorDB().connect_vectordb(index_name=self.context,index_schema=self.index_schema).similarity_search(question,k=self.docsretriever,filter=combined_filter)
+            self.documents = VectorDB().connect_vectordb(index_name=self.context,index_schema=self.index_schema).similarity_search(question,k=self.docsretriever,filter=combined_filter)
 
-        if self.documents:
-            for doc in self.documents:
-                self.prompt += doc.page_content 
+            if self.documents:
+                for doc in self.documents:
+                    self.prompt += doc.page_content 
                 
         return self.prompt

@@ -1,6 +1,7 @@
 from config.config_vectordb import VectorDB
 from config.config_sqldb import SQLDB
 from abc import ABC, abstractmethod 
+
 class Training(ABC):
     def __init__(self):
         self.redis_client = VectorDB().connect_client()

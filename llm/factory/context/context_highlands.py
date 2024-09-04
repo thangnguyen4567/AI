@@ -63,6 +63,10 @@ class ContextHighlands(Context):
                         {
                             'title': 'Tuyển dụng',
                             'description': 'Câu hỏi về cách thông tin tuyển dụng, cơ hội nghề nghiệp',
+                        },
+                        {
+                            'title': 'external',
+                            'description': 'Câu hỏi không liên quan đến bất cứ chủ đề nào',
                         }
                     ]
         self.docsretriever = 12
@@ -71,15 +75,17 @@ class ContextHighlands(Context):
 
         topics = self.classify_topic(question,self.topics)
 
-        combined_filter = RedisFilter.text("category") == topics[0].strip()
-        
-        for item in topics[1:]:
-            combined_filter |= RedisFilter.text("category") == item.strip()
+        if topics[0].strip() != 'external':
+            
+            combined_filter = RedisFilter.text("category") == topics[0].strip()
+            
+            for item in topics[1:]:
+                combined_filter |= RedisFilter.text("category") == item.strip()
 
-        self.documents = VectorDB().connect_vectordb(index_name=self.context,index_schema=self.index_schema).similarity_search(question,k=self.docsretriever,filter=combined_filter)
+            self.documents = VectorDB().connect_vectordb(index_name=self.context,index_schema=self.index_schema).similarity_search(question,k=self.docsretriever,filter=combined_filter)
 
-        if self.documents:
-            for doc in self.documents:
-                self.prompt += doc.page_content
+            if self.documents:
+                for doc in self.documents:
+                    self.prompt += doc.page_content
 
         return self.prompt
