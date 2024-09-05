@@ -2,7 +2,6 @@ from flask import request,Blueprint
 from llm.services.chatbot import ChatBot
 from llm.init import PowerAI
 
-llm = PowerAI()
 
 report = Blueprint('report', __name__)
 
@@ -22,6 +21,7 @@ def create_query_sql_custom():
     # answer = query['text'].replace("\n", " ")
     # result = {'question': question, 'answer': answer}
     # return result
+    llm = PowerAI()
 
     query = llm.generate_sql(question)
     answer = query.replace("\n", " ")
