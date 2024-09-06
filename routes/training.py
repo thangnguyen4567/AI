@@ -1,12 +1,13 @@
 from flask import Blueprint,render_template,request
 from llm.factory.training_factory import TrainingFactory
-from controller.trainingController import TrainingController
 from config.config_vectordb import VectorDB
 from config.config_sqldb import SQLDB
 from langchain.schema import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from tools.helper import remove_stopwords
 import pandas as pd
+from langchain_community.document_loaders import PyPDFLoader
+from langchain_community.document_loaders import UnstructuredWordDocumentLoader
 
 training = Blueprint('training', __name__)
 training_factory = TrainingFactory()
@@ -84,14 +85,18 @@ def import_data():
     if 'file' in request.files:
         db = request.args['db']
         file = request.files['file']
-        all_sheets = pd.read_excel(file, sheet_name=None)
-        finaldocx = []
+        file_extension = file.filename.split('.')[-1].lower()
         text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=1400,
             chunk_overlap=100,
             length_function=len,
         )
-        try:
+        vector_db = VectorDB()
+        finaldocx = []
+
+        if file_extension in ['xls', 'xlsx']:
+            all_sheets = pd.read_excel(file, sheet_name=None)
+
             for sheet_name, df in all_sheets.items():
                 for index, row in df.iterrows():
                     metadata = {}
@@ -107,9 +112,24 @@ def import_data():
                             page_content=text+metatext, 
                             metadata=metadata
                         ))
-                vector_db = VectorDB()
-                vector_db.add_vectordb(finaldocx,db)
-            return 'Import thành công'
-        except:
-            return 'Import thất bại'
+            
+        elif file_extension == 'pdf':
+            docs = PyPDFLoader(file)
+            texts = text_splitter.split_documents(docs.load())
+            for text in texts:
+                finaldocx.append(Document(page_content=text.page_content))
+            
+        elif file_extension in ['doc', 'docx']:
+            docs = UnstructuredWordDocumentLoader(file)
+            texts = text_splitter.split_documents(docs.load())
+            for text in texts:
+                finaldocx.append(Document(page_content=text.page_content))
+
+        else:
+            return 'Unsupported file type', 400
+        
+        vector_db.add_vectordb(finaldocx,db)
+
+        return 'Import thành công'
+
     return 'Import thất bại'

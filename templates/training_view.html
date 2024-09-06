@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="{{ url_for('static',filename='js/jquery-3.4.1.min.js') }}"></script>
     <script src="{{ url_for('static',filename='js/kendo.all.min.js') }}"></script>
-    <link href="{{ url_for('static',filename='css/bootstrap.min.css') }}" rel="stylesheet" }>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/fonts/glyphs/WebComponentsIcons.ttf') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/kendo.common.min.css') }}">
@@ -68,18 +67,18 @@
                         </div>
                         <form id="form_importdata" method="POST" action="" enctype="multipart/form-data">
                             <div class="form-group mb-3">
-                                <label for="file" class="form-label">Select Excel File</label>
+                                <label for="file" class="form-label">Select File</label>
                                 <div class="input-group mb-2">
-                                    <input type="file" class="form-control" name="file" id="file" accept=".xlsx" hidden>
+                                    <input type="file" class="form-control" name="file" id="file" accept=".xlsx, .doc, .docx, .pdf" hidden>
                                     <label for="file" class="input-group-text btn btn-primary me-2">
-                                        <i class="fas fa-file-excel me-2"></i> Choose File
+                                        <i class="fas fa-file-upload me-2"></i> Choose File
                                     </label>
                                     <button type="submit" class="ml-2 btn btn-success">
                                         <i class="fas fa-upload me-2"></i> Upload
                                     </button>
                                     <input type="text" class="form-control me-2 mt-3" id="file-name" placeholder="No file chosen" readonly>
                                 </div>
-                                <small class="form-text text-muted mt-2">Only .xlsx files are accepted</small>
+                                <small class="form-text text-muted mt-2">Only .xlsx, .doc, .docx, and .pdf files are accepted</small>
                             </div>
                         </form>
                     </div>

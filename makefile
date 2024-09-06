@@ -1,6 +1,7 @@
 rs:
 	docker restart webai_test
-
+rsdb:
+	docker restart redis_test
 log:
 	docker logs webai_test
 	
