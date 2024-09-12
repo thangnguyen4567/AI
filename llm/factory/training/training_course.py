@@ -10,8 +10,8 @@ class TrainingCourse(Training):
     def __init__(self):
         super().__init__()
 
-        google_api_key = os.getenv("GOOGLE_API_KEY_SUMMARY")
-        self.llm = GoogleGenerativeAI(model="gemini-pro", google_api_key=google_api_key)
+        #google_api_key = os.getenv("GOOGLE_API_KEY_SUMMARY")
+        #self.llm = GoogleGenerativeAI(model="gemini-pro", google_api_key=google_api_key)
         self.text_splitter = RecursiveCharacterTextSplitter(chunk_size=2000, chunk_overlap=100)
         self.columns = ['title','content','coursemoduleid','courseid','source']
         self.context = "course"

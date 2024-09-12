@@ -50,8 +50,17 @@ def get_index():
             {'text':'highlands'},
             {'text':'webcafe'},
         ]
-    elif datatype == 'training_course':
-        list_index = VectorDB().get_list_index()
+    elif datatype == 'course':
+        list_index = [index for index in VectorDB().get_list_index() if index.startswith('course')]
+        data = []
+        for index in list_index:
+            obj = {}
+            obj['text'] = index
+            obj['value'] = index
+            data.append(obj)
+
+    elif datatype == 'system':
+        list_index = [index for index in VectorDB().get_list_index() if index.startswith('system')]
         data = []
         for index in list_index:
             obj = {}

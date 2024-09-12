@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/kendo.common.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/kendo.rtl.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/kendo.default.min.css') }}">
+    <script src="https://unpkg.com/jszip/dist/jszip.min.js"></script>
 </head>
 
 <body>
@@ -54,7 +55,11 @@
                 </div>
             </div>
         </div>
-        
+        <div class="mb-3">
+            <button id="demoBtn" class="btn btn-info w-100" onclick="window.location.href='/chatbot/demo?db=' + $('#dropdown_index').val();">
+                <i class="fas fa-eye me-2"></i>Demo
+            </button>
+        </div>
         <div id="importForm" class="row justify-content-center mb-4" style="display: none;">
             <div class="col-md-12">
                 <div class="card shadow">
@@ -116,7 +121,14 @@
                         url: "../training/read_index?type={{data.type}}"
                     },
                 }
-            })
+            }),
+            // Automatically bind to the first value
+            dataBound: function() {
+                var firstValue = this.dataSource.view()[0].value; // Get the first value
+                this.value(firstValue); // Set the dropdown to the first value
+                kendoGrid(firstValue); // Call kendoGrid with the first value
+                document.getElementById('form_importdata').setAttribute('action', '/training/import?db=' + firstValue);
+            }
         });
         // Xử lý kendo grid
         function kendoGrid(index) {
@@ -171,7 +183,10 @@
             dataSource: dataSource,
             height: 800,
             sortable: true,
-            toolbar: ["create", "search"],
+            toolbar: ["create", "search","excel"],
+            excel: {
+                fileName: "dataset.xlsx"
+            },
             search: {
                 fields: ["content", "title", "coursemoduleid", "courseid"]
             },

@@ -6,9 +6,9 @@ from llm.factory.training.training_chatbot import TrainingChatbot
 
 class TrainingFactory:
     def create_training(self,training_type):
-        if training_type == 'training_course':
+        if training_type == 'course':
             return TrainingCourse()
-        elif training_type == 'training_system':
+        elif training_type == 'system':
             return TrainingSystem()
         elif training_type == 'training_sql':
             return TrainingSQL()
