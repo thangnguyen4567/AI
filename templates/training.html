@@ -32,32 +32,53 @@
       text-overflow: ellipsis;
     }
 </style>
-<div class="pl-5 pr-5 mt-5">
-  <div>
-    <h1 class="bd-title" id="content" style="text-align: center;">DS Dữ Liệu Training</h1>
+<div class="container-fluid mt-5"> <!-- Changed from container to container-fluid to expand the width -->
+  <div class="text-center mb-4">
+    <h1 class="bd-title" id="content">Danh Sách Dữ Liệu Training</h1>
   </div>
   <ul class="nav nav-tabs">
-    <li class="active"><a data-toggle="tab" href="#sql">Câu truy vấn đã train</a></li>
-    <li><a data-toggle="tab" href="#ddl">Bảng dữ liệu đã train</a></li>
-    <!-- <li><a data-toggle="tab" href="#doc">Tài liệu đã train</a></li> -->
-    <li><a data-toggle="tab" href="#import">Import dữ liệu</a></li>
+    <li class="nav-item">
+      <a class="nav-link active" data-toggle="tab" onclick="changeTab(event, 'sql')">Câu Truy Vấn Đã Train</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" data-toggle="tab" onclick="changeTab(event, 'ddl')">Bảng Dữ Liệu Đã Train</a>
+    </li>
   </ul>
 
   <div class="tab-content">
-    <div id="sql" class="tab-pane fade in active">
+    <div id="sql" class="tab-pane fade show active">
       {% include 'table_training_sql.html' %}
     </div>
     <div id="ddl" class="tab-pane fade">
       {% include 'table_training_ddl.html' %}
     </div>
-    <!-- <div id="doc" class="tab-pane fade">
-      {% include 'table_training_doc.html' %}
-    </div> -->
-    <div id="import" class="tab-pane fade">
-      {% include 'import_training.html' %}
-    </div>
   </div>
 </div>
+
+<script>
+  function changeTab(event, tabId) {
+    // Prevent default anchor click behavior
+    event.preventDefault();
+    
+    // Remove active class from all tabs
+    const tabs = document.querySelectorAll('.nav-link');
+    tabs.forEach(tab => {
+      tab.classList.remove('active');
+    });
+
+    // Hide all tab content
+    const tabContents = document.querySelectorAll('.tab-pane');
+    tabContents.forEach(content => {
+      content.classList.remove('show', 'active');
+    });
+
+    // Add active class to the clicked tab
+    event.currentTarget.classList.add('active');
+
+    // Show the selected tab content
+    document.getElementById(tabId).classList.add('show', 'active');
+  }
+</script>
 
 </body>
 </html>

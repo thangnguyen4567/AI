@@ -19,8 +19,11 @@ def view_training_data_v2():
 @training.route('/index')
 def view_training_data():
     data = request.args
-    training = training_factory.create_training(request.args['type'])
-    return render_template('training_view.html',data={'type':data['type'],'columns':training.columns})
+    if request.args['type'] == 'report':
+        return render_template('training.html')
+    else:
+        training = training_factory.create_training(request.args['type'])
+        return render_template('training_view.html',data={'type':data['type'],'columns':training.columns})
 
 @training.route('/read', methods=['GET'])
 def get_training_data():

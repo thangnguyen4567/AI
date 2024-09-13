@@ -15,7 +15,7 @@ $(document).ready(function () {
                 }
             },
             update: {
-                url: "../training/update",
+                url: "../training/update?type=training_ddl",
                 method: "POST",
                 data: {
                     type: 'training_ddl',
@@ -112,7 +112,7 @@ $(document).ready(function () {
                             url: "../training/get_table_ddl/"+this.value(),
                             type: 'GET',
                         }).done(function(res) {
-                            kendo.editable.options.model.set('query',res);
+                            kendo.editable.options.model.set('table',res);
                         });
                     }
                 });

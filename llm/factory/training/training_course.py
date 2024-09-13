@@ -12,7 +12,7 @@ class TrainingCourse(Training):
 
         #google_api_key = os.getenv("GOOGLE_API_KEY_SUMMARY")
         #self.llm = GoogleGenerativeAI(model="gemini-pro", google_api_key=google_api_key)
-        self.text_splitter = RecursiveCharacterTextSplitter(chunk_size=2000, chunk_overlap=100)
+        self.text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
         self.columns = ['title','content','coursemoduleid','courseid','source']
         self.context = "course"
 
@@ -37,7 +37,7 @@ class TrainingCourse(Training):
                 if key in self.columns:
                     metadata[key] = value
             for doc in all_splits:
-                finaldocx.append(Document(page_content=doc.page_content,metadata=metadata))
+                finaldocx.append(Document(page_content=metadata['title']+' '+doc.page_content,metadata=metadata))
             
             ## Xử lý lưu docs tóm tắt tài liệu
             # summary = 'Bản tóm tắt tài liệu '+data['title']+':' + self.summary_traning_data(all_splits)
