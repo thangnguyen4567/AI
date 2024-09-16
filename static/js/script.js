@@ -17,12 +17,8 @@ async function submit_data() {
       body: JSON.stringify(
         { 
           question: question,
-          context: 'webcafe',
+          context: 'course',
           chat_history: chat_history,
-          contextdata: {
-            // type: ['order','info','coffee']
-            type: ['order','coffee']
-          }
         }
       ),
     });

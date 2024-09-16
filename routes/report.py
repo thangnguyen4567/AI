@@ -1,6 +1,6 @@
 from flask import request,Blueprint
-from llm.services.chatbot import ChatBot
-from llm.init import PowerAI
+# from llm.services.chatbot import ChatBot
+from project.report.init import PowerAI
 
 
 report = Blueprint('report', __name__)

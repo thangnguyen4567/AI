@@ -1,5 +1,5 @@
 from flask import Blueprint,render_template,request
-from llm.factory.training_factory import TrainingFactory
+from factory.training_factory import TrainingFactory
 from config.config_vectordb import VectorDB
 from config.config_sqldb import SQLDB
 from langchain.schema import Document

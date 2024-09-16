@@ -1,6 +1,6 @@
 from flask import Blueprint,request,session
 from dotenv import load_dotenv
-from llm.services.editor import Editor
+from services.editor import Editor
 
 load_dotenv('.env')
 

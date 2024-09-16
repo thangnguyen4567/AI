@@ -1,6 +1,6 @@
 from flask import Blueprint,request,render_template, Response, stream_with_context
 from dotenv import load_dotenv
-from llm.services.chatbot import ChatBot
+from services.chatbot import ChatBot
 from queue import Queue
 from threading import Thread
 import asyncio
