@@ -34,11 +34,14 @@ class Context(ABC):
         topic = ''
         for item in topics:
             topic += item['title']+':'+item['description']+'\n'
+            if item['priority']:
+                topic += 'Độ ưu tiên:'+item['priority']+'\n'
 
         template = """
             Bạn là một AI phân loại câu hỏi của người dùng vào các chủ đề cụ thể. Dựa trên nội dung câu hỏi, xác định tất cả các chủ đề phù hợp nhất từ danh sách sau:
             {topic}
             Phân tích câu hỏi của người dùng và trả về **danh sách tên các chủ đề** phù hợp nhất từ danh sách trên mà không kèm thêm bất kỳ từ nào khác. Nếu câu hỏi liên quan đến nhiều chủ đề, hãy trả về tất cả các chủ đề đó.
+            Chọn chủ đề theo độ ưu tiên, nếu chủ đề có điểm ưu tiên càng cao thì nên được ưu tiên hơn
             Câu hỏi của người dùng: "{question}"
             Định dạng đầu ra: Tên Chủ đề 1, Tên Chủ đề 2,...
         """

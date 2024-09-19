@@ -16,7 +16,8 @@ class Model(ABC):
     @abstractmethod
     def generate_model(self, apikey: str, **kwargs) -> None:
         pass
-
+    
+    ##Tạo chain để xử lý câu hỏi
     def get_conversation_chain(self, message: list = None) -> list:
 
         if message is None:
@@ -32,6 +33,7 @@ class Model(ABC):
         )
         return conversation
     
+    ##Tạo chain để xử lý câu hỏi với streaming
     def get_conversation_chain_stream(self, message: list = None) -> list:
 
         if message is None:
@@ -43,6 +45,7 @@ class Model(ABC):
 
         return chain
 
+    ##Khởi tạo lịch sử chat
     def get_conversation_message(self,context: str,chat_history: list = None) -> list:
 
         message = [SystemMessagePromptTemplate.from_template(context)]
