@@ -17,7 +17,7 @@ async function submit_data() {
       body: JSON.stringify(
         { 
           question: question,
-          context: 'course',
+          context: 'lms',
           chat_history: chat_history,
         }
       ),

@@ -1,5 +1,5 @@
 from flask import request,Blueprint
-from project.lms.services.createquestion import CreateQuestion
+from project.lms.services.question import Question
 
 
 generate = Blueprint('generate', __name__)
@@ -7,6 +7,6 @@ generate = Blueprint('generate', __name__)
 @generate.route('/question', methods=['POST'])
 def create_question():
     data = request.get_json()
-    llm = CreateQuestion(data)
+    llm = Question(data)
     result = llm.response()
     return result

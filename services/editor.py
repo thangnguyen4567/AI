@@ -17,6 +17,6 @@ class Editor():
         
         self.model.generate_model(self.apikey)
         message = self.model.get_editor_message(self.system,self.context,self.query)
-        response = self.model.invoke(message)
+        response = self.model.llm.invoke(message)
 
         return response

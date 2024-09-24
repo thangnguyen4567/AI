@@ -63,9 +63,10 @@ class Model(ABC):
     def get_editor_message(self,systems: list,context: str,query: str) -> list:
 
         message = []
-        for system in systems:
-            message.append(SystemMessage(content=system))
 
+        message.append(SystemMessage(content='Answer the question based on the context below'))
+        message.append("The response should be in markdown format.")
+        message.append("The response should preserve any HTML formatting, links, and styles in the context.")
         message.append(SystemMessage(content='Cotext:'+context))
         message.append(HumanMessage(content=query))
         

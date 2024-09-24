@@ -2,7 +2,8 @@ from factory.base.training import Training
 from langchain_community.document_loaders import Docx2txtLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.schema import Document
-class TrainingSystem(Training):
+
+class TrainingHDSD(Training):
     def __init__(self):
         super().__init__()
         self.text_splitter = RecursiveCharacterTextSplitter(chunk_size=2000, chunk_overlap=100)

@@ -1,6 +1,7 @@
-from flask import Blueprint,request,session
+from flask import Blueprint,request
 from dotenv import load_dotenv
 from services.editor import Editor
+import markdown
 
 load_dotenv('.env')
 
@@ -12,7 +13,7 @@ def get_conversations():
     editor = Editor(data)
     answer = editor.response()
     if hasattr(answer, 'content'):
-        result = {'answer':answer.content}
+        result = {'answer':markdown.markdown(answer.content)}
     else:
-        result = {'answer':answer}
+        result = {'answer':markdown.markdown(answer)}
     return result

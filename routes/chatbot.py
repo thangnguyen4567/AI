@@ -67,8 +67,6 @@ def get_conversations_stream():
     async def generator():
         fullmessage = ''
         async for chunk in chat.chat_response_stream():
-            # fullmessage += chunk
-            # yield markdown.markdown(fullmessage)
             yield chunk
 
     return Response(generator(), mimetype='text/event-stream', content_type='text/event-stream')
