@@ -1,12 +1,11 @@
 from langchain.prompts import PromptTemplate
-from langchain_openai import ChatOpenAI
 from langchain_core.output_parsers import JsonOutputParser
 from langchain_core.pydantic_v1 import BaseModel, Field
-from factory.model_factory import ModelFactory
 from config.config_vectordb import VectorDB
 from langchain_community.vectorstores.redis import RedisFilter
 import re
 import json
+from factory.base.services import Services
 
 class QuestionMultichoice(BaseModel):
     qtype: str = Field(description="Loại câu hỏi chọn nhiều đáp án")
@@ -34,18 +33,14 @@ class QuestionTrueFalse(BaseModel):
     result: str = Field(description="Đáp án đúng là 1:True hoặc 2:False")
     generalfeedback: str = Field(description="Giải thích cho câu hỏi")
 
-class Question():
+class Question(Services):
     def __init__(self,config):
 
-        self.question = config.get('question')
+        super().__init__(config)
+
         self.qtype = config.get('qtype','multichoice')
         self.numberquestion = config.get('numberquestion','1')
-        self.model = ModelFactory.create_model(self,config.get('model','chatgpt'))
-        self.apikey = config.get('apikey')
-        self.model.generate_model(self.apikey)
-        self.project = config.get('project')
         self.modules = config.get('coursemoduleid')
-        self.chat_history = config.get('chat_history')
 
     def response(self):
 
@@ -71,7 +66,7 @@ class Question():
             combined_filter = RedisFilter.num('coursemoduleid') == int(self.modules[0])
 
             for item in self.modules[1:]:
-                combined_filter = RedisFilter.num('coursemoduleid') == int(item)
+                combined_filter |= RedisFilter.num('coursemoduleid') == int(item)
 
             index_schema = {
                 "numeric": [
@@ -93,18 +88,15 @@ class Question():
             partial_variables={"format_instructions": parser.get_format_instructions()},
         )
 
-        chain = prompt | self.model.llm
+        chain = prompt | self.model.llm | parser
 
         response = chain.invoke({"question": self.question,
                                  "qtype": self.qtype,
                                  "numberquestion": self.numberquestion, 
                                  'resource': resource
                                  })
-        
-        cleaned_string = re.sub(r'```json|```','', response.content)
-
-        json_blocks = re.findall(r'\{.*?\}', cleaned_string, re.DOTALL)
-
-        json_objects = [json.loads(block) for block in json_blocks]
-
-        return json_objects
+        if 'foo' in response:
+            return response['foo']
+        if 'questions' in response:
+            return response['questions']
+        return response

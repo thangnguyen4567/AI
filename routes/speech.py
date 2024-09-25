@@ -1,8 +1,6 @@
 from flask import Blueprint,send_file,request
-import pyttsx3
 from gtts import gTTS
 from pydub import AudioSegment
-import uuid
 import io
 
 speech = Blueprint('speech', __name__)

@@ -104,7 +104,7 @@ class ContextLMS(Context):
                         {"name":"coursemoduleid"},
                     ]
                 }
-                self.documents.extend(VectorDB().connect_vectordb(index_name='resource_LMS_TEST_MISA',index_schema=self.index_schema).similarity_search(question,k=8))
+                self.documents.extend(VectorDB().connect_vectordb(index_name='resource_'+contextdata['collection'],index_schema=self.index_schema).similarity_search(question,k=8))
 
             if topic.strip() in ['course']:
                 
@@ -119,7 +119,7 @@ class ContextLMS(Context):
                     ]
                 }
 
-                self.documents.extend(VectorDB().connect_vectordb(index_name='course_LMS_TEST_MISA',index_schema=self.index_schema).similarity_search(question,k=4))
+                self.documents.extend(VectorDB().connect_vectordb(index_name='course_'+contextdata['collection'],index_schema=self.index_schema).similarity_search(question,k=4))
 
         if self.documents:
             for doc in self.documents:
