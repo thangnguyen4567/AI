@@ -11,7 +11,7 @@ class Editor(Services):
 
     def response(self) -> list:
         
-        message = self.model.get_editor_message(self.system,self.context,self.query)
+        message = self.model.get_editor_message(self.context,self.query)
         response = self.model.llm.invoke(message)
 
         return response

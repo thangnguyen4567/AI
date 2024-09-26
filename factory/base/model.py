@@ -60,7 +60,7 @@ class Model(ABC):
 
         return message 
 
-    def get_editor_message(self,systems: list,context: str,query: str) -> list:
+    def get_editor_message(self,context: str,query: str) -> list:
 
         message = []
 
