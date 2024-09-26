@@ -34,7 +34,7 @@ class Context(ABC):
         topic = ''
         for item in topics:
             topic += item['title']+':'+item['description']+'\n'
-            if item['priority']:
+            if 'priority' in item:
                 topic += 'Độ ưu tiên:'+item['priority']+'\n'
 
         template = """

@@ -3,8 +3,6 @@ from langchain_core.output_parsers import JsonOutputParser
 from langchain_core.pydantic_v1 import BaseModel, Field
 from config.config_vectordb import VectorDB
 from langchain_community.vectorstores.redis import RedisFilter
-import re
-import json
 from factory.base.services import Services
 
 class QuestionMultichoice(BaseModel):
@@ -19,9 +17,9 @@ class QuestionMultichoice(BaseModel):
     generalfeedback: str = Field(description="Giải thích lý do chọn đáp án ở result")
 
 class QuestionEssay(BaseModel):
-    qtype: str = Field(description="Loại câu hỏi tự luận")
+    qtype: str = Field(description="Loại câu hỏi tự luận, mỗi câu hỏi tự luận sẽ có qtype,name,questiontext,generalfeedback được tách ra riêng biệt")
     name: str = Field(description="Tên câu hỏi")
-    questiontext: str = Field(description="Mô tả câu hỏi tự luận")
+    questiontext: str = Field(description="Đề bài cho 1 câu hỏi tự luận")
     generalfeedback: str = Field(description="Giải thích cho câu hỏi tự luận")
 
 class QuestionTrueFalse(BaseModel):
@@ -39,7 +37,7 @@ class Question(Services):
         super().__init__(config)
 
         self.qtype = config.get('qtype','multichoice')
-        self.numberquestion = config.get('numberquestion','1')
+        self.numberquestion = config.get('numberquestion')
         self.modules = config.get('coursemoduleid')
 
     def response(self):
@@ -53,12 +51,12 @@ class Question(Services):
 
         template = """
                 Bạn là một AI chuyên tạo câu hỏi theo yêu cầu của người dùng. Nhiệm vụ của bạn là tạo ra **chính xác** {numberquestion} câu hỏi phù hợp với ngữ cảnh, không hơn không kém.
+                Mỗi câu hỏi được tạo ra sẽ đi theo cấu trúc json dưới đây:
                 {format_instructions}
                 Yêu cầu: {question}  
                 Loại câu hỏi: {qtype}  
                 Câu hỏi phải dựa trên tài liệu sau: {resource} 
-                
-                **Lưu ý quan trọng:** Bạn phải tạo ra đúng {numberquestion} câu hỏi, và các câu hỏi phải tuân thủ loại yêu cầu ({qtype}). Không tạo thêm hoặc bớt câu hỏi.
+                **Lưu ý quan trọng:** Bạn phải tạo ra đúng số lượng {numberquestion} câu hỏi, và các câu hỏi phải tuân thủ loại yêu cầu ({qtype}). Không tạo thêm hoặc bớt câu hỏi.
         """
 
         if self.modules and self.modules[0]:
@@ -99,4 +97,8 @@ class Question(Services):
             return response['foo']
         if 'questions' in response:
             return response['questions']
+        if self.qtype == 'essay':
+            return [response]
+        if self.numberquestion == '1':
+            return [response]
         return response

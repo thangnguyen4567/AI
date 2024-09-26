@@ -1,6 +1,6 @@
 from flask import Blueprint,request
 from dotenv import load_dotenv
-from services.editor import Editor
+from project.lms.services.editor import Editor
 import markdown
 
 load_dotenv('.env')

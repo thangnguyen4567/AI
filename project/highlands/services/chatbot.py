@@ -1,5 +1,5 @@
 from factory.base.services import Services
-from project.lms.context.context import ContextLMS
+from project.highlands.context import ContextHighlands
 
 class ChatBot(Services):
 
@@ -7,7 +7,7 @@ class ChatBot(Services):
         super().__init__(config)
 
         if self.context is not None:
-            self.context = ContextLMS()
+            self.context = ContextHighlands()
             aggregation_question = self.context.aggregation_question_context(self.chat_history,self.question)
             self.prompt = self.context.retriever_document(self.contextdata,aggregation_question)
 
