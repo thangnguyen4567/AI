@@ -97,10 +97,11 @@ def import_data():
     if 'file' in request.files:
         db = request.args['db']
         file = request.files['file']
+        db = 'hdsd'
         file_extension = file.filename.split('.')[-1].lower()
         text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=1400,
-            chunk_overlap=100,
+            chunk_size=2000,
+            chunk_overlap=200,
             length_function=len,
         )
         vector_db = VectorDB()
@@ -112,8 +113,13 @@ def import_data():
             for sheet_name, df in all_sheets.items():
                 for index, row in df.iterrows():
                     metadata = {}
-                    content = remove_stopwords(row.content)
-                    texts = text_splitter.split_text(content)
+                    if 'content' in row:
+                        if not isinstance(row.content, str):
+                            continue
+                    else:
+                        continue
+                    # content = remove_stopwords(row.content)
+                    texts = text_splitter.split_text(row.content)
                     for text in texts:
                         metatext = ''
                         for column in df.columns:
@@ -121,7 +127,7 @@ def import_data():
                                 metadata[column] = row[column]
                                 metatext += column+':'+row[column]+','
                         finaldocx.append(Document(
-                            page_content=text+metatext, 
+                            page_content=text, 
                             metadata=metadata
                         ))
             

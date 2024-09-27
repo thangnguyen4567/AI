@@ -7,7 +7,7 @@ class ContextLMS(Context):
         self.prompt = """
             Bạn là AI trợ giảng Elearning Pro, được thiết kế để hỗ trợ người dùng trong việc trả lời các câu hỏi liên quan đến tài liệu hướng dẫn sử dụng và tài liệu trong khóa học.
             Nếu người dùng hỏi về một tài liệu cụ thể, hãy tóm tắt những ý chính của tài liệu đó
-            Khi cung cấp câu trả lời, nếu có tài liệu tham khảo hoặc nguồn tài liệu hoặc link khóa học, hãy hiển thị chúng dưới dạng thẻ a với target="_blank".
+            Khi cung cấp câu trả lời, nếu có tài liệu tham khảo hoặc nguồn tài liệu hoặc link khóa học hoặc link tài liệu hdsd theo vai trò **hãy hiển thị chúng dưới dạng thẻ a với target="_blank"** để người dùng biết bạn lấy nguồn tại liệu từ đâu để trả lời.
             Hãy trả lời một cách linh hoạt, tùy thuộc vào ngữ cảnh và thông tin mà người dùng cần. Nếu câu hỏi không rõ ràng, hãy hỏi lại để làm rõ.
             Nội dung hỗ trợ bao gồm 3 nhóm chính:
             1. **Tài liệu khóa học**: Bao gồm các tài liệu học tập, bài giảng, và tài liệu liên quan trực tiếp đến các khóa học.
@@ -85,11 +85,12 @@ class ContextLMS(Context):
                     "text": [
                         {"name":"title"},
                         {"name":"role"},
-                        {"name":"content"}
+                        {"name":"content"},
+                        {"name":"source"}
                     ],
                 }
 
-                self.documents.extend(VectorDB().connect_vectordb(index_name='system', index_schema=self.index_schema).similarity_search(question, k=4, filter=combined_filter))
+                self.documents.extend(VectorDB().connect_vectordb(index_name='hdsd', index_schema=self.index_schema).similarity_search(question, k=4, filter=combined_filter))
 
             if topic.strip() in ['resource']:
 
@@ -126,7 +127,14 @@ class ContextLMS(Context):
                 self.prompt += doc.page_content
                 if 'source' in doc.metadata and doc.metadata['source']:
                     if 'coursemoduleid' in doc.metadata:
-                        self.prompt += 'Nguồn tài liệu:' + doc.metadata['source'] + '.\n'
+                        self.prompt += 'Nguồn '+ doc.metadata['title'] + ':' + doc.metadata['source'] + '.\n'
+                    elif 'role' in doc.metadata:
+                        if doc.metadata['role'] == 'student':
+                            self.prompt += 'Nguồn tài liệu hdsd học viên:' + doc.metadata['source'] + '.\n'
+                        elif doc.metadata['role'] == 'teacher':
+                            self.prompt += 'Nguồn tài liệu hdsd giáo viên:' + doc.metadata['source'] + '.\n'
+                        elif doc.metadata['role'] == 'manager':
+                            self.prompt += 'Nguồn tài liệu hdsd quản lý đào tạo:' + doc.metadata['source'] + '.\n'
                     else:
                         self.prompt += 'Link khóa học:' + doc.metadata['source'] + '--Hết thông tin khóa học--.\n'
 
