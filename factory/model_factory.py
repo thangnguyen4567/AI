@@ -1,6 +1,6 @@
-from model.model_chatgpt import ModelChatGPT
-from model.model_gemini import ModelGemini
-from model.model_groq import ModelGroq
+from factory.model.model_chatgpt import ModelChatGPT
+from factory.model.model_gemini import ModelGemini
+from factory.model.model_groq import ModelGroq
 
 class ModelFactory:
     def create_model(self,model):

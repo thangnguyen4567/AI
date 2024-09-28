@@ -24,7 +24,7 @@ def get_conversations_stream():
     
     @async_to_sync
     async def generator():
-        async for chunk in chat.chat_response_stream():
+        async for chunk in chat.response_stream():
             yield chunk
 
     return Response(generator(), mimetype='text/event-stream', content_type='text/event-stream')

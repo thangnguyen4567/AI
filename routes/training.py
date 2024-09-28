@@ -97,7 +97,6 @@ def import_data():
     if 'file' in request.files:
         db = request.args['db']
         file = request.files['file']
-        db = 'hdsd'
         file_extension = file.filename.split('.')[-1].lower()
         text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=2000,

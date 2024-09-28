@@ -24,7 +24,6 @@ class ContextLMS(Context):
         """
 
         self.documents = []
-        
         self.topics = [
             {
                 'title': 'student',
@@ -90,10 +89,15 @@ class ContextLMS(Context):
                     ],
                 }
 
-                self.documents.extend(VectorDB().connect_vectordb(index_name='hdsd', index_schema=self.index_schema).similarity_search(question, k=4, filter=combined_filter))
+                try:
+                    self.documents.extend(VectorDB().connect_vectordb(index_name='hdsd', index_schema=self.index_schema).similarity_search(question, k=4, filter=combined_filter))
+                except:
+                    print('Chưa có dữ liệu training')
 
             if topic.strip() in ['resource']:
 
+                collection = 'resource_'+contextdata['collection']
+                
                 self.index_schema = {
                     "text": [
                         {"name":"source"},
@@ -105,10 +109,16 @@ class ContextLMS(Context):
                         {"name":"coursemoduleid"},
                     ]
                 }
-                self.documents.extend(VectorDB().connect_vectordb(index_name='resource_'+contextdata['collection'],index_schema=self.index_schema).similarity_search(question,k=8))
+
+                try:
+                    self.documents.extend(VectorDB().connect_vectordb(index_name=collection,index_schema=self.index_schema).similarity_search(question,k=8))
+                except:
+                    print('Chưa có dữ liệu training')
 
             if topic.strip() in ['course']:
                 
+                collection = 'course_'+contextdata['collection']
+
                 self.index_schema = {
                     "text": [
                         {"name":"source"},
@@ -120,7 +130,11 @@ class ContextLMS(Context):
                     ]
                 }
 
-                self.documents.extend(VectorDB().connect_vectordb(index_name='course_'+contextdata['collection'],index_schema=self.index_schema).similarity_search(question,k=4))
+                try:
+                    self.documents.extend(VectorDB().connect_vectordb(index_name=collection,index_schema=self.index_schema).similarity_search(question,k=4))
+                except:
+                    print('Chưa có dữ liệu training')
+
 
         if self.documents:
             for doc in self.documents:
@@ -129,12 +143,7 @@ class ContextLMS(Context):
                     if 'coursemoduleid' in doc.metadata:
                         self.prompt += 'Nguồn '+ doc.metadata['title'] + ':' + doc.metadata['source'] + '.\n'
                     elif 'role' in doc.metadata:
-                        if doc.metadata['role'] == 'student':
-                            self.prompt += 'Nguồn tài liệu hdsd học viên:' + doc.metadata['source'] + '.\n'
-                        elif doc.metadata['role'] == 'teacher':
-                            self.prompt += 'Nguồn tài liệu hdsd giáo viên:' + doc.metadata['source'] + '.\n'
-                        elif doc.metadata['role'] == 'manager':
-                            self.prompt += 'Nguồn tài liệu hdsd quản lý đào tạo:' + doc.metadata['source'] + '.\n'
+                        self.prompt += ' Nguồn tài liệu: ['+doc.metadata['title']+']' + doc.metadata['source'] + '.\n'
                     else:
                         self.prompt += 'Link khóa học:' + doc.metadata['source'] + '--Hết thông tin khóa học--.\n'
 
