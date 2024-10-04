@@ -42,8 +42,16 @@ def save_training_data():
     
 @training.route('/delete', methods=['POST'])
 def delete_training_data():
-    training = training_factory.create_training(request.args['type'])
-    return training.delete_training_data(request.form['id'])
+    if(request.form):
+        data = request.form
+        training = training_factory.create_training(request.args['type'])
+        return training.delete_training_data(key=request.form['id'])
+    else:
+        data = request.get_json() 
+        training = training_factory.create_training(data['type'])
+        return training.delete_training_data(data=data)
+
+
 
 @training.route('/read_index', methods=['GET'])
 def get_index():

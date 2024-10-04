@@ -8,5 +8,8 @@ class ChatBot(ChatbotServices):
 
         if self.context is not None:
             self.context = ContextLMS()
-            aggregation_question = self.context.aggregation_question_context(self.chat_history,self.question)
+            if len(self.question) < 20:
+                aggregation_question = self.context.aggregation_question_context(self.chat_history,self.question)
+            else:
+                aggregation_question = self.question
             self.prompt = self.context.retriever_document(self.contextdata,aggregation_question)

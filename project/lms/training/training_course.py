@@ -26,6 +26,7 @@ class TrainingCourse(Training):
 
             self.vector_db.add_vectordb([document],collection)
 
+            self.reponse['error'] = False
             self.reponse['message'] = 'Training thành công'
 
             return self.reponse
@@ -38,6 +39,36 @@ class TrainingCourse(Training):
             self.reponse['message'] = f'Training thất bại: {str(e)}'
 
             return self.reponse
+
+    def delete_training_data(self,data):
+
+        collection = 'course_'+data['collection']
+
+        try:
+            courseids_set = set(data['courseids'])
+            keys_to_delete = []
+
+            for key in self.redis_client.scan_iter("doc:"+collection+"*"):
+                courseid_redis = self.redis_client.hget(key, 'courseid').decode()
+                if courseid_redis in courseids_set:
+                    keys_to_delete.append(key)
+
+            if keys_to_delete:
+                self.redis_client.delete(*keys_to_delete)
+
+            self.reponse['error'] = False
+            self.reponse['message'] = 'Xóa khóa học thành công'
+
+            return self.reponse
+        
+        except Exception as e:
+
+            print(str(e))
+            self.reponse['error'] = True
+            self.reponse['message'] = f'Xóa khóa học thất bại: {str(e)}'
+
+            return self.reponse
+
 
     def check_training_duplication(self):
         pass

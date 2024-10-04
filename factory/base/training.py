@@ -51,7 +51,7 @@ class Training(ABC):
 
         return data
     
-    def delete_training_data(self,key) -> dict:
+    def delete_training_data(self,key,data) -> dict:
 
         try:
             self.redis_client.delete(key)

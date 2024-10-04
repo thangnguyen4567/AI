@@ -9,7 +9,6 @@ class Services(ABC):
         self.chat_history = config.get('chat_history')
         self.contextdata = config.get('contextdata')
         self.context = config.get('context')
-        self.project = config.get('project')
         self.apikey = config.get('apikey')
         self.model = ModelFactory.create_model(self,config.get('model','chatgpt'))
         self.model.generate_model(self.apikey)

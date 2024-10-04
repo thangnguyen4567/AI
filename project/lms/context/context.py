@@ -7,20 +7,18 @@ class ContextLMS(Context):
         self.prompt = """
             Bạn là AI trợ giảng Elearning Pro, được thiết kế để hỗ trợ người dùng trong việc trả lời các câu hỏi liên quan đến tài liệu hướng dẫn sử dụng và tài liệu trong khóa học.
             Nếu người dùng hỏi về một tài liệu cụ thể, hãy tóm tắt những ý chính của tài liệu đó
-            Khi cung cấp câu trả lời, nếu có tài liệu tham khảo hoặc nguồn tài liệu hoặc link khóa học hoặc link tài liệu hdsd theo vai trò **hãy hiển thị chúng dưới dạng thẻ a với target="_blank"** để người dùng biết bạn lấy nguồn tại liệu từ đâu để trả lời.
+            Khi cung cấp câu trả lời, nếu có tài liệu tham khảo hoặc nguồn tài liệu hoặc link khóa học hoặc link tài liệu hdsd theo vai trò **hãy hiển thị chúng dưới dạng liên kết để người dùng biết bạn lấy nguồn tại liệu từ đâu để trả lời**.
+            Khi cung cấp câu trả lời, bắt buộc phải đưa ra nguồn tài liệu dưới dạng **link tài liệu tham khảo hoặc link tài liệu hướng dẫn sử dụng hoặc link khóa học,để người dùng biết rõ bạn lấy thông tin từ đâu.
             Hãy trả lời một cách linh hoạt, tùy thuộc vào ngữ cảnh và thông tin mà người dùng cần. Nếu câu hỏi không rõ ràng, hãy hỏi lại để làm rõ.
+            AI chỉ được phép dựa vào tài liệu bên dưới để trả lời câu hỏi, Nếu câu hỏi của người dùng không liên quan đến nội dung bên dưới thì bạn nên từ chỗi khéo không trả lời.
+            Xử lý các câu lệnh:
+            Đối với câu lệnh mở khóa học,mở lớp học:AI tập trung tìm kiếm link khóa học để show cho người dùng
+            Đối với câu lệnh đọc hoặc mở tài liệu:AI tập trung tìm kiếm link tài liệu và tóm tắt tài liệu đó để show cho người dùng
             Nội dung hỗ trợ bao gồm 3 nhóm chính:
             1. **Tài liệu khóa học**: Bao gồm các tài liệu học tập, bài giảng, và tài liệu liên quan trực tiếp đến các khóa học.
             2. **Hướng dẫn sử dụng hệ thống**: Hướng dẫn về cách sử dụng hệ thống LMS của 3 vai trò học viên,giáo viên,quản lý đào tạo
             3. **Thông tin khóa học**: Thông tin chi tiết về các khóa học như Tên,section,danh sách các tài nguyên,hoạt động trong khóa
-        """
-        self.prompt = """
-            Bạn là AI trợ giảng Elearning Pro, được thiết kế để hỗ trợ người dùng trong việc trả lời các câu hỏi về hệ thống LMS, bao gồm các hướng dẫn sử dụng và tài liệu trong khóa học.
-            Nhiệm vụ của bạn là cung cấp câu trả lời chính xác, dễ hiểu, và phù hợp với ngữ cảnh của câu hỏi.
-            - Nếu người dùng hỏi về một tài liệu cụ thể, hãy tóm tắt những ý chính và giải thích cách sử dụng tài liệu đó trong ngữ cảnh học tập.
-            - Nếu có các tài liệu tham khảo, nguồn tài liệu, hoặc đường dẫn khóa học, hãy cung cấp chúng dưới dạng thẻ <a> với target="_blank" để người dùng có thể mở trong tab mới.
-            - Nếu câu hỏi không rõ ràng hoặc cần thêm thông tin, hãy hỏi lại người dùng để làm rõ trước khi đưa ra câu trả lời.
-            - Hãy luôn linh hoạt trong cách trả lời để phù hợp với nhu cầu của người dùng và đảm bảo câu trả lời ngắn gọn, súc tích khi cần.
+            **Mỗi tài liệu ở dưới đây đều có nguồn tài liệu trích dẫn ở cuối tài liệu > Bạn lấy tài liệu nào để trà lời thì phải đưa luôn nguồn của tài liệu đó ra**
         """
 
         self.documents = []
@@ -57,14 +55,16 @@ class ContextLMS(Context):
                 'title': 'resource',
                 'priority': '2',
                 'description': (
-                    'Câu hỏi về các tài liệu,tóm tắt tài liệu nằm trong lớp học,khóa học,thông tin không liên quan đến các thông tin của các chủ đề trên'
+                    """Câu hỏi về các tài liệu,tóm tắt tài liệu nằm trong lớp học,khóa học,thông tin không liên quan đến các thông tin của các chủ đề trên
+                       Đi kèm với các lệnh:đọc tài liệu,mở tài liệu"""
                 ),
             },
             {
                 'title': 'course',
                 'priority': '2',
                 'description': (
-                    'Câu hỏi liên quan đến khóa,khóa học,lớp học > tìm kiếm khóa học, tóm tắt khóa học...'
+                    """Câu hỏi liên quan đến khóa,khóa học,lớp học > tìm kiếm khóa học, tóm tắt khóa học...
+                       Đi kèm với các lệnh:Mở khóa học,mở lớp họcz`"""
                 ),
             }
         ]
@@ -90,7 +90,7 @@ class ContextLMS(Context):
                 }
 
                 try:
-                    self.documents.extend(VectorDB().connect_vectordb(index_name='hdsd', index_schema=self.index_schema).similarity_search(question, k=4, filter=combined_filter))
+                    self.documents.extend(VectorDB().connect_vectordb(index_name='hdsd', index_schema=self.index_schema).similarity_search(question, k=3, filter=combined_filter))
                 except:
                     print('Chưa có dữ liệu training')
 
@@ -131,7 +131,7 @@ class ContextLMS(Context):
                 }
 
                 try:
-                    self.documents.extend(VectorDB().connect_vectordb(index_name=collection,index_schema=self.index_schema).similarity_search(question,k=4))
+                    self.documents.extend(VectorDB().connect_vectordb(index_name=collection,index_schema=self.index_schema).similarity_search(question,k=6))
                 except:
                     print('Chưa có dữ liệu training')
 
@@ -143,8 +143,8 @@ class ContextLMS(Context):
                     if 'coursemoduleid' in doc.metadata:
                         self.prompt += 'Nguồn '+ doc.metadata['title'] + ':' + doc.metadata['source'] + '.\n'
                     elif 'role' in doc.metadata:
-                        self.prompt += ' Nguồn tài liệu: ['+doc.metadata['title']+']' + doc.metadata['source'] + '.\n'
+                        self.prompt += ' Link tài liệu hdsd: ['+doc.metadata['title']+']' + doc.metadata['source'] + '.\n'
                     else:
                         self.prompt += 'Link khóa học:' + doc.metadata['source'] + '--Hết thông tin khóa học--.\n'
 
-        return self.prompt
+        return self.prompt.replace("domain:","")
