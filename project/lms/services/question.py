@@ -71,7 +71,7 @@ class Question(Services):
                     {"name":"coursemoduleid"},
                 ]
             }
-            documents = VectorDB().connect_vectordb(index_name='resource_LMS_TEST_MISA',index_schema=index_schema).similarity_search(self.question,k=8,filter=combined_filter)
+            documents = VectorDB().connect_vectordb(index_name='resource_'+self.contextdata['collection'],index_schema=index_schema).similarity_search(self.question,k=8,filter=combined_filter)
             resource = ''
             if documents:
                 for doc in documents:
