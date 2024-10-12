@@ -8,7 +8,7 @@ class ChatBot(ChatbotServices):
 
         if self.context is not None:
             self.context = ContextLMS()
-            if len(self.question) < 20:
+            if len(self.question) <= 25:
                 aggregation_question = self.context.aggregation_question_context(self.chat_history,self.question)
             else:
                 aggregation_question = self.question

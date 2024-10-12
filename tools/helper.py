@@ -6,6 +6,8 @@ from queue import Queue
 from threading import Thread
 import asyncio
 import importlib
+import random
+import string
 
 def convert_unixtime(unixtime):
     unixtime = int(unixtime)
@@ -74,3 +76,7 @@ def get_chatbot(data):
         return chatbot_module.ChatBot(data)
     except ModuleNotFoundError:
         raise ValueError(f"Chatbot for project '{data['context']}' not found")
+    
+def generate_random_string(length=10):
+    letters = string.ascii_letters
+    return ''.join(random.choice(letters) for i in range(length))

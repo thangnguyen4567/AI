@@ -31,3 +31,4 @@ pandas
 langchain_text_splitters
 markdown
 flasgger
+docx2txt

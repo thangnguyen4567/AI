@@ -3,7 +3,11 @@ from langchain_community.document_loaders import PyPDFLoader
 from langchain_community.document_loaders import UnstructuredURLLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.schema import Document
+from langchain_community.document_loaders import Docx2txtLoader
 from pathlib import Path
+import requests
+import os
+from tools.helper import generate_random_string
 
 class TrainingResource(Training):
     def __init__(self):
@@ -27,6 +31,20 @@ class TrainingResource(Training):
                 for doc in docs.load():
                     text += doc.page_content
                 all_splits = [Document(page_content=split, metadata={}) for split in self.text_splitter.split_text(text)]
+
+            elif typefile == '.docx':
+
+                response = requests.get(data['source'])
+                random_string = generate_random_string()
+                name = random_string+'.docx'
+
+                with open(name, 'wb') as file:
+                    file.write(response.content)
+
+                docs = Docx2txtLoader(name)
+                all_splits = self.text_splitter.split_documents(docs.load())
+
+                os.remove(name)
 
             else:
                 docs = UnstructuredURLLoader(urls=[data['source']])
