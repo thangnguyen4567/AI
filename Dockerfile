@@ -21,8 +21,6 @@ COPY requirements.txt /app
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-RUN apt install -y ffmpeg
-
 COPY . /app
 
 EXPOSE 5000
