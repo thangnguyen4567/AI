@@ -4,6 +4,7 @@ from langchain_community.document_loaders import UnstructuredURLLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.schema import Document
 from langchain_community.document_loaders import Docx2txtLoader
+from pptx import Presentation
 from pathlib import Path
 import requests
 import os
@@ -44,6 +45,25 @@ class TrainingResource(Training):
                 docs = Docx2txtLoader(name)
                 all_splits = self.text_splitter.split_documents(docs.load())
 
+                os.remove(name)
+
+            elif typefile == '.pptx':
+
+                response = requests.get(data['source'])
+                random_string = generate_random_string()
+                name = random_string+'.docx'
+
+                with open(name, 'wb') as file:
+                    file.write(response.content)
+
+                full_text = ''
+                presentation = Presentation(name)
+                for slide in presentation.slides:
+                    for shape in slide.shapes:
+                        if hasattr(shape, "text"):
+                            full_text += shape.text
+
+                all_splits = self.text_splitter.split_text(full_text)
                 os.remove(name)
 
             else:
