@@ -8,6 +8,11 @@ import asyncio
 import importlib
 import random
 import string
+from pathlib import Path
+from langchain_community.document_loaders import PyPDFLoader
+import requests
+from langchain_community.document_loaders import Docx2txtLoader
+from pptx import Presentation
 
 def convert_unixtime(unixtime):
     unixtime = int(unixtime)
@@ -80,3 +85,41 @@ def get_chatbot(data):
 def generate_random_string(length=10):
     letters = string.ascii_letters
     return ''.join(random.choice(letters) for i in range(length))
+
+
+def file_reader(file_path):
+
+    path = Path(file_path)
+    typefile = path.suffix.lower()
+    text = ''
+
+    if typefile == '.pdf':
+        docs = PyPDFLoader(file_path)
+        for doc in docs.load():
+            text += doc.page_content
+
+    elif typefile == '.docx':
+        response = requests.get(file_path)
+        random_string = generate_random_string()
+        name = random_string+'.docx'
+        with open(name, 'wb') as file:
+            file.write(response.content)
+        docs = Docx2txtLoader(name)
+        text = docs.load()[0].page_content
+        os.remove(name)
+
+    elif typefile == '.pptx':
+        response = requests.get(file_path)
+        random_string = generate_random_string()
+        name = random_string+'.pptx'
+        with open(name, 'wb') as file:
+            file.write(response.content)
+            
+        presentation = Presentation(name)
+        for slide in presentation.slides:
+            for shape in slide.shapes:
+                if hasattr(shape, "text"):
+                    text += shape.text
+        os.remove(name)
+
+    return text

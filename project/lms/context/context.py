@@ -12,8 +12,7 @@ class ContextLMS(Context):
             Hãy trả lời một cách linh hoạt, tùy thuộc vào ngữ cảnh và thông tin mà người dùng cần. Nếu câu hỏi không rõ ràng, hãy hỏi lại để làm rõ.
             AI chỉ được phép dựa vào tài liệu bên dưới để trả lời câu hỏi, Nếu câu hỏi của người dùng không liên quan đến nội dung bên dưới thì bạn nên từ chỗi khéo không trả lời.
             Xử lý các câu lệnh:
-            Đối với câu lệnh mở khóa học,mở lớp học:AI tập trung tìm kiếm link khóa học để show cho người dùng
-            Đối với câu lệnh đọc hoặc mở tài liệu:AI tập trung tìm kiếm link tài liệu và tóm tắt tài liệu đó để show cho người dùng
+            Đối với câu lệnh {command} khóa học, lớp học, tài liệu> AI tập trung tìm kiếm link khóa học để show cho người dùng
             Nội dung hỗ trợ bao gồm 3 nhóm chính:
             1. **Tài liệu khóa học**: Bao gồm các tài liệu học tập, bài giảng, và tài liệu liên quan trực tiếp đến các khóa học.
             2. **Hướng dẫn sử dụng hệ thống**: Hướng dẫn về cách sử dụng hệ thống LMS của 3 vai trò học viên,giáo viên,quản lý đào tạo >Nếu có liên kiết đến màn hình show liên kết ra cho người dùng xem
@@ -69,9 +68,15 @@ class ContextLMS(Context):
             }
         ]
 
-    def retriever_document(self,contextdata: dict,question: str) -> str:
+    def retriever_document(self, contextdata: dict, question: str) -> str:
         
         topics = self.classify_topic(question, self.topics)
+
+        if 'command_open' in contextdata and 'command_read' in contextdata:
+            command = contextdata['command_open']+','+contextdata['command_read']
+            self.prompt = self.prompt.format(command=command)
+        else:
+            self.prompt = self.prompt.format(command='mở,đọc')
 
         for topic in topics:
             if topic.strip() in ['student', 'manager', 'teacher']:

@@ -6,10 +6,10 @@ from factory.base.services import Services
 from config.config_vectordb import VectorDB
 from langchain_community.vectorstores.redis import RedisFilter
 from typing import List
-
+from tools.helper import file_reader
 class Module(BaseModel):
     name: str = Field(description="Tên hoạt động hoặc tài nguyên trong lớp học")
-    module: str = Field(description="Loại module: url (link đến video), feedback (bài khảo sát),quiz (bài kiểm tra),resource (tài liệu),book (sách),assign (bài tập về nhà)")
+    module: str = Field(description="Loại module: url (link đến video hoặc tài liệu), feedback (bài khảo sát, đánh giá lớp học hoặc giảng viên),quiz (bài kiểm tra, bài thi),resource (tài liệu),book (sách),assign (bài tập về nhà)")
     intro: str = Field(description="Giới thiệu về module này ở trong khóa học nhằm mục đích gì")
 
 class Section(BaseModel):
@@ -33,28 +33,10 @@ class Course(Services):
         self.total_feedback = config.get('total_feedback')
         self.total_book = config.get('total_book')
         self.total_url = config.get('total_url')
-        self.modules = config.get('coursemoduleid')
 
     def response(self):
 
         resource = ''
-
-        if self.modules and self.modules[0]:
-            
-            combined_filter = RedisFilter.num('coursemoduleid') == int(self.modules[0])
-
-            for item in self.modules[1:]:
-                combined_filter |= RedisFilter.num('coursemoduleid') == int(item)
-
-            index_schema = {
-                "numeric": [
-                    {"name":"coursemoduleid"},
-                ]
-            }
-            documents = VectorDB().connect_vectordb(index_name='resource_'+self.contextdata['collection'],index_schema=index_schema).similarity_search(self.question,k=8,filter=combined_filter)
-            if documents:
-                for doc in documents:
-                    resource += doc.page_content
 
         parser = JsonOutputParser(pydantic_object=CourseInfo)
 
@@ -62,6 +44,12 @@ class Course(Services):
                 Bạn là một AI chuyên tạo agenda 1 khóa học theo yêu cầu của người dùng.
                 {format_instructions}
                 Chủ đề: {topic}
+                Sử dụng quiz khi cần tạo bài kiểm tra, bài thi cho khóa học
+                Sử dụng feedback khi cần tạo bài khảo sát để hoặc viên vào đánh giá lớp học hoặc giảng viên 
+                Sử dụng resource khi cần tạo tài liệu cho khóa học
+                Sử dụng book khi cần tạo sách cho khóa học
+                Sử dụng url khi cần tạo link hoặc video từ link tài liệu trích dẫn bên ngoài\
+                Sử dụng assign khi cần tạo bài tập về nhà cho khóa học
                 Yêu cầu: {question}
         """
         if self.total_quiz:
@@ -76,7 +64,8 @@ class Course(Services):
             template += "Số lượng sách:"+str(self.total_book)
         if self.total_url:
             template += "Số lượng video:"+str(self.total_url)
-        if resource:
+        if self.attachment_file:
+            resource = file_reader(self.attachment_file)
             template += "Dựa trên nội dung sau:"+resource
 
         prompt = PromptTemplate(

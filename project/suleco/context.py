@@ -1,5 +1,4 @@
 from config.config_vectordb import VectorDB
-from langchain_community.vectorstores.redis import RedisFilter
 from factory.base.context import Context
 
 class ContextSuleco(Context):

@@ -12,6 +12,7 @@ class Services(ABC):
         self.apikey = config.get('apikey')
         self.model = ModelFactory.create_model(self,config.get('model','chatgpt'))
         self.model.generate_model(self.apikey)
+        self.attachment_file = config.get('attachment_file')
 
     @abstractmethod
     def response(self) -> list:
