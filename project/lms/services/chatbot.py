@@ -1,5 +1,5 @@
 from factory.services.chatbot import ChatbotServices
-from project.lms.context.context import ContextLMS
+from project.lms.context.context import Context
 
 class ChatBot(ChatbotServices):
 
@@ -7,7 +7,7 @@ class ChatBot(ChatbotServices):
         super().__init__(config)
 
         if self.context is not None:
-            self.context = ContextLMS()
+            self.context = Context()
             if len(self.question) <= 35:
                 aggregation_question = self.context.aggregation_question_context(self.chat_history,self.question)
             else:

@@ -16,6 +16,7 @@ class Assignment(Services):
         super().__init__(config)
 
         self.coursemoduleids = config.get('coursemoduleids')
+        self.collection = 'resource_'+self.contextdata['collection']
 
     def response(self):
 
@@ -23,17 +24,17 @@ class Assignment(Services):
 
         if self.coursemoduleids and self.coursemoduleids[0]:
             
-            combined_filter = RedisFilter.num('coursemoduleids') == int(self.coursemoduleids[0])
+            combined_filter = RedisFilter.num('coursemoduleid') == int(self.coursemoduleids[0])
 
             for item in self.coursemoduleids[1:]:
-                combined_filter |= RedisFilter.num('coursemoduleids') == int(item)
+                combined_filter |= RedisFilter.num('coursemoduleid') == int(item)
 
             index_schema = {
                 "numeric": [
-                    {"name":"coursemoduleids"},
+                    {"name":"coursemoduleid"},
                 ]
             }
-            documents = VectorDB().connect_vectordb(index_name='resource_'+self.contextdata['collection'],index_schema=index_schema).similarity_search(self.question,k=8,filter=combined_filter)
+            documents = VectorDB().connect_vectordb(index_name=self.collection,index_schema=index_schema).similarity_search(self.question,k=8,filter=combined_filter)
             if documents:
                 for doc in documents:
                     resource += doc.page_content

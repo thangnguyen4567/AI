@@ -22,7 +22,7 @@ class TrainingResource(Training):
         finaldocx = []
         path = Path(data['source'])
         typefile = path.suffix.lower()
-        collection = 'resource_'+data['collection']
+        collection = self.get_collection_name(data,type)
 
         try:
             
@@ -51,7 +51,7 @@ class TrainingResource(Training):
 
                 response = requests.get(data['source'])
                 random_string = generate_random_string()
-                name = random_string+'.docx'
+                name = random_string+'.pptx'
 
                 with open(name, 'wb') as file:
                     file.write(response.content)
@@ -84,7 +84,10 @@ class TrainingResource(Training):
             for doc in all_splits:
                 content = 'Tài liệu: ' + metadata['title']
                 content += 'Thuộc lớp học: ' + metadata['coursename'] 
-                content += doc.page_content
+                if hasattr(doc, 'page_content'):
+                    content += doc.page_content
+                else:
+                    content += doc
                 finaldocx.append(Document(page_content=content,metadata=metadata))
 
             self.vector_db.add_vectordb(finaldocx,collection)
@@ -103,10 +106,9 @@ class TrainingResource(Training):
 
             return self.reponse
 
-
     def delete_training_data(self,data):
 
-        collection = 'resource_'+data['collection']
+        collection = self.get_collection_name(data,type)
 
         try:
             coursemoduleids_set = set(data['coursemoduleids'])
@@ -135,3 +137,9 @@ class TrainingResource(Training):
         
     def check_training_duplication(self):
         pass
+
+    def get_collection_name(self,data,type):
+        if type == 'resource':
+            return 'resource_'+data['collection']
+        else:
+            return 'course_'+data['collection']

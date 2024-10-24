@@ -12,8 +12,7 @@ def get_conversations():
     data = request.get_json()
     chat = get_chatbot(data)
     answer = chat.response()
-    result = {'answer': markdown.markdown(answer['text']).replace("AI:",""),
-              'metadata':chat.get_documents_metadata()}
+    result = {'answer': markdown.markdown(answer['text']).replace("AI:","")}
     return result
 
 @chatbot.route('/conversations_stream', methods=['POST'])
@@ -28,14 +27,6 @@ def get_conversations_stream():
             yield chunk
 
     return Response(generator(), mimetype='text/event-stream', content_type='text/event-stream')
-
-@chatbot.route('/get_metadata', methods=['POST'])
-def get_metadata():
-    data = request.get_json()
-    chat = get_chatbot(data)
-    
-    result = {'metadata':chat.get_documents_metadata()}
-    return result
 
 @chatbot.route('/check_model', methods=['POST'])
 def check_model():

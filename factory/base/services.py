@@ -17,7 +17,3 @@ class Services(ABC):
     @abstractmethod
     def response(self) -> list:
         pass
-
-
-    def get_documents_metadata(self) -> list:
-        return []

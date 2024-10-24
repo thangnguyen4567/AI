@@ -2,7 +2,7 @@ from config.config_vectordb import VectorDB
 from langchain_community.vectorstores.redis import RedisFilter
 from factory.base.context import Context
 
-class ContextLMS(Context):
+class Context(Context):
     def __init__(self):
         self.prompt = """
             Bạn là AI trợ giảng Elearning Pro, được thiết kế để hỗ trợ người dùng trong việc trả lời các câu hỏi liên quan đến tài liệu hướng dẫn sử dụng và tài liệu trong khóa học.
@@ -12,12 +12,13 @@ class ContextLMS(Context):
             Hãy trả lời một cách linh hoạt, tùy thuộc vào ngữ cảnh và thông tin mà người dùng cần. Nếu câu hỏi không rõ ràng, hãy hỏi lại để làm rõ.
             AI chỉ được phép dựa vào tài liệu bên dưới để trả lời câu hỏi, Nếu câu hỏi của người dùng không liên quan đến nội dung bên dưới thì bạn nên từ chỗi khéo không trả lời.
             Xử lý các câu lệnh:
-            Đối với câu lệnh {command} khóa học, lớp học, tài liệu> AI tập trung tìm kiếm link khóa học để show cho người dùng
+            Đối với câu lệnh {command} khóa học, lớp học, tài liệu > AI tập trung tìm kiếm link khóa học để show cho người dùng ko cần tóm tắt
             Nội dung hỗ trợ bao gồm 3 nhóm chính:
             1. **Tài liệu khóa học**: Bao gồm các tài liệu học tập, bài giảng, và tài liệu liên quan trực tiếp đến các khóa học.
             2. **Hướng dẫn sử dụng hệ thống**: Hướng dẫn về cách sử dụng hệ thống LMS của 3 vai trò học viên,giáo viên,quản lý đào tạo >Nếu có liên kiết đến màn hình show liên kết ra cho người dùng xem
             3. **Thông tin khóa học**: Thông tin chi tiết về các khóa học như Tên,section,danh sách các tài nguyên,hoạt động trong khóa
             **Mỗi tài liệu ở dưới đây đều có nguồn tài liệu trích dẫn ở cuối tài liệu > Bạn lấy tài liệu nào để trà lời thì phải đưa luôn nguồn của tài liệu đó ra**
+            {documents}
         """
 
         self.documents = []
@@ -68,15 +69,15 @@ class ContextLMS(Context):
             }
         ]
 
-    def retriever_document(self, contextdata: dict, question: str) -> str:
-        
-        topics = self.classify_topic(question, self.topics)
-
-        if 'command_open' in contextdata and 'command_read' in contextdata:
-            command = contextdata['command_open']+','+contextdata['command_read']
-            self.prompt = self.prompt.format(command=command)
+    def get_collection_name(self,data,type):
+        if type == 'resource':
+            return 'resource_'+data['collection']
         else:
-            self.prompt = self.prompt.format(command='mở,đọc')
+            return 'course_'+data['collection']
+
+    def get_documents(self, question: str , contextdata: dict) -> str:
+
+        topics = self.classify_topic(question, self.topics)
 
         for topic in topics:
             if topic.strip() in ['student', 'manager', 'teacher']:
@@ -93,15 +94,14 @@ class ContextLMS(Context):
                         {"name":"source"}
                     ],
                 }
-
                 try:
-                    self.documents.extend(VectorDB().connect_vectordb(index_name='hdsd', index_schema=self.index_schema).similarity_search(question, k=3, filter=combined_filter))
+                    self.documents.extend(VectorDB().connect_vectordb(index_name='hdsd', index_schema=self.index_schema).similarity_search(question, k=6, filter=combined_filter))
                 except:
                     print('Chưa có dữ liệu training')
 
             if topic.strip() in ['resource']:
 
-                collection = 'resource_'+contextdata['collection']
+                collection = self.get_collection_name(contextdata,'resource')
                 
                 self.index_schema = {
                     "text": [
@@ -114,7 +114,6 @@ class ContextLMS(Context):
                         {"name":"coursemoduleid"},
                     ]
                 }
-
                 try:
                     self.documents.extend(VectorDB().connect_vectordb(index_name=collection,index_schema=self.index_schema).similarity_search(question,k=8))
                 except:
@@ -122,7 +121,7 @@ class ContextLMS(Context):
 
             if topic.strip() in ['course']:
                 
-                collection = 'course_'+contextdata['collection']
+                collection = self.get_collection_name(contextdata,'course')
 
                 self.index_schema = {
                     "text": [
@@ -134,22 +133,30 @@ class ContextLMS(Context):
                         {"name":"courseid"},
                     ]
                 }
-
                 try:
                     self.documents.extend(VectorDB().connect_vectordb(index_name=collection,index_schema=self.index_schema).similarity_search(question,k=6))
                 except:
                     print('Chưa có dữ liệu training')
-
-
+  
+    def retriever_document(self, contextdata: dict, question: str) -> str:
+        
+        self.get_documents(question, contextdata)
+        documents = ''
         if self.documents:
             for doc in self.documents:
-                self.prompt += doc.page_content
+                documents += doc.page_content
                 if 'source' in doc.metadata and doc.metadata['source']:
                     if 'coursemoduleid' in doc.metadata:
-                        self.prompt += 'Nguồn '+ doc.metadata['title'] + ':' + doc.metadata['source'] + '.\n'
+                        documents += 'Nguồn '+ doc.metadata['title'] + ':' + doc.metadata['source'] + '.\n'
                     elif 'role' in doc.metadata:
-                        self.prompt += ' Link tài liệu hdsd: ['+doc.metadata['title']+']' + doc.metadata['source'] + '.\n'
+                        documents += ' Link tài liệu hdsd: ['+doc.metadata['title']+']' + doc.metadata['source'] + '.\n'
                     else:
-                        self.prompt += 'Link khóa học:' + doc.metadata['source'] + '--Hết thông tin khóa học--.\n'
+                        documents += 'Link khóa học:' + doc.metadata['source'] + '--Hết thông tin khóa học--.\n'
 
+        if 'command_open' in contextdata and 'command_read' in contextdata:
+            command = contextdata['command_open']+','+contextdata['command_read']
+            self.prompt = self.prompt.format(command=command,documents=documents)
+        else:
+            self.prompt = self.prompt.format(command='mở,đọc',documents=documents)
+        
         return self.prompt.replace("domain:","")

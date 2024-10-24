@@ -39,6 +39,7 @@ class Question(Services):
         self.qtype = config.get('qtype','multichoice')
         self.numberquestion = config.get('numberquestion')
         self.modules = config.get('coursemoduleid')
+        self.collection = 'resource_'+self.contextdata['collection']
 
     def response(self):
 
@@ -71,14 +72,13 @@ class Question(Services):
                     {"name":"coursemoduleid"},
                 ]
             }
-            documents = VectorDB().connect_vectordb(index_name='resource_'+self.contextdata['collection'],index_schema=index_schema).similarity_search(self.question,k=8,filter=combined_filter)
+            documents = VectorDB().connect_vectordb(index_name=self.collection,index_schema=index_schema).similarity_search(self.question,k=8,filter=combined_filter)
             resource = ''
             if documents:
                 for doc in documents:
                     resource += doc.page_content
         else:
             resource = 'Chưa có tài liệu'
-
 
         prompt = PromptTemplate(
             template=template,
