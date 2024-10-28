@@ -153,7 +153,7 @@ class Context(Context):
                     else:
                         documents += 'Link khóa học:' + doc.metadata['source'] + '--Hết thông tin khóa học--.\n'
 
-        if 'command_open' in contextdata and 'command_read' in contextdata:
+        if contextdata and 'command_open' in contextdata and 'command_read' in contextdata:
             command = contextdata['command_open']+','+contextdata['command_read']
             self.prompt = self.prompt.format(command=command,documents=documents)
         else:

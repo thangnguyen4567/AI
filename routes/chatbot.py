@@ -9,6 +9,36 @@ chatbot = Blueprint('chatbot', __name__)
 
 @chatbot.route('/conversations', methods=['POST'])
 def get_conversations():
+    """
+    ---
+    tags:
+      - Chatbot
+    summary: Get chatbot conversation response
+    description: This endpoint receives a JSON payload, processes it with the chatbot, and returns the response.
+    parameters:
+      - in: body
+        name: body
+        required: true
+        description: JSON payload containing the conversation data
+        schema:
+          type: object
+          properties:
+            question:
+              type: string
+              description: The input text for the chatbot
+            context:
+              type: string
+              description: The context of the chatbot
+    responses:
+      200:
+        description: Successful response
+        schema:
+          type: object
+          properties:
+            answer:
+              type: string
+              description: The chatbot's response in html format
+    """
     data = request.get_json()
     chat = get_chatbot(data)
     answer = chat.response()
