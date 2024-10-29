@@ -4,7 +4,6 @@ from config.config_vectordb import VectorDB
 from config.config_sqldb import SQLDB
 from langchain.schema import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from tools.helper import remove_stopwords
 import pandas as pd
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_community.document_loaders import UnstructuredWordDocumentLoader
@@ -103,7 +102,9 @@ def get_table_ddl(table):
 @training.route('/import', methods=['GET','POST'])
 def import_data():
     if 'file' in request.files:
-        db = request.args['db']
+        db = request.args.get('db')
+        if not db:
+            db = request.form['db']
         file = request.files['file']
         file_extension = file.filename.split('.')[-1].lower()
         text_splitter = RecursiveCharacterTextSplitter(
@@ -125,7 +126,6 @@ def import_data():
                             continue
                     else:
                         continue
-                    # content = remove_stopwords(row.content)
                     texts = text_splitter.split_text(row.content)
                     for text in texts:
                         metatext = ''
@@ -156,5 +156,5 @@ def import_data():
         vector_db.add_vectordb(finaldocx,db)
 
         return 'Import thành công'
-
-    return 'Import thất bại'
+    else:
+        return render_template('import.html')

@@ -14,7 +14,6 @@ def get_conversations():
     tags:
       - Chatbot
     summary: Get chatbot conversation response
-    description: This endpoint receives a JSON payload, processes it with the chatbot, and returns the response.
     parameters:
       - in: body
         name: body
@@ -26,9 +25,26 @@ def get_conversations():
             question:
               type: string
               description: The input text for the chatbot
+            question:
+              type: string
+              description: The input text for the chatbot
+              default: "Hello, how can I help you?"
             context:
               type: string
               description: The context of the chatbot
+              default: "lms"
+            chat_history:
+              type: array
+              items:
+                type: object
+                properties:
+                  human:
+                    type: string
+                    description: The human message
+                  bot:
+                    type: string
+                    description: The bot message
+              description: The chat history of the chatbot
     responses:
       200:
         description: Successful response
@@ -47,7 +63,51 @@ def get_conversations():
 
 @chatbot.route('/conversations_stream', methods=['POST'])
 def get_conversations_stream():
-    
+    """
+    ---
+    tags:
+      - Chatbot
+    summary: Get chatbot conversation response streaming
+    parameters:
+      - in: body
+        name: body
+        required: true
+        description: JSON payload containing the conversation data
+        schema:
+          type: object
+          properties:
+            question:
+              type: string
+              description: The input text for the chatbot
+            question:
+              type: string
+              description: The input text for the chatbot
+              default: "Hello, how can I help you?"
+            context:
+              type: string
+              description: The context of the chatbot
+              default: "lms"
+            chat_history:
+              type: array
+              items:
+                type: object
+                properties:
+                  human:
+                    type: string
+                    description: The human message
+                  bot:
+                    type: string
+                    description: The bot message
+              description: The chat history of the chatbot
+    responses:
+      200:
+        description: Successful response
+        content:
+          text/event-stream:
+            schema:
+              type: string
+              description: The chatbot's response text
+    """
     data = request.get_json()
     chat = get_chatbot(data)
     
@@ -58,16 +118,6 @@ def get_conversations_stream():
 
     return Response(generator(), mimetype='text/event-stream', content_type='text/event-stream')
 
-@chatbot.route('/check_model', methods=['POST'])
-def check_model():
-    data = request.get_json()
-    try:
-        chat = get_chatbot(data)
-        chat.check_chatbot()
-        return {'error':False}
-    except:
-        return {'error':True}
-
 @chatbot.route('/demo', methods=['GET'])
-def chatbottemplate():
+def chatbot_demo():
     return render_template('chatbot.html')

@@ -70,11 +70,13 @@ class Context(Context):
         ]
 
     def get_collection_name(self,data,type):
-        if type == 'resource':
-            return 'resource_'+data['collection']
-        else:
-            return 'course_'+data['collection']
-
+        if data and 'collection' in data:
+            if type == 'resource':
+                return 'resource_'+data['collection']
+            else:
+                return 'course_'+data['collection']
+        return None
+    
     def get_documents(self, question: str , contextdata: dict) -> str:
 
         topics = self.classify_topic(question, self.topics)
