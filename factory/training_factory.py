@@ -1,5 +1,6 @@
 from project.lms.training.training_course import TrainingCourse
 from project.lms.training.training_resource import TrainingResource
+from project.lms.training.training_resource_saas import TrainingResourceSaas
 from project.report.training.training_ddl import TrainingDDL
 from project.report.training.training_sql import TrainingSQL
 
@@ -9,6 +10,8 @@ class TrainingFactory:
             return TrainingCourse()
         elif training_type == 'resource':
             return TrainingResource()
+        elif training_type == 'resource_saas':
+            return TrainingResourceSaas()
         elif training_type == 'training_sql':
             return TrainingSQL()
         elif training_type == 'training_ddl':

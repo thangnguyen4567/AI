@@ -7,10 +7,11 @@ from langchain_community.document_loaders import Docx2txtLoader
 from pptx import Presentation
 from pathlib import Path
 import requests
+import tempfile
 import os
 from tools.helper import generate_random_string
 
-class TrainingResource(Training):
+class TrainingResourceSaas(Training):
     def __init__(self):
         super().__init__()
         self.text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
@@ -23,11 +24,19 @@ class TrainingResource(Training):
         path = Path(data['source'])
         typefile = path.suffix.lower()
         collection = self.get_collection_name(data)
+
+        cookies = {}
+        cookies['tenantid'] = data['contextdata']['collection']
+        response = requests.get(data['source'], cookies=cookies)
+
+        with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+            temp_file.write(response.content)
+            temp_path = temp_file.name
         
         try:
             
             if typefile == '.pdf':
-                docs = PyPDFLoader(data['source'])
+                docs = PyPDFLoader(temp_path)
                 text = ''
                 for doc in docs.load():
                     text += doc.page_content
@@ -35,36 +44,19 @@ class TrainingResource(Training):
 
             elif typefile == '.docx':
 
-                response = requests.get(data['source'])
-                random_string = generate_random_string()
-                name = random_string+'.docx'
-
-                with open(name, 'wb') as file:
-                    file.write(response.content)
-
-                docs = Docx2txtLoader(name)
+                docs = Docx2txtLoader(temp_path)
                 all_splits = self.text_splitter.split_documents(docs.load())
-
-                os.remove(name)
 
             elif typefile == '.pptx':
 
-                response = requests.get(data['source'])
-                random_string = generate_random_string()
-                name = random_string+'.pptx'
-
-                with open(name, 'wb') as file:
-                    file.write(response.content)
-
                 full_text = ''
-                presentation = Presentation(name)
+                presentation = Presentation(temp_path)
                 for slide in presentation.slides:
                     for shape in slide.shapes:
                         if hasattr(shape, "text"):
                             full_text += shape.text
 
                 all_splits = self.text_splitter.split_text(full_text)
-                os.remove(name)
 
             else:
                 docs = UnstructuredURLLoader(urls=[data['source']])
@@ -90,6 +82,7 @@ class TrainingResource(Training):
                     content += doc
                 finaldocx.append(Document(page_content=content,metadata=metadata))
 
+            os.remove(temp_path)
             self.vector_db.add_vectordb(finaldocx,collection)
 
             self.reponse['error'] = False

@@ -1,6 +1,6 @@
 from langchain.prompts import PromptTemplate
 from langchain_core.output_parsers import JsonOutputParser
-from langchain_core.pydantic_v1 import BaseModel, Field
+from pydantic import BaseModel, Field
 from config.config_vectordb import VectorDB
 from langchain_community.vectorstores.redis import RedisFilter
 from factory.base.services import Services
@@ -89,10 +89,11 @@ class Question(Services):
         chain = prompt | self.model.llm | parser
 
         response = chain.invoke({"question": self.question,
-                                 "qtype": self.qtype,
-                                 "numberquestion": self.numberquestion, 
-                                 'resource': resource
-                                 })
+                                "qtype": self.qtype,
+                                "numberquestion": self.numberquestion, 
+                                'resource': resource
+                                })
+        
         if 'foo' in response:
             return response['foo']
         if 'questions' in response:

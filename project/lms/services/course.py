@@ -1,12 +1,11 @@
 from factory.base.services import Services
 from langchain.prompts import PromptTemplate
-from langchain_core.pydantic_v1 import BaseModel, Field
+from pydantic import BaseModel,Field
 from langchain_core.output_parsers import JsonOutputParser
 from factory.base.services import Services
-from config.config_vectordb import VectorDB
-from langchain_community.vectorstores.redis import RedisFilter
 from typing import List
 from tools.helper import file_reader
+
 class Module(BaseModel):
     name: str = Field(description="Tên hoạt động hoặc tài nguyên trong lớp học")
     module: str = Field(description="Loại module: url (link đến video hoặc tài liệu), feedback (bài khảo sát, đánh giá lớp học hoặc giảng viên),quiz (bài kiểm tra, bài thi),resource (tài liệu),book (sách),assign (bài tập về nhà)")

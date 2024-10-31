@@ -9,7 +9,7 @@ class TrainingCourse(Training):
 
     def save_training_data(self,data):
 
-        collection = 'course_'+data['collection']
+        collection = self.get_collection_name(data)
 
         try:
             metadata = {}
@@ -72,3 +72,6 @@ class TrainingCourse(Training):
 
     def check_training_duplication(self):
         pass
+
+    def get_collection_name(self,data):
+        return 'course_'+data['contextdata']['collection']
