@@ -6,6 +6,7 @@ from langchain_community.vectorstores.redis import RedisFilter
 from pydantic import BaseModel, Field
 from langchain_core.output_parsers import JsonOutputParser
 from typing import List
+from langchain_community.callbacks.manager import get_openai_callback
 
 class AssignmentInfo(BaseModel):
     question: List[str] = Field(description="Câu hỏi bài tập về nhà")
@@ -61,6 +62,16 @@ class Assignment(Services):
 
         chain = prompt | self.model.llm | parser
 
-        response = chain.invoke({"question": self.question,"resource":resource})
+        with get_openai_callback() as cb:
+            response = chain.invoke({"question": self.question,"resource":resource})
         
-        return response
+        result = {}
+        result['response'] = response
+        result['info'] = {
+            'total_tokens': cb.total_tokens,
+            'total_cost': cb.total_cost,
+            'total_prompt_tokens': cb.prompt_tokens,
+            'total_completion_tokens': cb.completion_tokens
+        }
+
+        return result

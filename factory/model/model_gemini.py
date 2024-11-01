@@ -8,7 +8,7 @@ class ModelGemini(Model):
     
     def generate_model(self,apikey: str):
 
-        if apikey is None:
+        if apikey is None or apikey == '':
             apikey = os.getenv("GOOGLE_API_KEY")
 
         self.llm = GoogleGenerativeAI(model="gemini-pro", google_api_key=apikey)

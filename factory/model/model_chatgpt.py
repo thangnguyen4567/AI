@@ -8,7 +8,7 @@ class ModelChatGPT(Model):
 
     def generate_model(self,apikey: str):
 
-        if apikey is None:
+        if apikey is None or apikey == '':
             apikey = os.getenv("OPENAI_API_KEY")
             
-        self.llm = ChatOpenAI(model="gpt-4o-mini",api_key=apikey,temperature=0.5)
+        self.llm = ChatOpenAI(model="gpt-4o-mini",api_key=apikey,temperature=0.5,stream_usage=True)

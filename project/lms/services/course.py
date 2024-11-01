@@ -5,6 +5,7 @@ from langchain_core.output_parsers import JsonOutputParser
 from factory.base.services import Services
 from typing import List
 from tools.helper import file_reader
+from langchain_community.callbacks.manager import get_openai_callback
 
 class Module(BaseModel):
     name: str = Field(description="Tên hoạt động hoặc tài nguyên trong lớp học")
@@ -75,6 +76,16 @@ class Course(Services):
 
         chain = prompt | self.model.llm | parser
 
-        response = chain.invoke({"question": self.question})
+        with get_openai_callback() as cb:
+            response = chain.invoke({"question": self.question})
         
-        return response
+        result = {}
+        result['response'] = response
+        result['info'] = {
+            'total_tokens': cb.total_tokens,
+            'total_cost': cb.total_cost,
+            'total_prompt_tokens': cb.prompt_tokens,
+            'total_completion_tokens': cb.completion_tokens
+        }
+        
+        return result

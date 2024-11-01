@@ -1,6 +1,7 @@
 from factory.services.chatbot import ChatbotServices
 from project.lms.context.context import Context
-
+from langchain_community.callbacks.manager import get_openai_callback
+import json
 class ChatBot(ChatbotServices):
 
     def __init__(self,config):
@@ -13,3 +14,24 @@ class ChatBot(ChatbotServices):
             else:
                 aggregation_question = self.question
             self.prompt = self.context.retriever_document(self.contextdata,aggregation_question)
+
+    async def response_stream(self):
+        
+        message = self.model.get_conversation_message(self.prompt,self.chat_history)
+        chain = self.model.get_conversation_chain_stream(message)
+
+        with get_openai_callback() as cb:
+            async for chunk in chain.astream({"question": self.question}):
+                data = {
+                    "message": chunk
+                }
+                yield f"{json.dumps(data)}"
+            data = {
+                "usage": {
+                    "prompt_tokens": cb.prompt_tokens,
+                    "completion_tokens": cb.completion_tokens,
+                    "total_tokens": cb.total_tokens,
+                    "total_cost": cb.total_cost
+                }
+            }
+            yield f"{json.dumps(data)}"

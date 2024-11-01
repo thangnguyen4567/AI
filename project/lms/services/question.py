@@ -4,6 +4,7 @@ from pydantic import BaseModel, Field
 from config.config_vectordb import VectorDB
 from langchain_community.vectorstores.redis import RedisFilter
 from factory.base.services import Services
+from langchain_community.callbacks.manager import get_openai_callback
 
 class QuestionMultichoice(BaseModel):
     qtype: str = Field(description="Loại câu hỏi chọn nhiều đáp án")
@@ -88,18 +89,28 @@ class Question(Services):
 
         chain = prompt | self.model.llm | parser
 
-        response = chain.invoke({"question": self.question,
+        with get_openai_callback() as cb:
+            response = chain.invoke({"question": self.question,
                                 "qtype": self.qtype,
                                 "numberquestion": self.numberquestion, 
                                 'resource': resource
                                 })
-        
+
+        result = {}
         if 'foo' in response:
-            return response['foo']
+            result['response'] = response['foo']
         if 'questions' in response:
-            return response['questions']
+            result['response'] = response['questions']
         if self.qtype == 'essay':
-            return [response]
+            result['response'] = [response]
         if self.numberquestion == '1':
-            return [response]
-        return response
+            result['response'] = [response]
+
+        result['info'] = {
+            'total_tokens': cb.total_tokens,
+            'total_cost': cb.total_cost,
+            'total_prompt_tokens': cb.prompt_tokens,
+            'total_completion_tokens': cb.completion_tokens
+        }
+
+        return result

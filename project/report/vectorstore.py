@@ -1,13 +1,12 @@
 from langchain_openai import OpenAIEmbeddings
 from langchain.schema import Document
 from tools.helper import convert_unixtime
-from langchain.vectorstores.redis import Redis
+from langchain_community.vectorstores.redis import Redis
 from dotenv import load_dotenv
 import os
 import time
 import redis
 from project.report.base import LLMBase
-
 
 class VectorStore(LLMBase):
     def __init__(self):

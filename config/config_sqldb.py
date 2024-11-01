@@ -1,8 +1,9 @@
-from langchain.sql_database import SQLDatabase
+from langchain_community.utilities import SQLDatabase
 from dotenv import load_dotenv
 import os
 import json
 import pyodbc
+
 class SQLDB:
     def __init__(self):
         load_dotenv()

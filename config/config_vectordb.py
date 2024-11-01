@@ -1,6 +1,5 @@
 from langchain_openai import OpenAIEmbeddings
-from langchain_community.embeddings import HuggingFaceHubEmbeddings
-from langchain.vectorstores.redis import Redis
+from langchain_community.vectorstores import Redis
 from dotenv import load_dotenv
 import os
 import redis
