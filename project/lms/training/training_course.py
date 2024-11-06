@@ -42,7 +42,7 @@ class TrainingCourse(Training):
 
     def delete_training_data(self,data):
 
-        collection = 'course_'+data['collection']
+        collection = self.get_collection_name(data)
 
         try:
             courseids_set = set(data['courseids'])

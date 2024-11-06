@@ -115,8 +115,8 @@ class TrainingResourceSaas(Training):
             if keys_to_delete:
                 self.redis_client.delete(*keys_to_delete)
 
-            self.reponse['error'] = False
-            self.reponse['message'] = 'Xóa dữ liệu thành công'
+                self.reponse['error'] = False
+                self.reponse['message'] = 'Xóa dữ liệu thành công'
 
             return self.reponse
                         

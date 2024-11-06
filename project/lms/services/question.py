@@ -60,26 +60,30 @@ class Question(Services):
                 Câu hỏi phải dựa trên tài liệu sau: {resource} 
                 **Lưu ý quan trọng:** Bạn phải tạo ra đúng số lượng {numberquestion} câu hỏi, và các câu hỏi phải tuân thủ loại yêu cầu ({qtype}). Không tạo thêm hoặc bớt câu hỏi.
         """
+        try:
+            if self.modules and self.modules[0]:
+                    
+                combined_filter = RedisFilter.num('coursemoduleid') == int(self.modules[0])
 
-        if self.modules and self.modules[0]:
-            
-            combined_filter = RedisFilter.num('coursemoduleid') == int(self.modules[0])
+                for item in self.modules[1:]:
+                    combined_filter |= RedisFilter.num('coursemoduleid') == int(item)
 
-            for item in self.modules[1:]:
-                combined_filter |= RedisFilter.num('coursemoduleid') == int(item)
-
-            index_schema = {
-                "numeric": [
-                    {"name":"coursemoduleid"},
-                ]
-            }
-            documents = VectorDB().connect_vectordb(index_name=self.collection,index_schema=index_schema).similarity_search(self.question,k=8,filter=combined_filter)
-            resource = ''
-            if documents:
-                for doc in documents:
-                    resource += doc.page_content
-        else:
+                index_schema = {
+                    "numeric": [
+                        {"name":"coursemoduleid"},
+                    ]
+                }
+                documents = VectorDB().connect_vectordb(index_name=self.collection,index_schema=index_schema).similarity_search(self.question,k=8,filter=combined_filter)
+                resource = ''
+                if documents:
+                    for doc in documents:
+                        resource += doc.page_content
+            else:
+                resource = 'Chưa có tài liệu'
+        except Exception as e:
             resource = 'Chưa có tài liệu'
+            print(e)
+            
 
         prompt = PromptTemplate(
             template=template,
