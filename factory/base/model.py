@@ -59,14 +59,3 @@ class Model(ABC):
             message.append(HumanMessagePromptTemplate.from_template("{question}"))
 
         return message 
-
-    def get_editor_message(self,context: str,query: str) -> list:
-
-        message = []
-
-        message.append(SystemMessage(content='Answer the question based on the context below'))
-        message.append("The response should preserve any HTML formatting, links, and styles in the context.")
-        message.append(SystemMessage(content='Cotext:'+context))
-        message.append(HumanMessage(content=query))
-        
-        return message

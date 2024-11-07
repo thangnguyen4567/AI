@@ -25,32 +25,9 @@ def generate_content():
         generate = Course(data)
     elif type == 'assignment':
         generate = Assignment(data)
-
+    elif type == 'editor':
+        generate = Editor(data)
+        
     result = generate.response()
 
-    return result
-
-@generate.route('/course', methods=['POST'])
-def create_course():
-    data = request.get_json()
-    service = Course(data)
-    result = service.response()
-    return result
-
-@generate.route('/editor', methods=['POST'])
-def create_editor():
-    data = request.get_json()
-    editor = Editor(data)
-    answer = editor.response()
-    if hasattr(answer, 'content'):
-        result = {'answer':markdown.markdown(answer.content)}
-    else:
-        result = {'answer':markdown.markdown(answer)}
-    return result
-
-@generate.route('/assignment', methods=['POST'])
-def create_assignment():
-    data = request.get_json()
-    assignment = Assignment(data)
-    result = assignment.response()
     return result
