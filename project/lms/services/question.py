@@ -109,6 +109,8 @@ class Question(Services):
             result['response'] = [response]
         if self.numberquestion == '1':
             result['response'] = [response]
+        else:
+            result['response'] = response
 
         result['info'] = {
             'total_tokens': cb.total_tokens,
