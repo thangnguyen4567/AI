@@ -26,7 +26,6 @@ services:
       FLASK_RUN_PORT: 5000
     volumes:
       - .:/app
-      - ./data-gym-cache:/tmp
     depends_on:
       - redis
     restart: always
