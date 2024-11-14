@@ -3,6 +3,7 @@ from routes.report import report
 from routes.speech import speech
 from routes.training import training
 from routes.generate import generate
+from routes.english import english
 from flask import Flask
 from flask_cors import CORS
 from logging.handlers import RotatingFileHandler
@@ -29,6 +30,7 @@ app.register_blueprint(report, url_prefix='/report')
 app.register_blueprint(speech, url_prefix='/speech')
 app.register_blueprint(training, url_prefix='/training')
 app.register_blueprint(generate, url_prefix='/generate')
+app.register_blueprint(english, url_prefix='/english')
 
 @app.route('/')
 def home():

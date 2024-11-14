@@ -33,3 +33,18 @@ markdown
 flasgger
 docx2txt
 python-pptx
+# AI phát âm
+-f https://download.pytorch.org/whl/torch_stable.html
+torch==2.0.0+cpu
+torchaudio==2.0.0+cpu
+soundfile==0.10.3.post1
+omegaconf
+epitran==1.15
+audioread
+dtwalign
+eng_to_ipa
+pickle-mixin
+sqlalchemy
+transformers
+sentencepiece
+ortools
