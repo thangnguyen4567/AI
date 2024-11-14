@@ -68,9 +68,8 @@ const blockUI = () => {
     document.getElementById("buttonNext").onclick = null;
     document.getElementById("original_script").classList.add('disabled');
     document.getElementById("playRecordedAudio").classList.add('disabled');
-
+    document.getElementById("ai_feedback").innerHTML = "";
     document.getElementById("buttonNext").style["background-color"] = '#adadad';
-
 
 };
 
@@ -596,4 +595,3 @@ const initializeServer = async () => {
         }
     }
 }
-
