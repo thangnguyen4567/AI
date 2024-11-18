@@ -7,3 +7,4 @@ Venv/
 /logs
 /env
 speech.mp3
+/data-gym-cache
