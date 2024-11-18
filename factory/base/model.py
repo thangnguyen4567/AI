@@ -6,7 +6,13 @@ from langchain.prompts import (
     ChatPromptTemplate,
     SystemMessagePromptTemplate,
     HumanMessagePromptTemplate,
+    MessagesPlaceholder
 )
+from langchain.agents.format_scratchpad.openai_tools import (
+    format_to_openai_tool_messages,
+)
+from langchain.agents.output_parsers.openai_tools import OpenAIToolsAgentOutputParser
+from langchain.agents import AgentExecutor
 from abc import ABC, abstractmethod 
 
 class Model(ABC):
@@ -59,3 +65,33 @@ class Model(ABC):
             message.append(HumanMessagePromptTemplate.from_template("{question}"))
 
         return message 
+    
+    def get_agent(self,tools: list,message: list) -> AgentExecutor:
+
+        llm_with_tools = self.llm.bind_tools(tools)
+        message.append(HumanMessagePromptTemplate.from_template("{question}"))
+        message.append(MessagesPlaceholder(variable_name="agent_scratchpad"))
+        prompt = ChatPromptTemplate.from_messages(message)
+        
+        # prompt = ChatPromptTemplate.from_messages(
+        #     [
+        #         message,
+        #         ("user", "{question}"),
+        #         MessagesPlaceholder(variable_name="agent_scratchpad"),
+        #     ]
+        # )
+        agent = (
+            {
+                "question": lambda x: x["question"],
+                "agent_scratchpad": lambda x: format_to_openai_tool_messages(
+                    x["intermediate_steps"]
+                ),
+            }
+            | prompt
+            | llm_with_tools
+            | OpenAIToolsAgentOutputParser()
+        )
+
+        agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
+
+        return agent_executor

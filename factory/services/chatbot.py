@@ -18,3 +18,7 @@ class ChatbotServices(Services):
 
         async for chunk in chain.astream({"question": self.question}):
             yield chunk
+
+
+    async def agent_response(self):
+        pass

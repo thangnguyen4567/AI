@@ -39,7 +39,7 @@ torch==2.0.0+cpu
 torchaudio==2.0.0+cpu
 soundfile==0.10.3.post1
 omegaconf
-epitran==1.15
+epitran
 audioread
 dtwalign
 eng_to_ipa
