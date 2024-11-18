@@ -1,6 +1,7 @@
 from config.config_vectordb import VectorDB
 from langchain_community.vectorstores.redis import RedisFilter
 from factory.base.context import Context
+import re
 
 class Context(Context):
     def __init__(self):
@@ -146,7 +147,7 @@ class Context(Context):
         documents = ''
         if self.documents:
             for doc in self.documents:
-                documents += doc.page_content
+                documents += re.sub(r"[{}]", "", doc.page_content)
                 if 'source' in doc.metadata and doc.metadata['source']:
                     if 'coursemoduleid' in doc.metadata:
                         documents += 'Nguồn '+ doc.metadata['title'] + ':' + doc.metadata['source'] + '.\n'
