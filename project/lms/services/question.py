@@ -5,6 +5,7 @@ from config.config_vectordb import VectorDB
 from langchain_community.vectorstores.redis import RedisFilter
 from factory.base.services import Services
 from langchain_community.callbacks.manager import get_openai_callback
+from tools.helper import file_reader
 
 class QuestionMultichoice(BaseModel):
     qtype: str = Field(description="Loại câu hỏi chọn nhiều đáp án")
@@ -84,6 +85,8 @@ class Question(Services):
             resource = 'Chưa có tài liệu'
             print(e)
             
+        if self.attachment_file:
+            resource = file_reader(self.attachment_file)
 
         prompt = PromptTemplate(
             template=template,
@@ -103,11 +106,11 @@ class Question(Services):
         result = {}
         if 'foo' in response:
             result['response'] = response['foo']
-        if 'questions' in response:
+        elif 'questions' in response:
             result['response'] = response['questions']
-        if self.qtype == 'essay':
+        elif self.qtype == 'essay':
             result['response'] = [response]
-        if self.numberquestion == '1':
+        elif self.numberquestion == '1':
             result['response'] = [response]
         else:
             result['response'] = response

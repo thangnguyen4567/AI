@@ -7,6 +7,7 @@ from pydantic import BaseModel, Field
 from langchain_core.output_parsers import JsonOutputParser
 from typing import List
 from langchain_community.callbacks.manager import get_openai_callback
+from tools.helper import file_reader
 
 class AssignmentInfo(BaseModel):
     question: List[str] = Field(description="Câu hỏi bài tập về nhà")
@@ -48,6 +49,10 @@ class Assignment(Services):
         else:
             resource = 'Chưa có tài liệu'
 
+        
+        if self.attachment_file:
+            resource = file_reader(self.attachment_file)
+
         template = """
                 Bạn là một AI chuyên tạo gia tạo câu hỏi cho bài tập về nhà.
                 {format_instructions}
@@ -55,6 +60,7 @@ class Assignment(Services):
                 Tài liệu: {resource}
         """
 
+           
         parser = JsonOutputParser(pydantic_object=AssignmentInfo)
 
         prompt = PromptTemplate(
