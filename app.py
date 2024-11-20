@@ -18,7 +18,13 @@ swagger = Swagger(app)
 
 app.secret_key = 'secret_key'
 app.cors = CORS(app, resources={r"*": {"origins": "*"}},supports_credentials=True)
-handler = RotatingFileHandler(os.path.join(app.root_path, 'logs', 'error_log.log'), maxBytes=102400, backupCount=10)
+
+# Ensure the logs directory exists
+logs_dir = os.path.join(app.root_path, 'logs')
+if not os.path.exists(logs_dir):
+    os.makedirs(logs_dir)
+
+handler = RotatingFileHandler(os.path.join(logs_dir, 'error_log.log'), maxBytes=102400, backupCount=10)
 logging_format = logging.Formatter(
     '%(asctime)s - %(levelname)s - %(filename)s - %(funcName)s - %(lineno)s - %(message)s')
 handler.setFormatter(logging_format)
