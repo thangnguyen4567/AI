@@ -23,6 +23,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . /app
 
+RUN mkdir /app/redis
+
 EXPOSE 5000
 
 COPY . .

@@ -2,7 +2,7 @@ from langchain.agents import tool
 from config.config_vectordb import VectorDB
 
 @tool
-def search_course(question: str) -> list:
+def search_course(question: str,dbname: str) -> list:
     """ Tìm kiếm khóa học liên quan đến câu hỏi, tóm tắt khóa học..., khi cần gợi ý khóa học dựa vào câu hỏi của người dùng
         Đi kèm với các lệnh:Mở khóa học,mở lớp học
 
@@ -21,7 +21,7 @@ def search_course(question: str) -> list:
     }
     prompt = ''
     try:
-        document = VectorDB().connect_vectordb(index_name='course_LMS_TEST_MISA', index_schema=index_schema).similarity_search(question, k=8)
+        document = VectorDB().connect_vectordb(index_name='course_'+dbname, index_schema=index_schema).similarity_search(question, k=8)
         for doc in document:
             prompt += doc.page_content + ',link khóa học:' + doc.metadata['source'] + '--Hết thông tin khóa học--.\n'
     except:

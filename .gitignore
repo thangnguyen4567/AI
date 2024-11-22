@@ -8,3 +8,4 @@ Venv/
 /env
 speech.mp3
 /data-gym-cache
+/redis
