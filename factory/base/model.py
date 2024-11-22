@@ -62,7 +62,7 @@ class Model(ABC):
                     message.append(HumanMessage(content=chat['human']))
                 if 'bot' in chat and chat['bot'] != None:
                     message.append(AIMessage(content=chat['bot']))
-            message.append(HumanMessagePromptTemplate.from_template("{messages}"))
+            message.append(HumanMessagePromptTemplate.from_template("{question}"))
 
         return message 
     
@@ -73,13 +73,6 @@ class Model(ABC):
         message.append(MessagesPlaceholder(variable_name="agent_scratchpad"))
         prompt = ChatPromptTemplate.from_messages(message)
         
-        # prompt = ChatPromptTemplate.from_messages(
-        #     [
-        #         message,
-        #         ("user", "{question}"),
-        #         MessagesPlaceholder(variable_name="agent_scratchpad"),
-        #     ]
-        # )
         agent = (
             {
                 "question": lambda x: x["question"],

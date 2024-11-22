@@ -33,6 +33,7 @@ markdown
 flasgger
 docx2txt
 python-pptx
+langgraph
 # AI phát âm
 -f https://download.pytorch.org/whl/torch_stable.html
 torch==2.0.0+cpu
