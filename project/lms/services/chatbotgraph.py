@@ -15,30 +15,41 @@ from langchain.prompts import (
     MessagesPlaceholder
 )
 import json
+from datetime import datetime
 
 class ChatBotGraph(Graph):
 
     def __init__(self, config):
         super().__init__(config)
-        
-        if self.context is not None:
-            self.context = Context()
-            if len(self.question) <= 35:
-                aggregation_question = self.context.aggregation_question_context(self.chat_history, self.question)
-            else:
-                aggregation_question = self.question
-            self.prompt = self.context.retriever_document(self.contextdata, aggregation_question, True)
+        self.prompt = ChatPromptTemplate.from_messages(
+            [
+                (
+                    "system",
+                    "Bạn là AI trợ giảng Elearning Pro, được thiết kế để hỗ trợ người dùng trong việc trả lời các câu hỏi liên quan đến tài liệu hướng dẫn sử dụng và tài liệu trong khóa học."
+                    "Nếu người dùng hỏi về một tài liệu cụ thể, hãy tóm tắt những ý chính của tài liệu đó."
+                    "Khi cung cấp câu trả lời, nếu có tài liệu tham khảo hoặc nguồn tài liệu hoặc link khóa học hoặc link tài liệu hdsd theo vai trò **hãy hiển thị chúng dưới dạng liên kết để người dùng biết bạn lấy nguồn tài liệu từ đâu để trả lời**."
+                    "Khi cung cấp câu trả lời, bắt buộc phải đưa ra nguồn tài liệu dưới dạng **link tài liệu tham khảo hoặc link tài liệu hướng dẫn sử dụng hoặc link khóa học, để người dùng biết rõ bạn lấy thông tin từ đâu."
+                    "Hãy trả lời một cách linh hoạt, tùy thuộc vào ngữ cảnh và thông tin mà người dùng cần. Nếu câu hỏi không rõ ràng, hãy hỏi lại để làm rõ."
+                    "AI chỉ được phép dựa vào tài liệu bên dưới để trả lời câu hỏi, nếu câu hỏi của người dùng không liên quan đến nội dung bên dưới thì bạn nên từ chối khéo không trả lời."
+                    "Xử lý các câu lệnh:"
+                    "Đối với câu lệnh 'mở,đọc' khóa học, lớp học, tài liệu > AI tập trung tìm kiếm link khóa học để show cho người dùng không cần tóm tắt."
+                    "Nội dung hỗ trợ bao gồm 3 nhóm chính:"
+                    "1. **Tài liệu khóa học**: Bao gồm các tài liệu học tập, bài giảng, và tài liệu liên quan trực tiếp đến các khóa học."
+                    "2. **Hướng dẫn sử dụng hệ thống**: Hướng dẫn về cách sử dụng hệ thống LMS của 3 vai trò học viên, giáo viên, quản lý đào tạo > Nếu có liên kết đến màn hình show liên kết ra cho người dùng xem."
+                    "3. **Thông tin khóa học**: Thông tin chi tiết về các khóa học như Tên, section, danh sách các tài nguyên, hoạt động trong khóa."
+                    "Các tham số truyền vào:"
+                    "Thời gian hiện tại: {time}"
+                    "dbname: LMS_TEST_MISA"
+                    "**Mỗi tài liệu ở dưới đây đều có nguồn tài liệu trích dẫn ở cuối tài liệu > Bạn lấy tài liệu nào để trả lời thì phải đưa luôn nguồn của tài liệu đó ra**"
+                ),
+                ("placeholder", "{messages}"),
+            ]
+        ).partial(time=datetime.now)
 
     def build_graph(self):
 
-        tools = [search_course,search_resource]
-        message = self.model.get_conversation_message(self.prompt,self.chat_history)
-        # Bỏ phần từ cuối cùng của message
-        message.pop()
-        message.append(MessagesPlaceholder(variable_name="messages"))
-
-        prompt = ChatPromptTemplate.from_messages(message)
-        runnable = prompt | self.model.llm.bind_tools(tools,tool_choice="any")
+        tools = [search_course,search_resource,search_hdsd]
+        runnable = self.prompt | self.model.llm.bind_tools(tools)
 
         try:
             self.builder.add_node("assistant", Assistant(runnable))
@@ -74,10 +85,6 @@ class ChatBotGraph(Graph):
                 "thread_id": thread_id,
             }
         }
-        # events = graph.invoke(
-        #     {"messages": [("user", self.question)]}, config=config
-        # )
-        # return events["messages"][-1].content
     
         async for event in graph.astream_events({"messages": [("user", self.question)]}, config=config, version="v1"):
             kind = event["event"]

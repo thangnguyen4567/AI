@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 import markdown
 from tools.helper import async_to_sync,get_chatbot
 from project.lms.services.chatbotgraph import ChatBotGraph
-
+from project.lms.services.chatbotagent import ChatBotAgent
 load_dotenv('.env')
 
 chatbot = Blueprint('chatbot', __name__)
@@ -167,11 +167,11 @@ def chatbot_agent():
               description: The chatbot's response text
     """
     data = request.get_json()
-    chat = get_chatbot(data)
+    chat = ChatBotAgent(data)
     
     @async_to_sync
     async def generator():
-        async for chunk in chat.agent_response():
+        async for chunk in chat.response_stream():
             yield chunk
 
     return Response(generator(), mimetype='text/event-stream', content_type='text/event-stream')
@@ -228,10 +228,7 @@ def chatbot_graph():
               description: The chatbot's response text
     """
     data = request.get_json()
-    try:
-        chat = ChatBotGraph(data)
-    except Exception as e:
-        print(e)
+    chat = ChatBotGraph(data)
     
     @async_to_sync
     async def generator():
