@@ -42,18 +42,27 @@ class ChatBot(ChatbotServices):
 
     async def agent_response(self):
 
-        # tools = [search_resource, search_course, search_hdsd]
-        tools = [search_course]
+        tools = [search_resource, search_course, search_hdsd]
         message = self.model.get_conversation_message(self.prompt,self.chat_history)
         agent = self.model.get_agent(tools,message)
 
-        async for event in agent.astream_events({"question": self.question},version="v1",):
-            kind = event["event"]
-            if kind == "on_chat_model_stream":
-                content = event["data"]["chunk"].content
-                if content:
-                    data = {
-                        "message": content
-                    }
-                    yield f"{json.dumps(data)}"
+        with get_openai_callback() as cb:   
+            async for event in agent.astream_events({"question": self.question},version="v1",):
+                kind = event["event"]
+                if kind == "on_chat_model_stream":
+                    content = event["data"]["chunk"].content
+                    if content:
+                        data = {
+                            "message": content
+                        }
+                        yield f"{json.dumps(data)}"
+            data = {
+                "usage": {
+                    "prompt_tokens": cb.prompt_tokens,
+                    "completion_tokens": cb.completion_tokens,
+                    "total_tokens": cb.total_tokens,
+                    "total_cost": cb.total_cost
+                }
+            }
+            yield f"{json.dumps(data)}"
 

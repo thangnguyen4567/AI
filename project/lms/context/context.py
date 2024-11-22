@@ -2,6 +2,7 @@ from config.config_vectordb import VectorDB
 from langchain_community.vectorstores.redis import RedisFilter
 from factory.base.context import Context
 import re
+from datetime import datetime
 
 class Context(Context):
     def __init__(self):
@@ -18,6 +19,9 @@ class Context(Context):
             1. **Tài liệu khóa học**: Bao gồm các tài liệu học tập, bài giảng, và tài liệu liên quan trực tiếp đến các khóa học.
             2. **Hướng dẫn sử dụng hệ thống**: Hướng dẫn về cách sử dụng hệ thống LMS của 3 vai trò học viên,giáo viên,quản lý đào tạo >Nếu có liên kiết đến màn hình show liên kết ra cho người dùng xem
             3. **Thông tin khóa học**: Thông tin chi tiết về các khóa học như Tên,section,danh sách các tài nguyên,hoạt động trong khóa
+            Các tham số truyền vào:
+            Thời gian hiện tại: {time}
+            dbname: LMS_TEST_MISA
             **Mỗi tài liệu ở dưới đây đều có nguồn tài liệu trích dẫn ở cuối tài liệu > Bạn lấy tài liệu nào để trà lời thì phải đưa luôn nguồn của tài liệu đó ra**
             {documents}
         """
@@ -141,9 +145,10 @@ class Context(Context):
                 except:
                     print('Chưa có dữ liệu training')
   
-    def retriever_document(self, contextdata: dict, question: str) -> str:
+    def retriever_document(self, contextdata: dict, question: str, skip_documents: bool = False) -> str:
         
-        self.get_documents(question, contextdata)
+        if not skip_documents:
+            self.get_documents(question, contextdata)
         documents = ''
         if self.documents:
             for doc in self.documents:
@@ -158,8 +163,8 @@ class Context(Context):
 
         if contextdata and 'command_open' in contextdata and 'command_read' in contextdata:
             command = contextdata['command_open']+','+contextdata['command_read']
-            self.prompt = self.prompt.format(command=command,documents=documents)
+            self.prompt = self.prompt.format(command=command,documents=documents,time=datetime.now)
         else:
-            self.prompt = self.prompt.format(command='mở,đọc',documents=documents)
+            self.prompt = self.prompt.format(command='mở,đọc',documents=documents,time=datetime.now)
         
         return self.prompt.replace("domain:","")

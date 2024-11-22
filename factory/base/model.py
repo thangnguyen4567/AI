@@ -62,7 +62,7 @@ class Model(ABC):
                     message.append(HumanMessage(content=chat['human']))
                 if 'bot' in chat and chat['bot'] != None:
                     message.append(AIMessage(content=chat['bot']))
-            message.append(HumanMessagePromptTemplate.from_template("{question}"))
+            message.append(HumanMessagePromptTemplate.from_template("{messages}"))
 
         return message 
     
