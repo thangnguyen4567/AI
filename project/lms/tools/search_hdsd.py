@@ -1,9 +1,10 @@
 from langchain.agents import tool
 from langchain_community.vectorstores.redis import RedisFilter
 from config.config_vectordb import VectorDB
+from langchain_core.runnables import RunnableConfig
 
 @tool
-def search_hdsd(role: str,question: str) -> list:
+def search_hdsd(role: str,question: str, config: RunnableConfig) -> list:
     """ - Câu hỏi về hướng dẫn vai trò học viên các chức năng: Đăng nhập, Dashboard học viên, 
         xem lịch, tham gia lớp học, hướng dẫn các hoạt động trong lớp, 
         làm khảo sát và kì thi, tra cứu thư viện, diễn đàn, tin tức

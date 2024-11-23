@@ -1,6 +1,8 @@
 from project.lms.tools.search_resource import search_resource
 from project.lms.tools.search_course import search_course
 from project.lms.tools.search_hdsd import search_hdsd
+from project.lms.tools.search_student_course import search_student_course
+from project.lms.tools.search_student_module import search_student_module
 from factory.services.graph import Graph
 from langgraph.graph import START
 from project.lms.context.context import Context
@@ -12,8 +14,9 @@ from langgraph.graph.message import AnyMessage, add_messages
 import uuid
 from langchain.prompts import (
     ChatPromptTemplate,
-    MessagesPlaceholder
+    HumanMessagePromptTemplate,
 )
+from langchain_core.messages import AIMessage, HumanMessage
 import json
 from datetime import datetime
 
@@ -21,6 +24,14 @@ class ChatBotGraph(Graph):
 
     def __init__(self, config):
         super().__init__(config)
+        self.message = []
+        if self.chat_history is not None:
+            for chat in self.chat_history:
+                if 'human' in chat:
+                    self.message.append(HumanMessage(content=chat['human']))
+                if 'bot' in chat and chat['bot'] != None:
+                    self.message.append(AIMessage(content=chat['bot']))
+        
         self.prompt = ChatPromptTemplate.from_messages(
             [
                 (
@@ -37,18 +48,17 @@ class ChatBotGraph(Graph):
                     "1. **Tài liệu khóa học**: Bao gồm các tài liệu học tập, bài giảng, và tài liệu liên quan trực tiếp đến các khóa học."
                     "2. **Hướng dẫn sử dụng hệ thống**: Hướng dẫn về cách sử dụng hệ thống LMS của 3 vai trò học viên, giáo viên, quản lý đào tạo > Nếu có liên kết đến màn hình show liên kết ra cho người dùng xem."
                     "3. **Thông tin khóa học**: Thông tin chi tiết về các khóa học như Tên, section, danh sách các tài nguyên, hoạt động trong khóa."
-                    "Các tham số truyền vào:"
                     "Thời gian hiện tại: {time}"
-                    "dbname: LMS_TEST_MISA"
                     "**Mỗi tài liệu ở dưới đây đều có nguồn tài liệu trích dẫn ở cuối tài liệu > Bạn lấy tài liệu nào để trả lời thì phải đưa luôn nguồn của tài liệu đó ra**"
                 ),
+                *self.message,
                 ("placeholder", "{messages}"),
             ]
         ).partial(time=datetime.now)
 
     def build_graph(self):
 
-        tools = [search_course,search_resource,search_hdsd]
+        tools = [search_resource,search_hdsd,search_student_course,search_student_module]
         runnable = self.prompt | self.model.llm.bind_tools(tools)
 
         try:
@@ -83,6 +93,10 @@ class ChatBotGraph(Graph):
         config = {
             "configurable": {
                 "thread_id": thread_id,
+                "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJpYXQiOjE3MzIyNjg5NDIsImp0aSI6IjAxMGFlMDIyLWE4YjctMTFlZi1iZGM1LTAyNDJhYzE0MDAwMyIsImlzcyI6ImxvY2FsaG9zdCIsIm5iZiI6MTczMjI2ODk0MiwiZXhwIjoxNzMyODczNzQyLCJ1c2VyaWQiOiIyIn0.-KEJj58RJT4m0YR502TQQ37zP_pyQfSUrIYtNlL33-V7U0-zimmP_oeLT6e1ZVvNaNQdQdBc04EtnF8YRB3d5Q",
+                "endpoint": "http://10.10.10.14:8009",
+                "userid": "2",
+                "dbname": "LMS_TEST_MISA"
             }
         }
     
