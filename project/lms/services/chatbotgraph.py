@@ -89,10 +89,11 @@ class ChatBotGraph(Graph):
         # except Exception as e:
         #     print(f"Error: {e}")
 
-        thread_id = str(uuid.uuid4())
+        # thread_id = str(uuid.uuid4())
         config = {
             "configurable": {
-                "thread_id": thread_id,
+                "thread_id": "1", 
+                "checkpoint_id": "1ef663ba-28fe-6528-8002-5a559208592c",
                 "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJpYXQiOjE3MzIyNjg5NDIsImp0aSI6IjAxMGFlMDIyLWE4YjctMTFlZi1iZGM1LTAyNDJhYzE0MDAwMyIsImlzcyI6ImxvY2FsaG9zdCIsIm5iZiI6MTczMjI2ODk0MiwiZXhwIjoxNzMyODczNzQyLCJ1c2VyaWQiOiIyIn0.-KEJj58RJT4m0YR502TQQ37zP_pyQfSUrIYtNlL33-V7U0-zimmP_oeLT6e1ZVvNaNQdQdBc04EtnF8YRB3d5Q",
                 "endpoint": "http://10.10.10.14:8009",
                 "userid": "2",
