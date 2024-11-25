@@ -2,7 +2,6 @@ from project.lms.tools.search_resource import search_resource
 from project.lms.tools.search_course import search_course
 from project.lms.tools.search_hdsd import search_hdsd
 from project.lms.tools.search_student_course import search_student_course
-from project.lms.tools.search_student_module import search_student_module
 from factory.services.graph import Graph
 from langgraph.graph import START
 from project.lms.context.context import Context
@@ -24,6 +23,8 @@ class ChatBotGraph(Graph):
 
     def __init__(self, config):
         super().__init__(config)
+        self.userid = config.get('userid')
+        self.endpoint = config.get('endpoint')
         self.message = []
         if self.chat_history is not None:
             for chat in self.chat_history:
@@ -58,7 +59,7 @@ class ChatBotGraph(Graph):
 
     def build_graph(self):
 
-        tools = [search_resource,search_hdsd,search_student_course,search_student_module]
+        tools = [search_course,search_resource,search_hdsd,search_student_course]
         runnable = self.prompt | self.model.llm.bind_tools(tools)
 
         try:
@@ -94,10 +95,10 @@ class ChatBotGraph(Graph):
             "configurable": {
                 "thread_id": "1", 
                 "checkpoint_id": "1ef663ba-28fe-6528-8002-5a559208592c",
-                "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJpYXQiOjE3MzIyNjg5NDIsImp0aSI6IjAxMGFlMDIyLWE4YjctMTFlZi1iZGM1LTAyNDJhYzE0MDAwMyIsImlzcyI6ImxvY2FsaG9zdCIsIm5iZiI6MTczMjI2ODk0MiwiZXhwIjoxNzMyODczNzQyLCJ1c2VyaWQiOiIyIn0.-KEJj58RJT4m0YR502TQQ37zP_pyQfSUrIYtNlL33-V7U0-zimmP_oeLT6e1ZVvNaNQdQdBc04EtnF8YRB3d5Q",
-                "endpoint": "http://10.10.10.14:8009",
-                "userid": "2",
-                "dbname": "LMS_TEST_MISA"
+                "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJpYXQiOjE3MzI1MTgyNTksImp0aSI6IjdkZDY1OGMwLWFhZmItMTFlZi05NWQ4LTAyNTBmYzdlN2RiMyIsImlzcyI6Im1pc2EtaW50ZXJncmF0ZWQudm5yZXNvdXJjZS5uZXQiLCJuYmYiOjE3MzI1MTgyNTksImV4cCI6MTczMzEyMzA1OSwidXNlcmlkIjoiMiJ9.0sU6DmkT_28920Bh8uPQerxoLIsM5DuNbdi3KurbTBc-nVERrNxZvxzlSu3qEt7jmaLXk9Y35ttfzj8xznNtcg",
+                "endpoint": self.endpoint,
+                "userid": self.userid,
+                "dbname": self.contextdata['collection']
             }
         }
     
@@ -110,6 +111,14 @@ class ChatBotGraph(Graph):
                         "message": content
                     }
                     yield f"{json.dumps(data)}"
+            elif kind == "on_tool_start":
+                tool_name = event['name']
+                yield f"{json.dumps({'tool': tool_name})}"
+
+        print("--")
+        print(
+                    f"Starting tool: {event['name']} with inputs: {event['data'].get('input')}"
+                )
     
     def response(self):
 
