@@ -4,11 +4,10 @@ from langchain_core.runnables import RunnableConfig
 
 @tool
 def search_course(question: str, config: RunnableConfig) -> list:
-    """ Tìm kiếm khóa học liên quan đến câu hỏi, tóm tắt khóa học..., khi cần gợi ý khóa học dựa vào câu hỏi của người dùng
-        Đi kèm với các lệnh:Mở khóa học,mở lớp học
+    """ Tìm kiếm khóa học liên quan đến câu hỏi
 
     Args:
-        question: Câu hỏi người dùng về nhu cầu học tập, tóm tắt, gợi ý khóa học, kỹ năng cụ thể.
+        question: Câu hỏi người dùng
     """ 
     configuration = config.get("configurable", {})
     index_schema = {
