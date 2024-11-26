@@ -9,6 +9,8 @@ from pathlib import Path
 import requests
 import os
 from tools.helper import generate_random_string
+from pdf2image import convert_from_path
+import pytesseract
 
 class TrainingResource(Training):
     def __init__(self):
@@ -31,7 +33,27 @@ class TrainingResource(Training):
                 text = ''
                 for doc in docs.load():
                     text += doc.page_content
-                all_splits = [Document(page_content=split, metadata={}) for split in self.text_splitter.split_text(text)]
+                if text != '':
+                    all_splits = [Document(page_content=split, metadata={}) for split in self.text_splitter.split_text(text)]
+                else:
+                    # Xử lý cho case file pdf toàn là hình ảnh
+                    response = requests.get(data['source'])
+                    random_string = generate_random_string()
+                    name = random_string+'.pdf'
+
+                    with open(name, 'wb') as file:
+                        file.write(response.content)
+
+                    images = convert_from_path(name)
+                    extracted_text = ""
+
+                    for image in images:
+                        text = pytesseract.image_to_string(image, lang="vie")  
+                        extracted_text += text + "\n"
+
+                    all_splits = [Document(page_content=split, metadata={}) for split in self.text_splitter.split_text(extracted_text)]
+
+                    os.remove(name)
 
             elif typefile == '.docx':
 

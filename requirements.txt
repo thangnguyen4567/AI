@@ -34,3 +34,5 @@ flasgger
 docx2txt
 python-pptx
 langgraph
+pytesseract
+pdf2image

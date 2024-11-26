@@ -236,23 +236,3 @@ def chatbot_graph():
             yield chunk
 
     return Response(generator(), mimetype='text/event-stream', content_type='text/event-stream')
-
-
-@chatbot.route('/test_ne', methods=['GET'])
-def test_ne():
-  import requests
-  data = {
-      "userid": 2
-  }
-  headers = {
-      "Accept-Charset": "",
-      "Content-Type": "application/json",
-      "Authorization": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJpYXQiOjE3MzIyNjg5NDIsImp0aSI6IjAxMGFlMDIyLWE4YjctMTFlZi1iZGM1LTAyNDJhYzE0MDAwMyIsImlzcyI6ImxvY2FsaG9zdCIsIm5iZiI6MTczMjI2ODk0MiwiZXhwIjoxNzMyODczNzQyLCJ1c2VyaWQiOiIyIn0.-KEJj58RJT4m0YR502TQQ37zP_pyQfSUrIYtNlL33-V7U0-zimmP_oeLT6e1ZVvNaNQdQdBc04EtnF8YRB3d5Q",
-  }
-
-  url = "http://10.10.10.14:8009/api/integrated/ai/student-course"
-  try:
-    response = requests.get(url, json=data, headers=headers)
-    return str(response.json()['data'])
-  except Exception as e:
-    return str(e)

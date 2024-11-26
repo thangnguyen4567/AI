@@ -15,6 +15,10 @@ RUN curl https://packages.microsoft.com/config/ubuntu/18.04/prod.list > /etc/apt
 RUN apt-get update
 RUN ACCEPT_EULA=Y apt-get install -y --allow-unauthenticated msodbcsql17
 RUN apt install ffmpeg -y
+RUN apt update
+RUN apt install tesseract-ocr tesseract-ocr-vie -y
+RUN apt install poppler-utils -y
+
 WORKDIR /app
 
 COPY requirements.txt /app

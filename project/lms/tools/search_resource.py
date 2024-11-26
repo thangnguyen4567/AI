@@ -4,7 +4,8 @@ from langchain_core.runnables import RunnableConfig
 
 @tool
 def search_resource(question: str, config: RunnableConfig) -> list:
-    """ Tìm kiếm thông tin
+    """ Nếu câu hỏi không liên quan đến bất kì tool nào thì sử dụng tool này để tìm kiếm tài liệu
+        Tìm kiếm thông tin
         Tìm kiếm tài liệu để trả lời cho câu hỏi của người dùng mà AI không có thông tin liên quan
         Tìm kiếm tài liệu liên quan đến câu hỏi,tóm tắt tài liệu nằm trong lớp học,khóa học,khi cần gợi ý tài liệu dựa vào câu hỏi của người dùng
         Đi kèm với các lệnh:đọc tài liệu,mở tài liệu
