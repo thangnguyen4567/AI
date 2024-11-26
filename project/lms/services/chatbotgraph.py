@@ -2,6 +2,7 @@ from project.lms.tools.search_resource import search_resource
 from project.lms.tools.search_course import search_course
 from project.lms.tools.search_hdsd import search_hdsd
 from project.lms.tools.search_student_course import search_student_course
+from project.lms.tools.search_teacher_info import search_teacher_info
 from factory.services.graph import Graph
 from langgraph.graph import START
 from project.lms.context.context import Context
