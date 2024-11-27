@@ -3,6 +3,7 @@ from project.lms.services.course import Course
 from project.lms.services.question import Question
 from project.lms.services.editor import Editor
 from project.lms.services.assignment import Assignment
+from project.lms.services.feedback import Feedback
 import markdown
 
 generate = Blueprint('generate', __name__)
@@ -27,6 +28,10 @@ def generate_content():
         generate = Assignment(data)
     elif type == 'editor':
         generate = Editor(data)
+    elif type == 'feedback':
+        generate = Feedback(data)
+    else:
+        return {'error': 'Type not found'}
         
     result = generate.response()
 
