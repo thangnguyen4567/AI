@@ -7,13 +7,9 @@ from langchain_core.runnables import RunnableLambda
 from langchain_core.messages import ToolMessage
 from factory.base.services import Services
 
-class State(TypedDict):
-    messages: Annotated[list[AnyMessage], add_messages]
-
 class Graph(Services, ABC):
     def __init__(self,config):
         super().__init__(config)
-        self.builder = StateGraph(State)
 
     def create_tool_node_with_fallback(self,tools: list) -> dict:
         return ToolNode(tools).with_fallbacks(

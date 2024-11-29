@@ -1,22 +1,17 @@
-from project.lms.tools.search_resource import search_resource
-from project.lms.tools.search_course import search_course
-from project.lms.tools.search_hdsd import search_hdsd
 from project.lms.tools.search_student_course import search_student_course
 from project.lms.tools.search_teacher_info import search_teacher_info
 from factory.services.graph import Graph
-from langgraph.graph import START
+from langgraph.prebuilt import ToolNode
 from project.lms.context.context import Context
-from langchain_core.runnables import Runnable, RunnableConfig
+from langchain_core.runnables import RunnableConfig
 from langgraph.prebuilt import tools_condition
 from langgraph.checkpoint.memory import MemorySaver
-from typing import TypedDict, Annotated
-from langgraph.graph.message import AnyMessage, add_messages
+from langgraph.graph import END, START, StateGraph, MessagesState
 import uuid
 from langchain.prompts import (
     ChatPromptTemplate,
-    HumanMessagePromptTemplate,
 )
-from langchain_core.messages import AIMessage, HumanMessage
+from langchain_core.messages import HumanMessage, AIMessage
 import json
 from datetime import datetime
 
@@ -26,54 +21,30 @@ class ChatBotGraph(Graph):
         super().__init__(config)
         self.userid = config.get('userid')
         self.endpoint = config.get('endpoint')
-        self.message = []
-        if self.chat_history is not None:
-            for chat in self.chat_history:
-                if 'human' in chat:
-                    self.message.append(HumanMessage(content=chat['human']))
-                if 'bot' in chat and chat['bot'] != None:
-                    self.message.append(AIMessage(content=chat['bot']))
-        
-        self.prompt = ChatPromptTemplate.from_messages(
-            [
-                (
-                    "system",
-                    "Bạn là AI trợ giảng Elearning Pro, được thiết kế để hỗ trợ người dùng trong việc trả lời các câu hỏi liên quan đến tài liệu hướng dẫn sử dụng và tài liệu trong khóa học."
-                    "Nếu người dùng hỏi về một tài liệu cụ thể, hãy tóm tắt những ý chính của tài liệu đó."
-                    "Khi cung cấp câu trả lời, nếu có tài liệu tham khảo hoặc nguồn tài liệu hoặc link khóa học hoặc link tài liệu hdsd theo vai trò **hãy hiển thị chúng dưới dạng liên kết để người dùng biết bạn lấy nguồn tài liệu từ đâu để trả lời**."
-                    "Khi cung cấp câu trả lời, bắt buộc phải đưa ra nguồn tài liệu dưới dạng **link tài liệu tham khảo hoặc link tài liệu hướng dẫn sử dụng hoặc link khóa học, để người dùng biết rõ bạn lấy thông tin từ đâu."
-                    "Hãy trả lời một cách linh hoạt, tùy thuộc vào ngữ cảnh và thông tin mà người dùng cần. Nếu câu hỏi không rõ ràng, hãy hỏi lại để làm rõ."
-                    "AI chỉ được phép dựa vào tài liệu bên dưới để trả lời câu hỏi, nếu câu hỏi của người dùng không liên quan đến nội dung bên dưới thì bạn nên từ chối khéo không trả lời."
-                    "Xử lý các câu lệnh:"
-                    "Đối với câu lệnh 'mở,đọc' khóa học, lớp học, tài liệu > AI tập trung tìm kiếm link khóa học để show cho người dùng không cần tóm tắt."
-                    "Nội dung hỗ trợ bao gồm 3 nhóm chính:"
-                    "1. **Tài liệu khóa học**: Bao gồm các tài liệu học tập, bài giảng, và tài liệu liên quan trực tiếp đến các khóa học."
-                    "2. **Hướng dẫn sử dụng hệ thống**: Hướng dẫn về cách sử dụng hệ thống LMS của 3 vai trò học viên, giáo viên, quản lý đào tạo > Nếu có liên kết đến màn hình show liên kết ra cho người dùng xem."
-                    "3. **Thông tin khóa học**: Thông tin chi tiết về các khóa học như Tên, section, danh sách các tài nguyên, hoạt động trong khóa."
-                    "Thời gian hiện tại: {time}"
-                    "**Mỗi tài liệu ở dưới đây đều có nguồn tài liệu trích dẫn ở cuối tài liệu > Bạn lấy tài liệu nào để trả lời thì phải đưa luôn nguồn của tài liệu đó ra**"
-                ),
-                *self.message,
-                ("placeholder", "{messages}"),
-            ]
-        ).partial(time=datetime.now)
+        if self.context is not None:
+            self.context = Context()
+            if len(self.question) <= 35:
+                self.aggregation_question = self.context.aggregation_question_context(self.chat_history,self.question)
+            else:
+                self.aggregation_question = self.question
 
     def build_graph(self):
 
-        tools = [search_course,search_resource,search_hdsd,search_student_course]
-        runnable = self.prompt | self.model.llm.bind_tools(tools)
-
+        self.builder = StateGraph(MessagesState)
+        tools = [search_student_course,search_teacher_info]
         try:
-            self.builder.add_node("assistant", Assistant(runnable))
-            self.builder.add_node("tools", self.create_tool_node_with_fallback(tools))
-            self.builder.add_edge(START, "assistant")
+            self.builder.add_node("tool_assistant", Assistant(self.model.llm,tools,self.chat_history))
+            self.builder.add_node("tools", ToolNode(tools))
             self.builder.add_conditional_edges(
-                "assistant",
+                START,
+                self.route_tool,
+            )
+            self.builder.add_conditional_edges(
+                "tool_assistant",
                 tools_condition,
             )
-            self.builder.add_edge("tools", "assistant")
-            self.builder.add_node("end")
-            self.builder.add_edge("assistant", "end", condition=lambda state: state["messages"][-1][1].lower() in ["exit", "quit"])
+            self.builder.add_edge("tools", 'tool_assistant')
+
         except Exception as e:
             print(e)
 
@@ -83,27 +54,25 @@ class ChatBotGraph(Graph):
     
     async def response_stream(self):
         graph = self.build_graph()
-        # try:
-        #     img = graph.get_graph(xray=True).draw_mermaid_png()
-        #     with open("output.png", "wb") as f:
-        #         f.write(img)
-        #     print("Image saved as output.png")
-        # except Exception as e:
-        #     print(f"Error: {e}")
+        try:
+            img = graph.get_graph(xray=True).draw_mermaid_png()
+            with open("output.png", "wb") as f:
+                f.write(img)
+            print("Image saved as output.png")
+        except Exception as e:
+            print(f"Error: {e}")
 
-        # thread_id = str(uuid.uuid4())
         config = {
             "configurable": {
-                "thread_id": "1", 
+                "thread_id": str(uuid.uuid4()), 
                 "checkpoint_id": "1ef663ba-28fe-6528-8002-5a559208592c",
-                "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJpYXQiOjE3MzI1MTgyNTksImp0aSI6IjdkZDY1OGMwLWFhZmItMTFlZi05NWQ4LTAyNTBmYzdlN2RiMyIsImlzcyI6Im1pc2EtaW50ZXJncmF0ZWQudm5yZXNvdXJjZS5uZXQiLCJuYmYiOjE3MzI1MTgyNTksImV4cCI6MTczMzEyMzA1OSwidXNlcmlkIjoiMiJ9.0sU6DmkT_28920Bh8uPQerxoLIsM5DuNbdi3KurbTBc-nVERrNxZvxzlSu3qEt7jmaLXk9Y35ttfzj8xznNtcg",
+                "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJpYXQiOjE3MzI3ODgxMDEsImp0aSI6ImM0MTFhZDhjLWFkNmYtMTFlZi1iMmViLTAyNDJhYzE0MDAwMyIsImlzcyI6IjEwLjEwLjEwLjE0IiwibmJmIjoxNzMyNzg4MTAxLCJleHAiOjE3MzMzOTI5MDEsInVzZXJpZCI6IjIifQ.Bzm6YcczcqIdFdUxpNHY93T9cTShLz3_EitVC4_NwTR-tA7ALRvuDKKuJeVHdUfsAXx-DPAKRX6Dxofr7w2OJg",
                 "endpoint": self.endpoint,
                 "userid": self.userid,
                 "dbname": self.contextdata['collection']
             }
         }
-    
-        async for event in graph.astream_events({"messages": [("user", self.question)]}, config=config, version="v1"):
+        async for event in graph.astream_events({"messages": ("user", self.question)}, config=config, version="v1"):
             kind = event["event"]
             if kind == "on_chat_model_stream":
                 content = event["data"]["chunk"].content
@@ -115,34 +84,46 @@ class ChatBotGraph(Graph):
             elif kind == "on_tool_start":
                 tool_name = event['name']
                 yield f"{json.dumps({'tool': tool_name})}"
-
-        print("--")
-        print(
-                    f"Starting tool: {event['name']} with inputs: {event['data'].get('input')}"
-                )
     
     def response(self):
-
         pass
 
-class State(TypedDict):
-    messages: Annotated[list[AnyMessage], add_messages]
-
+    def route_tool(self, state: MessagesState):
+        self.context.selecttopics = self.context.classify_topic(self.aggregation_question, self.context.topics)
+        if any(topic.strip() == 'searchdata' for topic in self.context.selecttopics):
+            return 'tool_assistant'
+        else:
+            self.prompt = self.context.retriever_document(self.contextdata,self.question)
+            message = self.model.get_conversation_message(self.prompt,self.chat_history)
+            chain = self.model.get_conversation_chain(message)
+            chain({"question": self.question})
+            return END
+    
 class Assistant:
-    def __init__(self, runnable: Runnable):
-        self.runnable = runnable
+    def __init__(self, llm, tools, chat_history):
+        message = []
+        if chat_history is not None:
+            for chat in chat_history:
+                if 'human' in chat:
+                    message.append(HumanMessage(content=chat['human']))
+                if 'bot' in chat and chat['bot'] != None:
+                    message.append(AIMessage(content=chat['bot']))
+        self.prompt = ChatPromptTemplate.from_messages(
+            [
+                (
+                    "system",
+                    "Bạn là một trợ lý AI hỗ trợ quản lý thông tin đào tạo cho cả học viên và giảng viên. "
+                    "Nhiệm vụ của bạn là giúp người dùng tra cứu thông tin về lịch học, khóa học, điểm danh, "
+                    "và các thông tin liên quan khác"
+                    "\nThời gian hiện tại: {time}.",
+                ),
+                *message,
+                ("placeholder", "{messages}"),
+            ]
+        ).partial(time=datetime.now().strftime("%d/%m/%y"))
+        self.runnable = self.prompt | llm.bind_tools(tools)
 
-    def __call__(self, state: State, config: RunnableConfig):
-        while True:
-            state = {**state}
-            result = self.runnable.invoke(state)
-            if not result.tool_calls and (
-                not result.content
-                or isinstance(result.content, list)
-                and not result.content[0].get("text")
-            ):
-                messages = state["messages"] + [("user", "Respond with a real output.")]
-                state = {**state, "messages": messages}
-            else:
-                break
-        return {"messages": result}
+    def __call__(self, state: MessagesState, config: RunnableConfig):
+        state = {**state}
+        response = self.runnable.invoke(state)
+        return {"messages": [response]}
