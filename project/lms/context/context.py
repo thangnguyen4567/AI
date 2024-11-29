@@ -71,8 +71,16 @@ class Context(Context):
                     """Câu hỏi liên quan đến khóa,khóa học,lớp học > tìm kiếm khóa học, tóm tắt khóa học...
                        Đi kèm với các lệnh:Mở khóa học,mở lớp họcz`"""
                 ),
+            },
+            {
+                'title': 'searchdata',
+                'priority': '2',
+                'description': (
+                    """Câu hỏi liên quan đến tra cứu thông tin đào tạo những dữ liệu cần truy xuất thông tin trong DB, lớp học, lịch học, tiến trình học, dữ liệu học viên, xếp hạng"""
+                ),
             }
         ]
+        self.selecttopics = []
 
     def get_collection_name(self,data,type):
         if data and 'collection' in data:
@@ -84,7 +92,10 @@ class Context(Context):
     
     def get_documents(self, question: str , contextdata: dict) -> str:
 
-        topics = self.classify_topic(question, self.topics)
+        if self.selecttopics == []:
+            topics = self.classify_topic(question, self.topics)
+        else:
+            topics = self.selecttopics
 
         for topic in topics:
             if topic.strip() in ['student', 'manager', 'teacher']:
@@ -123,7 +134,8 @@ class Context(Context):
                 }
                 try:
                     self.documents.extend(VectorDB().connect_vectordb(index_name=collection,index_schema=self.index_schema).similarity_search(question,k=8))
-                except:
+                except Exception as e:
+                    print(e)
                     print('Chưa có dữ liệu training')
 
             if topic.strip() in ['course']:
