@@ -79,8 +79,8 @@ def get_chatbot(data):
         module_name = f"project.{data['context']}.services.chatbot"
         chatbot_module = importlib.import_module(module_name)
         return chatbot_module.ChatBot(data)
-    except ModuleNotFoundError:
-        raise ValueError(f"Chatbot for project '{data['context']}' not found")
+    except Exception as e:
+        print(e)
     
 def generate_random_string(length=10):
     letters = string.ascii_letters
