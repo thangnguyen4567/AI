@@ -2,9 +2,6 @@ from factory.services.chatbot import ChatbotServices
 from project.lms.context.context import Context
 from langchain_community.callbacks.manager import get_openai_callback
 import json
-from project.lms.tools.search_resource import search_resource
-from project.lms.tools.search_course import search_course
-from project.lms.tools.search_hdsd import search_hdsd
 
 class ChatBot(ChatbotServices):
 
@@ -24,7 +21,7 @@ class ChatBot(ChatbotServices):
         message = self.model.get_conversation_message(self.prompt,self.chat_history)
         chain = self.model.get_conversation_chain_stream(message)
 
-        with get_openai_callback() as cb:
+        with get_openai_callback() as cb: 
             async for chunk in chain.astream({"question": self.question}):
                 data = {
                     "message": chunk
@@ -32,37 +29,10 @@ class ChatBot(ChatbotServices):
                 yield f"{json.dumps(data)}"
             data = {
                 "usage": {
-                    "prompt_tokens": cb.prompt_tokens,
+                    "prompt_tokens": cb.prompt_tokens, 
                     "completion_tokens": cb.completion_tokens,
                     "total_tokens": cb.total_tokens,
                     "total_cost": cb.total_cost
                 }
             }
             yield f"{json.dumps(data)}"
-
-    async def agent_response(self):
-
-        tools = [search_resource, search_course, search_hdsd]
-        message = self.model.get_conversation_message(self.prompt,self.chat_history)
-        agent = self.model.get_agent(tools,message)
-
-        with get_openai_callback() as cb:   
-            async for event in agent.astream_events({"question": self.question},version="v1",):
-                kind = event["event"]
-                if kind == "on_chat_model_stream":
-                    content = event["data"]["chunk"].content
-                    if content:
-                        data = {
-                            "message": content
-                        }
-                        yield f"{json.dumps(data)}"
-            data = {
-                "usage": {
-                    "prompt_tokens": cb.prompt_tokens,
-                    "completion_tokens": cb.completion_tokens,
-                    "total_tokens": cb.total_tokens,
-                    "total_cost": cb.total_cost
-                }
-            }
-            yield f"{json.dumps(data)}"
-

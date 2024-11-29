@@ -39,21 +39,21 @@ def api_create_speech():
               type: string
               example: 'Không có dữ liệu'
     """
-    if 'text' in request.get_json() :
-        text = request.get_json()['text']
-        
-        tts = gTTS(text=text, lang='vi')
-        audio_buffer = io.BytesIO()
-        tts.write_to_fp(audio_buffer)
-        
-        audio_buffer.seek(0)
-        audio = AudioSegment.from_file(audio_buffer, format="mp3")
-        faster_audio = audio.speedup(playback_speed=1.3)
-        
-        output_buffer = io.BytesIO()
-        faster_audio.export(output_buffer, format="mp3")
-        output_buffer.seek(0)
+    data = request.get_json()
+    text = data.get('text')
+    lang = data.get('lang','vi')
+    
+    tts = gTTS(text=text, lang=lang)
+    audio_buffer = io.BytesIO()
+    tts.write_to_fp(audio_buffer)
+    
+    audio_buffer.seek(0)
+    audio = AudioSegment.from_file(audio_buffer, format="mp3")
+    playback_speed = 1.1 if lang == 'en' else 1.3
+    faster_audio = audio.speedup(playback_speed=playback_speed)
+    
+    output_buffer = io.BytesIO()
+    faster_audio.export(output_buffer, format="mp3")
+    output_buffer.seek(0)
 
-        return send_file(output_buffer, mimetype='audio/mpeg')
-    else:
-        return 'Không có dữ liệu'
+    return send_file(output_buffer, mimetype='audio/mpeg')
