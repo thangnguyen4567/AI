@@ -94,6 +94,7 @@ class Context(Context):
 
         if self.selecttopics == []:
             topics = self.classify_topic(question, self.topics)
+            self.selecttopics = topics
         else:
             topics = self.selecttopics
 

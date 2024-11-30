@@ -13,7 +13,7 @@ window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecogn
 
 const recognition = new SpeechRecognition();
 recognition.interimResults = true;
-recognition.lang = "vi-VN";
+recognition.lang = "en-US";
 //recognition.start();
 
 
@@ -35,6 +35,9 @@ recognition.addEventListener('end', () => { //changes the color of mic when endi
     icon.style.animation = 'none'
     icon.style.color = 'black'
     icon.style.fontSize = "16px"
+    setTimeout(() => {
+        document.getElementById('onClickAddChat').click();
+    }, 50);
  });
 
  recognition.addEventListener('start', () => { //changes the color of mic when starting

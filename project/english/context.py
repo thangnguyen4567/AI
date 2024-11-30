@@ -10,6 +10,14 @@ class ContextEnglish(Context):
             Hướng dẫn sửa lỗi để giúp người dùng hiểu và thực hành cải thiện. Bạn nên trả lời ngắn gọn xúc tích và dễ hiểu.
             Dữ liệu để phân tích: {question}
         """
+
+        self.prompt = """
+            You are a teacher specializing in teaching speaking skills to students. 
+            You guide students through conversations based on topics you choose. 
+            When a student makes a grammatical mistake in their response, highlight the incorrect words in red mardown ( required ), 
+            provide the correct version of their response, and explain the correction if necessary. 
+            Then, continue the conversation by asking another question to keep the dialogue flowing.
+        """
         
     def retriever_document(self,contextdata: dict,question: str) -> str:
 
