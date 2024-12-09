@@ -33,17 +33,17 @@ class ChatBotGraph(Graph):
         self.builder = StateGraph(MessagesState)
         tools = [search_student_course,search_teacher_info]
         try:
-            self.builder.add_node("tool_assistant", Assistant(self.model.llm,tools,self.chat_history))
+            self.builder.add_node("agent", Assistant(self.model.llm,tools,self.chat_history))
             self.builder.add_node("tools", ToolNode(tools))
             self.builder.add_conditional_edges(
                 START,
                 self.route_tool,
             )
             self.builder.add_conditional_edges(
-                "tool_assistant",
+                "agent",
                 tools_condition,
             )
-            self.builder.add_edge("tools", 'tool_assistant')
+            self.builder.add_edge("tools", 'agent')
 
         except Exception as e:
             print(e)
@@ -54,13 +54,13 @@ class ChatBotGraph(Graph):
     
     async def response_stream(self):
         graph = self.build_graph()
-        try:
-            img = graph.get_graph(xray=True).draw_mermaid_png()
-            with open("output.png", "wb") as f:
-                f.write(img)
-            print("Image saved as output.png")
-        except Exception as e:
-            print(f"Error: {e}")
+        # try:
+        #     img = graph.get_graph(xray=True).draw_mermaid_png()
+        #     with open("output.png", "wb") as f:
+        #         f.write(img)
+        #     print("Image saved as output.png")
+        # except Exception as e:
+        #     print(f"Error: {e}")
 
         config = {
             "configurable": {
@@ -87,7 +87,7 @@ class ChatBotGraph(Graph):
     
     def response(self):
         pass
-
+ 
     def route_tool(self, state: MessagesState):
         self.context.selecttopics = self.context.classify_topic(self.aggregation_question, self.context.topics)
         if any(topic.strip() == 'searchdata' for topic in self.context.selecttopics):

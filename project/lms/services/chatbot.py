@@ -36,3 +36,9 @@ class ChatBot(ChatbotServices):
                 }
             }
             yield f"{json.dumps(data)}"
+            if 'resource' in self.context.selecttopics:
+                yield json.dumps({'topic': 'resource'})
+            elif 'course' in self.context.selecttopics:
+                yield json.dumps({'topic': 'course'})
+            elif any(topic.strip() in ['student', 'teacher', 'manager'] for topic in self.context.selecttopics):
+                yield json.dumps({'topic': 'hdsd'})
