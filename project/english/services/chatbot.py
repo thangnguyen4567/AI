@@ -5,9 +5,10 @@ class ChatBot(ChatbotServices):
     
     def __init__(self,config):
         super().__init__(config)
+        self.module = config.get('module')
 
         if self.context is not None:
-            self.context = ContextEnglish()
+            self.context = ContextEnglish(self.module)
             aggregation_question = self.context.aggregation_question_context(self.chat_history,self.question)
             self.prompt = self.context.retriever_document(self.contextdata,aggregation_question)
 

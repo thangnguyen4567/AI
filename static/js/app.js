@@ -35,9 +35,10 @@ recognition.addEventListener('end', () => { //changes the color of mic when endi
     icon.style.animation = 'none'
     icon.style.color = 'black'
     icon.style.fontSize = "16px"
-    setTimeout(() => {
-        document.getElementById('onClickAddChat').click();
-    }, 50);
+    // setTimeout(() => {
+    //     document.getElementById('onClickAddChat').click();
+    // }, 50);
+    
  });
 
  recognition.addEventListener('start', () => { //changes the color of mic when starting

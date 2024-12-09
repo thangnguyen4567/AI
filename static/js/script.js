@@ -20,6 +20,7 @@ async function submit_data(paramquestion = null) {
           question: question,
           context: 'english',
           chat_history: chat_history,
+          module: 'gramma'
         }
       ),
     });
@@ -34,6 +35,7 @@ async function submit_data(paramquestion = null) {
         document.getElementById("ai_speaking_img").classList.add("d-none");
       }
     }
+    scrollToBottom()
     let history = {
       human: question,
       bot: data.answer 
