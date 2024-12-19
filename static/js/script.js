@@ -1,12 +1,13 @@
 var chat_history = [];
-async function submit_data() {
-    var question = document.getElementById("questioninput").value;
+async function submit_data(paramquestion = null) {
+    var question = paramquestion ?? document.getElementById("questioninput").value;
     //loading animation
     var chat_container = document.querySelector(".chat_container");
     var spinner = document.createElement("div");
     spinner.classList.add("loading-spinner");
-
-    onAppendClientChat();
+    if(paramquestion == null) {
+      onAppendClientChat();
+    }
     chat_container.appendChild(spinner);
     console.log("Question:", question);
     var response = await fetch("/chatbot/conversations", {
@@ -17,13 +18,24 @@ async function submit_data() {
       body: JSON.stringify(
         { 
           question: question,
-          context: 'lms',
+          context: 'english',
           chat_history: chat_history,
+          module: 'gramma'
         }
       ),
     });
     const data = await response.json();
     onAppendBotChat(data.answer)
+    if(paramquestion == null) {
+      const audioUrl = await fetchAudio(data.answer);
+      audio = new Audio(audioUrl);
+      audio.play();
+      document.getElementById("ai_speaking_img").classList.remove("d-none");
+      audio.onended = () => {
+        document.getElementById("ai_speaking_img").classList.add("d-none");
+      }
+    }
+    scrollToBottom()
     let history = {
       human: question,
       bot: data.answer 
@@ -218,3 +230,25 @@ function convertLinksToImages(htmlString) {
         }
     });
 }
+
+function cleanString(htmlString) {
+  const doc = new DOMParser().parseFromString(htmlString, 'text/html');
+  const text = doc.body.textContent || "";
+  return text.replace(/[^\w\s.,!?]/gi, ''); 
+}
+
+async function fetchAudio(text) {
+  text = cleanString(text)
+  const response = await fetch('https://ebmai.vnresource.net/speech/voice', {
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ text, lang: 'en' }),
+  });
+  const audioBlob = await response.blob();
+  const audioUrl = URL.createObjectURL(audioBlob);
+  return audioUrl;
+}
+
+setTimeout(submit_data("Hi"),2000)
