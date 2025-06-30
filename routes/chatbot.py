@@ -1,13 +1,15 @@
-from flask import Blueprint,request,render_template, Response
+from flask import Blueprint, request, render_template, Response
 from dotenv import load_dotenv
 import markdown
-from tools.helper import async_to_sync,get_chatbot
+from tools.helper import async_to_sync, get_chatbot
 from project.lms.services.chatbotgraph import ChatBotGraph
-load_dotenv('.env')
 
-chatbot = Blueprint('chatbot', __name__)
+load_dotenv(".env")
 
-@chatbot.route('/conversations', methods=['POST'])
+chatbot = Blueprint("chatbot", __name__)
+
+
+@chatbot.route("/conversations", methods=["POST"])
 def get_conversations():
     """
     ---
@@ -58,10 +60,11 @@ def get_conversations():
     data = request.get_json()
     chat = get_chatbot(data)
     answer = chat.response()
-    result = {'answer': markdown.markdown(answer['text']).replace("AI:","")}
+    result = {"answer": markdown.markdown(answer["text"]).replace("AI:", "")}
     return result
 
-@chatbot.route('/conversations_stream', methods=['POST'])
+
+@chatbot.route("/conversations_stream", methods=["POST"])
 def get_conversations_stream():
     """
     ---
@@ -110,19 +113,23 @@ def get_conversations_stream():
     """
     data = request.get_json()
     chat = get_chatbot(data)
-    
+
     @async_to_sync
     async def generator():
         async for chunk in chat.response_stream():
             yield chunk
 
-    return Response(generator(), mimetype='text/event-stream', content_type='text/event-stream')
+    return Response(
+        generator(), mimetype="text/event-stream", content_type="text/event-stream"
+    )
 
-@chatbot.route('/demo', methods=['GET'])
+
+@chatbot.route("/demo", methods=["GET"])
 def chatbot_demo():
-    return render_template('chatbot.html')
+    return render_template("chatbot.html")
 
-@chatbot.route('/graph', methods=['POST'])
+
+@chatbot.route("/graph", methods=["POST"])
 def chatbot_graph():
     """
     ---
@@ -171,10 +178,12 @@ def chatbot_graph():
     """
     data = request.get_json()
     chat = ChatBotGraph(data)
-    
+
     @async_to_sync
     async def generator():
         async for chunk in chat.response_stream():
             yield chunk
 
-    return Response(generator(), mimetype='text/event-stream', content_type='text/event-stream')
+    return Response(
+        generator(), mimetype="text/event-stream", content_type="text/event-stream"
+    )
