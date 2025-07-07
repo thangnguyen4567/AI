@@ -1,18 +1,18 @@
 rs:
-	docker restart webai_test
+	docker restart ai-web-1
 rsdb:
 	docker restart redis_test
 log:
-	docker logs webai_test
+	docker logs ai-web-1
 	
 clearlog:
-	sudo truncate -s 0 $(docker inspect --format='{{.LogPath}}' webai_test)
+	sudo truncate -s 0 $(docker inspect --format='{{.LogPath}}' ai-web-1)
 
 logdb:
 	docker logs redis_test
 
 e:
-	docker exec -it webai_test bash
+	docker exec -it ai-web-1 bash
 
 edb:
 	docker exec -it redis_test bash
