@@ -1,5 +1,5 @@
 from langchain_openai import OpenAIEmbeddings
-from langchain_community.vectorstores import Redis
+from langchain_redis import RedisConfig, RedisVectorStore
 from dotenv import load_dotenv
 import os
 import redis
@@ -14,13 +14,15 @@ class VectorDB:
         self.redis_url = self.vector_name + '://' + self.vector_host + ':' + self.vector_port
 
     def connect_vectordb(self, index_name, index_schema):
-        vector_db = Redis.from_existing_index(
-            self.embeddings,
+
+        config = RedisConfig(
             index_name=index_name,
             redis_url=self.redis_url,
-            schema=index_schema
+            metadata_schema=index_schema,
         )
-        return vector_db
+ 
+        vector_store = RedisVectorStore(self.embeddings, config=config)
+        return vector_store
 
     def add_vectordb(self, documents, index_name):
         Redis.from_documents(

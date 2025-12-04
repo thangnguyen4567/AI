@@ -36,3 +36,4 @@ python-pptx
 langgraph
 pytesseract
 pdf2image
+langchain_redis==0.2.3
