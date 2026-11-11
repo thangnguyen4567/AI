@@ -4,7 +4,11 @@ from factory.model.model_groq import ModelGroq
 from factory.model.model_claude import ModelClaude
 
 class ModelFactory:
-    def create_model(self,model):
+    @staticmethod
+    def create_model(*args):
+        # Chấp nhận cả create_model(model) và create_model(self, model)
+        # (code cũ gọi trên class kèm self).
+        model = args[-1]
         if model == 'gemini':
             return ModelGemini()
         elif model == 'chatgpt':
