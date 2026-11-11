@@ -24,11 +24,25 @@ class ModelClaude(Model):
 
         # Không truyền temperature/top_p/top_k: Claude Opus 5.5 / Sonnet 5.5
         # từ chối các tham số sampling này (HTTP 400).
+        model_name = os.getenv("CLAUDE_MODEL", "claude-haiku-5-5")
+
+        # Các model mới bật adaptive thinking mặc định, stream về content dạng list
+        # lẫn block thinking; langchain-core 0.3.x merge chunk lỗi
+        # "TypeError: string indices must be integers". Chatbot hỏi đáp không cần
+        # thinking nên tắt đi (cũng nhanh và rẻ hơn).
+        extra = {}
+        if "haiku" in model_name:
+            extra["thinking"] = {"type": "disabled"}
+        elif "sonnet-5-5" in model_name:
+            extra["thinking"] = {"type": "between_tools"}  # Sonnet 5.5 không cho disabled
+        # Opus 5.5 không tắt được thinking; nếu gặp lỗi trên hãy dùng haiku/sonnet.
+
         self.llm = ChatAnthropic(
-            model=os.getenv("CLAUDE_MODEL", "claude-haiku-5-5"),
+            model=model_name,
             api_key=apikey,
             max_tokens=4096,
             stream_usage=True,
+            **extra,
         )
 
     def get_agent(self, tools: list, message: list) -> AgentExecutor:
