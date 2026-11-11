@@ -17,7 +17,9 @@ class ModelClaude(Model):
 
     def generate_model(self, apikey: str):
 
-        if apikey is None or apikey == "":
+        # Client có thể gửi `apikey` của provider khác (vd. OpenAI) trong request;
+        # chỉ dùng nếu đúng dạng key Anthropic, nếu không lấy từ môi trường.
+        if not apikey or not str(apikey).startswith("sk-ant-"):
             apikey = os.getenv("ANTHROPIC_API_KEY")
 
         # Không truyền temperature/top_p/top_k: Claude Opus 5.5 / Sonnet 5.5
