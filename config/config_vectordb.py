@@ -13,12 +13,24 @@ class VectorDB:
         self.vector_port = os.getenv("VECTORDB_PORT")
         self.redis_url = self.vector_name + '://' + self.vector_host + ':' + self.vector_port
 
+    @staticmethod
+    def _normalize_schema(index_schema):
+        """RedisConfig (langchain_redis) cần list [{"name":..., "type":...}].
+        Code cũ truyền dạng dict {"text": [{"name":..}], "numeric": [...]}."""
+        if isinstance(index_schema, dict):
+            return [
+                {**field, "type": field_type}
+                for field_type, fields in index_schema.items()
+                for field in fields
+            ]
+        return index_schema
+
     def connect_vectordb(self, index_name, index_schema):
 
         config = RedisConfig(
             index_name=index_name,
             redis_url=self.redis_url,
-            metadata_schema=index_schema,
+            metadata_schema=self._normalize_schema(index_schema),
         )
  
         vector_store = RedisVectorStore(self.embeddings, config=config)
