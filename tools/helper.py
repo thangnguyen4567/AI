@@ -79,9 +79,11 @@ def get_chatbot(data):
         module_name = f"project.{data['context']}.services.chatbot"
         chatbot_module = importlib.import_module(module_name)
         return chatbot_module.ChatBot(data)
-    except Exception as e:
-        print(e)
-    
+    except Exception:
+        # Không nuốt lỗi: trả None sẽ gây AttributeError khó hiểu ở route.
+        logging.exception("get_chatbot failed")
+        raise
+
 def generate_random_string(length=10):
     letters = string.ascii_letters
     return ''.join(random.choice(letters) for i in range(length))
