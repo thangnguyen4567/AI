@@ -10,7 +10,7 @@ class Services(ABC):
         self.contextdata = config.get('contextdata')
         self.context = config.get('context')
         self.apikey = config.get('apikey')
-        self.model = ModelFactory.create_model(self,config.get('model','chatgpt'))
+        self.model = ModelFactory.create_model(self,config.get('model','claude'))
         self.model.generate_model(self.apikey)
         self.attachment_file = config.get('attachment_file')
 
