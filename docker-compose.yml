@@ -21,6 +21,8 @@ services:
     env_file:
       - .env
     environment:
+      LANGCHAIN_TRACING_V2: "false"
+      LANGSMITH_TRACING: "false"
       FLASK_APP: app.py
       FLASK_RUN_HOST: 0.0.0.0
       FLASK_ENV: development
